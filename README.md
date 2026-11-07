@@ -1,4 +1,4 @@
-# Lume — notas locais em Markdown
+# Marginália Notes — notas locais em Markdown
 
 ## Stack e por quê
 - **Tauri 2 + Rust**: instalador de poucos MB, acesso nativo ao disco (leitura/escrita de `.md` sem backend), mesma base para desktop e, depois, Android/iOS.
@@ -187,9 +187,9 @@ O arquivo `.github/workflows/compilar.yml` compila na nuvem o instalador do Wind
 - **Menu da nota** (botão ⋯ ou clique direito em qualquer nota da barra lateral, das abas ou da lista): abrir em nova aba / ao lado, copiar, mover, favoritar, fixar, virar tarefa, mesclar, copiar link, histórico, abrir no app padrão, mostrar na pasta, exportar, renomear, apagar.
 - **Blocos móveis**: arraste pela alça ⠿ qualquer bloco da barra lateral; esconda blocos e reorganize os botões da barra de formatação em Configurações.
 
-## Lume (identidade)
-- Nome do app: **Lume**. Ícone em `src-tauri/icons/lume.svg` (chama âmbar sobre fundo noturno); o logo na barra lateral usa as cores do tema escolhido.
-- Temas da marca: **Lume Dia** (padrão em instalações novas) e **Lume Noite**; os outros temas continuam disponíveis.
+## Marginália Notes (identidade)
+- Nome do app: **Marginália Notes** (antes Lume / Notas Locais). Ícone em `src-tauri/icons/marginalia.svg`: folha com a linha de margem e uma pena âmbar; o logo na barra lateral usa as cores do tema escolhido.
+- Temas da marca: **Marginália Papel** (padrão em instalações novas) e **Marginália Noite**; os outros temas continuam disponíveis.
 - O identificador do app continua `app.notaslocais`, então atualizar não apaga nem duplica as notas.
 
 ## Leitor de PDF
@@ -198,3 +198,6 @@ O arquivo `.github/workflows/compilar.yml` compila na nuvem o instalador do Wind
 - **Páginas**: organizador com miniaturas — arrastar para reordenar, excluir/restaurar, favoritar, girar, filtro "só favoritas".
 - **Configurar páginas**: rolagem vertical ou horizontal (deslizar) e página em retrato/paisagem.
 - Ordem, páginas excluídas, rotação e favoritos ficam nas propriedades da nota; o arquivo PDF original não é alterado.
+
+- Cor de pasta personalizada: no ⋯ da pasta, escolha uma cor ou digite `#hex`, `rgb()` ou `hsl()`.
+- Tabelas: clique numa célula para editar no lugar (Enter desce, Tab avança, Esc cancela).
