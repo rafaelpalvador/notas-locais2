@@ -166,3 +166,9 @@ O arquivo `.github/workflows/compilar.yml` compila na nuvem o instalador do Wind
 - **Markdown** = texto-fonte com destaque; **Leitura** = somente leitura. O modo escolhido fica salvo.
 - A seção **Arquivos** da barra lateral é uma árvore: pastas expandem e mostram as notas dentro; `+` cria nota na pasta; arraste notas e pastas; botão direito (ou toque longo) numa nota abre Abrir / Abrir ao lado / Renomear / Duplicar / Excluir.
 - Celular: a gaveta lateral agora tem uma camada escura real — tocar fora fecha a gaveta sem mexer na nota; o texto da barra não fica mais selecionável; o fundo do app no Android é opaco (`src-tauri/tauri.android.conf.json`).
+
+## Modos de edição estilo Joplin
+- Chave **Markdown | Texto rico** no topo: Markdown = editor de texto-fonte; Texto rico = escrita com visualização ao vivo.
+- No Markdown, o botão de layout alterna **Dividido → Só editor → Só visualização** (rolagem sincronizada no dividido).
+- Botão **Leitura** separado: abre a nota só para ler e, clicando de novo, volta ao editor anterior.
+- Barra de ferramentas com ícones: link, listas, tarefas, título, citação, linha, data/hora e anexo.

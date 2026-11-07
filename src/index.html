@@ -444,6 +444,29 @@ html:not([data-real]){background:var(--bg)}
  body.sbo #mn{pointer-events:none}
  #fl .tf>.it,#fl .tn{min-height:38px;font-size:15px}
 }
+/* NEW12 Joplin */
+.jmode{display:inline-flex;align-items:center;gap:6px}
+.jsw{display:inline-flex;border:1px solid var(--bd);border-radius:8px;overflow:hidden;background:var(--sf)}
+.jsw button,.jbtn{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:6px 10px;font:500 13px var(--ui);color:var(--mu);cursor:pointer}
+.jsw button+button{border-left:1px solid var(--bd)}
+.jsw button.on{background:var(--ac);color:#fff}
+.jbtn{border:1px solid var(--bd);border-radius:8px;background:var(--sf)}.jbtn:hover,.jsw button:not(.on):hover{color:var(--ink);background:rgba(120,120,128,.12)}
+.jbtn.on{background:var(--ac);color:#fff;border-color:var(--ac)}.jbtn[hidden]{display:none}
+.jmode svg,#ft .ji svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+@media(max-width:1000px){.jmode span>span,.jbtn span,.jsw button span{display:none}.jsw button,.jbtn{padding:7px 9px}}
+body[data-m=split] #ft{display:flex}
+#ft{background:var(--sf);border-bottom:1px solid var(--bd)}
+#ft button{color:var(--mu)!important;padding:5px 8px!important;border-radius:5px!important}#ft button:hover{color:var(--ink)!important;background:rgba(120,120,128,.15)!important}
+#ft .ji{display:inline-grid;place-items:center;min-width:30px}#ft .sp{width:1px;height:18px;margin:0 5px;background:var(--ln)}
+body.jmd #ew{border-top:0}
+body[data-m=split]:not(.pvmin) #cmw{border-right:1px solid var(--ln)!important;flex:1 1 50%;min-width:0}
+body[data-m=split]:not(.pvmin) #pv{flex:1 1 50%;background:var(--sf)}
+body[data-m=split] #cmw .cm-content{font-family:var(--mono,ui-monospace,SFMono-Regular,Menlo,Consolas,monospace);font-size:calc(var(--fz) - 1px);max-width:none}
+body[data-m=split] #cmw .cm-line{max-width:none!important}
+body[data-m=split] #cmw .cm-scroller{padding:18px 22px}
+body[data-m=split] #pvt{display:none}
+body[data-m=split].pvmin #cmw .cm-content{max-width:860px;margin:0 auto}
+@media(max-width:760px){body[data-m=split]:not(.pvmin) #ew{flex-direction:column}body[data-m=split]:not(.pvmin) #cmw{border-right:0!important;border-bottom:1px solid var(--ln)}}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -2555,6 +2578,62 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
  const close=e=>{e.preventDefault();e.stopPropagation();sb.classList.remove('open')};ov.addEventListener('pointerdown',close);ov.addEventListener('click',close);
  let x0=null;sb.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});sb.addEventListener('touchend',e=>{if(x0!==null&&x0-e.changedTouches[0].clientX>70)sb.classList.remove('open');x0=null},{passive:true});
  addEventListener('keydown',e=>{if(e.key==='Escape'&&sb.classList.contains('open'))sb.classList.remove('open')});sync()})();
+
+/* NEW12: modos de edição como no Joplin (chave Markdown/Texto rico, layout Editor/Dividido/Visualização) + botão Leitura */
+(function(){const B=document.body,grp=document.querySelector('#bar .grp'),seg=document.querySelector('#bar .seg2');if(!grp||!seg)return;seg.style.display='none';
+ const ic={md:'<svg viewBox="0 0 24 24"><rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M6 15V9l2.5 3L11 9v6M15.5 9v6M13.5 13l2 2 2-2"/></svg>',
+  rt:'<svg viewBox="0 0 24 24"><path d="M4 7V5h11v2M9.5 5v14M7.5 19h4M14 12h6M17 12v7M15.5 19h3"/></svg>',
+  ed:'<svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M7 9h10M7 12h10M7 15h6"/></svg>',
+  sp:'<svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M12 4.5v15M6 9h3.5M6 12h3.5M14.5 9h3.5M14.5 12h3.5"/></svg>',
+  vw:'<svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M7 9h10M7 12h7"/><circle cx="16" cy="15.5" r="1.6"/></svg>',
+  rd:'<svg viewBox="0 0 24 24"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg>'};
+ const w=document.createElement('span');w.className='jmode';
+ w.innerHTML='<span class="jsw" role="group" aria-label="Editor"><button data-jm="md" title="Editor Markdown">'+ic.md+'<span>Markdown</span></button><button data-jm="rt" title="Editor de texto rico (escrita)">'+ic.rt+'<span>Texto rico</span></button></span>'+
+  '<button class="jbtn" id="jly" title="Alternar layout do editor"></button><button class="jbtn" id="jrd" title="Modo leitura">'+ic.rd+'<span>Leitura</span></button>';
+ seg.after(w);
+ const g=(k,d)=>{try{return localStorage.getItem(k)||d}catch(e){return d}},p=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+ let LAST=g('ln:jlast','view');if(!['split','view'].includes(LAST))LAST='view';
+ const setM=m=>{B.dataset.m=m;modeChanged()};
+ const lay=()=>B.dataset.m==='read'&&g('ln:jlv','')==='1'?'vw':B.classList.contains('pvmin')?'ed':'sp';
+ const setLay=l=>{if(l==='vw'){p('ln:jlv','1');setM('read');return}p('ln:jlv','0');p('ln:pvmin',l==='ed'?'1':'0');uiFlags();setM('split')};
+ window.jSync=function(){const m=B.dataset.m,rd=m==='read',reader=rd&&g('ln:jlv','')!=='1',edMd=m==='split'||(rd&&g('ln:jlv','')==='1');
+  if(m==='split'||m==='view'){LAST=m;p('ln:jlast',m)}
+  w.querySelector('[data-jm="md"]').classList.toggle('on',edMd||(reader&&LAST==='split'));w.querySelector('[data-jm="rt"]').classList.toggle('on',m==='view'||(reader&&LAST==='view'));
+  const l=$('#jly'),L=lay(),nm={ed:'Só editor',sp:'Dividido',vw:'Só visualização'};l.innerHTML=ic[L]+'<span>'+nm[L]+'</span>';l.hidden=!edMd;l.title='Layout: '+nm[L]+' (clique para alternar)';
+  $('#jrd').classList.toggle('on',reader);B.classList.toggle('jmd',edMd);B.classList.toggle('jrt',m==='view')};
+ w.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();
+  if(b.dataset.jm==='md'){p('ln:jlv','0');setM('split')}
+  else if(b.dataset.jm==='rt'){p('ln:jlv','0');setM('view')}
+  else if(b.id==='jly'){const L=lay();setLay(L==='sp'?'ed':L==='ed'?'vw':'sp')}
+  else if(b.id==='jrd'){if(B.dataset.m==='read'&&g('ln:jlv','')!=='1')setM(LAST);else{p('ln:jlv','0');setM('read')}}
+  jSync()});
+ const mc=modeChanged;modeChanged=function(){const r=mc.apply(this,arguments);try{jSync()}catch(x){}return r};
+ document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#pvt'))setTimeout(jSync,0)});
+ setTimeout(jSync,0)})();
+/* barra de ferramentas estilo Joplin (ícones) */
+(function(){const ft=$('#ft');if(!ft)return;const ico=(d,t,c)=>'<button data-c="'+c+'" title="'+t+'" aria-label="'+t+'" class="ji"><svg viewBox="0 0 24 24">'+d+'</svg></button>';
+ const h='<i class="sp"></i>'+ico('<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>','Link [[nota]]','lk')+
+  ico('<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2"/><circle cx="4.5" cy="12" r="1.2"/><circle cx="4.5" cy="18" r="1.2"/>','Lista com marcadores','ul')+
+  ico('<path d="M10 6h10M10 12h10M10 18h10M4 5h1.5v4M4 9h3M4 14.5a1.5 1.5 0 0 1 3 0c0 1.2-3 2-3 3.5h3"/>','Lista numerada','ol')+
+  ico('<rect x="3.5" y="4" width="6" height="6" rx="1.2"/><path d="M5 7l1.2 1.2L8.3 6M13 7h8M3.5 14h6v6h-6zM13 17h8"/>','Lista de tarefas','ck')+
+  ico('<path d="M5 6v12M13 6v12M5 12h8M17 10l2-1.5V18"/>','Título','h2')+
+  ico('<path d="M7 7h4v4c0 3-1.5 5-4 6M15 7h4v4c0 3-1.5 5-4 6"/>','Citação','q')+
+  ico('<path d="M3 12h18"/>','Linha horizontal','hr')+
+  ico('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>','Inserir data e hora','tm')+
+  ico('<path d="M20 11.5l-8.3 8.3a5 5 0 0 1-7-7l8.3-8.3a3.3 3.3 0 0 1 4.7 4.7l-8.3 8.3a1.7 1.7 0 0 1-2.4-2.4l7.6-7.6"/>','Anexar arquivo','att');
+ const ref=ft.querySelector('[data-c="lk"]');if(ref){ref.remove()}const x=ft.querySelector('[data-c="x"]');(x||ft.querySelector('#ftm')).insertAdjacentHTML(x?'afterend':'beforebegin',h)})();
+const _cmd12=cmd;cmd=function(c){const v=window.cmView&&cmView();
+ if(c==='att'){$('#fi').click();return}
+ if(v&&(c==='ol'||c==='hr'||c==='tm')){if(c==='ol')return cmCmd('blk:num');const r=v.state.selection.main,d=new Date(),pad=n=>String(n).padStart(2,'0');
+  let ins=c==='tm'?pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes()):'---';
+  if(c==='hr'){const ln=v.state.doc.lineAt(r.from);ins=(ln.text.trim()&&r.from===ln.to?'\n\n':r.from>ln.from?'\n':'')+'---\n'}
+  v.dispatch({changes:{from:r.from,to:r.to,insert:ins},selection:{anchor:r.from+ins.length},userEvent:'input'});v.focus();return}
+ return _cmd12.apply(this,arguments)};
+/* rolagem sincronizada editor ⇄ visualização (modo dividido) */
+(function(){let lock=0,tm;const pv=$('#pv');const sc=()=>window.cmView&&cmView()&&cmView().scrollDOM;
+ const fr=el=>{const m=el.scrollHeight-el.clientHeight;return m>0?el.scrollTop/m:0},to=(el,f)=>{el.scrollTop=f*(el.scrollHeight-el.clientHeight)};
+ const go=(a,b)=>{if(document.body.dataset.m!=='split'||document.body.classList.contains('pvmin')||lock)return;lock=1;to(b,fr(a));clearTimeout(tm);tm=setTimeout(()=>lock=0,60)};
+ const hook=()=>{const s=sc();if(!s){setTimeout(hook,300);return}s.addEventListener('scroll',()=>go(s,pv),{passive:true});pv.addEventListener('scroll',()=>go(pv,s),{passive:true})};hook()})();
 
 boot();
 </script>
