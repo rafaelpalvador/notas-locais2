@@ -635,6 +635,12 @@ td.cel,th.cel{outline:2px solid var(--ac);outline-offset:-2px;background:var(--a
 .remc{display:flex;gap:8px;align-items:center;margin-bottom:10px}.remc input{flex:1}.remc .pri{padding:8px 14px;border-radius:9px;border:0;background:var(--gold);color:var(--on);font-weight:600;cursor:pointer}
 .reml{border-top:1px solid var(--bd);padding-top:8px;margin:6px 0 10px;display:flex;flex-direction:column;gap:4px;font-size:13px}.remi{display:flex;align-items:center;gap:8px}.remi span{flex:1}.remi button{border:0;background:none;color:var(--mu);font-size:16px;cursor:pointer}
 .remtipl{margin:8px 0;padding-left:20px;line-height:1.55;font-size:14px}
+/* NEW20 */
+#dragg{position:fixed;z-index:120;pointer-events:none;padding:6px 12px;border-radius:9px;background:var(--sf);color:var(--ink);border:1px solid var(--bd);box-shadow:0 10px 28px rgba(0,0,0,.28);font:500 13px var(--ui);max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.pdrag,body.pdrag *{cursor:grabbing!important;user-select:none!important}
+.dragsrc{opacity:.45}
+#fl .dz{background:var(--acs)!important;outline:2px dashed var(--ac);outline-offset:-2px;border-radius:7px}
+#fl .dz-b{box-shadow:inset 0 3px 0 var(--ac)}#fl .dz-a{box-shadow:inset 0 -3px 0 var(--ac)}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -3597,6 +3603,28 @@ STP.splice(STP.findIndex(p=>p[0]==='sync'),0,['lemb','Lembretes','<circle cx="12
 const _stPage19=stPage;stPage=function(p){if(p!=='lemb')return _stPage19(p);const up=LEMB.filter(r=>!r.fired).sort((a,b)=>a.at-b.at);
  return'<h2>Lembretes</h2><p class="mu">'+(ANDR?'Os avisos são entregues pelo Android, mesmo com o app fechado.':'Os avisos aparecem enquanto o app estiver aberto.')+'</p>'+stRow('Testar notificação','Agenda um aviso para daqui a 12 segundos.','<button class="stb" id="remtest">Testar</button>'+(ANDR?'<button class="stb" id="remtip">Dicas para o Honor</button>':''))+
   '<h3>Próximos</h3>'+(up.length?'<div class="stl">'+up.map(r=>{const n=S.notes.find(x=>x.id===r.noteId);return'<div class="sti"><span class="stn"><b>'+esc(lembFmt(r.at))+'</b> — '+esc(r.text)+(n?' <small class="mu">('+esc(n.title)+')</small>':'')+'</span><button class="stb" data-remdel="'+r.id+'">Cancelar</button></div>'}).join('')+'</div>':'<p class="mu">Nenhum lembrete agendado. Use o botão ⏰ no topo da nota ou na barra de formatação.</p>')};
+
+/* NEW20: arrastar notas e pastas com o mouse sem depender do arrastar nativo (que o app do Windows bloqueia) */
+(function(){let st=null,drag=null,ghost=null,tgt=null,pos='in',noClick=false;
+ const SRC='#fl .tn[data-id],#fl .fr[data-fd],#lv .cd[data-id],#sb .it[data-id]',SKIP='button,input,select,textarea,a,.fco,.nmo,.fx,.fnn,.fmv,.tdc2,.sbg';
+ document.addEventListener('dragstart',e=>{if(e.target.closest&&e.target.closest(SRC))e.preventDefault()},true);
+ document.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||e.button!==0)return;const el=e.target.closest&&e.target.closest(SRC);if(!el||e.target.closest(SKIP))return;
+  st={el,x:e.clientX,y:e.clientY,id:el.dataset.id||null,fd:el.dataset.fd||null}},true);
+ const clear=()=>{document.querySelectorAll('.dz,.dz-b,.dz-a').forEach(x=>x.classList.remove('dz','dz-b','dz-a'))};
+ document.addEventListener('pointermove',e=>{if(!st)return;if(!drag){if(Math.hypot(e.clientX-st.x,e.clientY-st.y)<6)return;
+   drag=st;ghost=document.createElement('div');ghost.id='dragg';const n=drag.id&&S.notes.find(x=>x.id===drag.id);ghost.textContent=(drag.fd?'📁 '+basn(drag.fd):'📄 '+(n?n.title:''));document.body.appendChild(ghost);document.body.classList.add('pdrag');drag.el.classList.add('dragsrc');getSelection().removeAllRanges()}
+  e.preventDefault();ghost.style.left=(e.clientX+14)+'px';ghost.style.top=(e.clientY+10)+'px';
+  const u=document.elementFromPoint(e.clientX,e.clientY),t=u&&u.closest&&u.closest('#fl .it[data-f],#fl [data-all]');clear();tgt=null;
+  if(t&&!(drag.fd&&t.dataset.f===drag.fd)){tgt=t;if(drag.fd&&!t.dataset.all){const r=t.getBoundingClientRect(),y=(e.clientY-r.top)/(r.height||1);pos=y<.25?'before':y>.75?'after':'in';t.classList.add(pos==='in'?'dz':pos==='before'?'dz-b':'dz-a')}else{pos='in';t.classList.add('dz')}}
+  const sb=$('#sb'),R=sb.getBoundingClientRect();if(e.clientX<R.right){if(e.clientY<R.top+50)sb.scrollTop-=12;else if(e.clientY>R.bottom-50)sb.scrollTop+=12}},true);
+ const end=e=>{const d=drag,t=tgt,p=pos;st=null;if(!d)return;drag=null;tgt=null;clear();ghost&&ghost.remove();ghost=null;document.body.classList.remove('pdrag');d.el.classList.remove('dragsrc');noClick=true;setTimeout(()=>noClick=false,60);
+  if(!t||e.type==='pointercancel')return;const f=t.dataset.all?'':t.dataset.f;
+  if(d.fd){dropFolder(d.fd,f,t.dataset.all?'in':p)}else if(d.id){const ids=(typeof SELN!=='undefined'&&SELN.size>1&&SELN.has(d.id))?[...SELN]:[d.id];
+   if(ids.length>1){ids.forEach(id=>{const n=S.notes.find(x=>x.id===id);if(n&&n.folder!==f){n.folder=f;n.updated=now();persistNew(n)}});save();SELN.clear();selPaint();renderSB();if(view.t!=='n')go(view);toast(ids.length+' notas movidas para '+(f||'a raiz'))}
+   else moveNote(d.id,f)}};
+ document.addEventListener('pointerup',end,true);document.addEventListener('pointercancel',end,true);
+ document.addEventListener('click',e=>{if(noClick){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();noClick=false}},true);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drag){tgt=null;end({type:'pointercancel'})}})})();
 
 boot();
 </script>
