@@ -181,3 +181,8 @@ O arquivo `.github/workflows/compilar.yml` compila na nuvem o instalador do Wind
 - **Markdown extra**: notas de rodapé `[^1]`, `H~2~O`, `x^2^`, emojis `:rocket:`, sumário `[toc]`, listas de definição (`Termo` + `: definição`).
 - **Seleção múltipla**: Ctrl/Shift+clique (ou toque longo no celular) para mover, marcar tag, fixar, virar tarefa ou excluir várias notas.
 - **Ordenação e fixar**: botão de ordenar na seção Arquivos (título, atualização, criação; crescente/decrescente) e "📌 Fixar no topo".
+
+## Configurações, menu das notas e barra lateral móvel
+- **⚙ Configurações** (botão no topo da barra lateral ou Ctrl + ,): Aparência, Interface, Editor, Arquivos e links, Barra de ferramentas, Sincronização, Atalhos e Avançado, com busca.
+- **Menu da nota** (botão ⋯ ou clique direito em qualquer nota da barra lateral, das abas ou da lista): abrir em nova aba / ao lado, copiar, mover, favoritar, fixar, virar tarefa, mesclar, copiar link, histórico, abrir no app padrão, mostrar na pasta, exportar, renomear, apagar.
+- **Blocos móveis**: arraste pela alça ⠿ qualquer bloco da barra lateral; esconda blocos e reorganize os botões da barra de formatação em Configurações.

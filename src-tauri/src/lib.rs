@@ -239,6 +239,24 @@ fn ext_open(app: tauri::AppHandle, id: String, with: Option<String>) -> Result<E
         Ok(ExtOut { path: ps, mtime: mtime_ms(&p), body: n.body })
     }
 }
+
+#[tauri::command]
+fn ext_reveal(app: tauri::AppHandle, id: String) -> Result<(), String> {
+    let p = note_file(&app, &id)?;
+    #[cfg(mobile)]
+    { let _ = p; return Err("Indisponível no celular".into()); }
+    #[cfg(not(mobile))]
+    {
+        let ps = p.to_string_lossy().to_string();
+        #[cfg(target_os = "windows")]
+        { use std::os::windows::process::CommandExt; std::process::Command::new("explorer").arg(format!("/select,{}", ps)).creation_flags(0x08000000).spawn().map_err(|e| e.to_string())?; }
+        #[cfg(target_os = "macos")]
+        { std::process::Command::new("open").args(["-R", ps.as_str()]).spawn().map_err(|e| e.to_string())?; }
+        #[cfg(all(unix, not(target_os = "macos")))]
+        { let d = p.parent().map(|x| x.to_string_lossy().to_string()).unwrap_or(ps); std::process::Command::new("xdg-open").arg(d).spawn().map_err(|e| e.to_string())?; }
+        Ok(())
+    }
+}
 #[tauri::command]
 fn ext_poll(app: tauri::AppHandle, id: String) -> Result<ExtOut, String> {
     let p = note_file(&app, &id)?;
@@ -251,7 +269,7 @@ fn ext_poll(app: tauri::AppHandle, id: String) -> Result<ExtOut, String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![load_vault, save_note, delete_note, create_folder, save_asset, read_asset, set_vault, rename_folder, delete_folder, http_req, ext_open, ext_poll])
+        .invoke_handler(tauri::generate_handler![load_vault, save_note, delete_note, create_folder, save_asset, read_asset, set_vault, rename_folder, delete_folder, http_req, ext_open, ext_poll, ext_reveal])
         .run(tauri::generate_context!())
         .expect("erro ao iniciar o app");
 }
