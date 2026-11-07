@@ -292,6 +292,7 @@ fn ext_poll(app: tauri::AppHandle, id: String) -> Result<ExtOut, String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_notification::init())
         .invoke_handler(tauri::generate_handler![load_vault, save_note, delete_note, create_folder, save_asset, read_asset, set_vault, rename_folder, delete_folder, http_req, ext_open, ext_poll, ext_reveal, update_install])
         .run(tauri::generate_context!())
         .expect("erro ao iniciar o app");

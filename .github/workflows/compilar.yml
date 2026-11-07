@@ -81,10 +81,10 @@ jobs:
         run: npx tauri android init --ci
       - name: Ícones do app
         run: npx tauri icon src-tauri/icons/icon.png
-      - name: Permissões (microfone e câmera)
+      - name: Permissões (microfone, câmera e lembretes)
         run: |
           M=src-tauri/gen/android/app/src/main/AndroidManifest.xml
-          for P in RECORD_AUDIO CAMERA MODIFY_AUDIO_SETTINGS; do
+          for P in RECORD_AUDIO CAMERA MODIFY_AUDIO_SETTINGS POST_NOTIFICATIONS SCHEDULE_EXACT_ALARM USE_EXACT_ALARM RECEIVE_BOOT_COMPLETED VIBRATE; do
             grep -q "android.permission.$P" "$M" || perl -0pi -e "s#(<manifest[^>]*>)#\$1\n    <uses-permission android:name=\"android.permission.$P\" />#" "$M"
           done
           grep -n "uses-permission" "$M"

@@ -628,6 +628,13 @@ body.audrag,body.audrag *{cursor:grabbing!important;user-select:none}
 .fcx{display:flex;gap:6px;align-items:center;margin:8px 0 4px}.fcx #fcc{width:34px;height:30px;padding:0;border:1px solid var(--bd);border-radius:7px;background:none;flex:none}.fcx #fct{flex:1;min-width:0;padding:6px 8px;border-radius:7px;border:1px solid var(--bd);background:var(--bg);color:var(--ink);font:12.5px var(--ui)}.fcx #fcok{flex:none}
 td.cel,th.cel{outline:2px solid var(--ac);outline-offset:-2px;background:var(--acs)!important;cursor:text;white-space:pre-wrap}
 #cmw .cm-blk-tb td,#cmw .cm-blk-tb th,#pv .tb td,#pv .tb th{cursor:text}
+/* NEW19 */
+#remb{position:relative}#remb sup{font-size:9px;margin-left:1px;color:var(--ac);font-weight:700}#remb.on{color:var(--ac)}
+#remd .mdb{max-width:440px}#remd input{width:100%;box-sizing:border-box;padding:8px 10px;border-radius:9px;border:1px solid var(--bd);background:var(--bg);color:var(--ink);font:14px var(--ui)}
+.remp{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 8px}.remp button{padding:8px 12px;border-radius:999px;border:1px solid var(--bd);background:var(--sf);color:var(--ink);font:13px var(--ui);cursor:pointer}.remp button:hover{background:var(--acs)}
+.remc{display:flex;gap:8px;align-items:center;margin-bottom:10px}.remc input{flex:1}.remc .pri{padding:8px 14px;border-radius:9px;border:0;background:var(--gold);color:var(--on);font-weight:600;cursor:pointer}
+.reml{border-top:1px solid var(--bd);padding-top:8px;margin:6px 0 10px;display:flex;flex-direction:column;gap:4px;font-size:13px}.remi{display:flex;align-items:center;gap:8px}.remi span{flex:1}.remi button{border:0;background:none;color:var(--mu);font-size:16px;cursor:pointer}
+.remtipl{margin:8px 0;padding-left:20px;line-height:1.55;font-size:14px}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -3528,6 +3535,68 @@ document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest
  else if(k==='updtoksave'){e.stopPropagation();try{localStorage.setItem('ln:ghtok',$('#updtok').value.trim())}catch(x){}toast('Token salvo');updCheck(true)}},true);
 setTimeout(()=>{if(isWin&&ST.updAuto!==false)updCheck(false)},8000);
 {const c0=CMDS;CMDS=()=>c0().concat([['Verificar atualizações',()=>{stOpen('atual');updCheck(true)}]])}
+
+/* NEW19: lembretes com notificação (Android agenda no sistema: avisa com o app fechado) */
+const ANDR=/Android/i.test(navigator.userAgent)&&!!AT;
+let LEMB=[];try{LEMB=JSON.parse(localStorage.getItem('ln:lemb')||'[]')}catch(e){}
+const lembSave=()=>{try{localStorage.setItem('ln:lemb',JSON.stringify(LEMB))}catch(e){}};
+const lembFmt=t=>{const d=new Date(t),hoje=new Date();const dia=d.toDateString()===hoje.toDateString()?'hoje':(new Date(hoje.getTime()+864e5).toDateString()===d.toDateString()?'amanhã':d.toLocaleDateString(loc(),{day:'2-digit',month:'short'}));return dia+' às '+d.toLocaleTimeString(loc(),{hour:'2-digit',minute:'2-digit'})};
+async function lembPerm(){if(AT){try{let ok=await AT.invoke('plugin:notification|is_permission_granted');if(!ok){const r=await AT.invoke('plugin:notification|request_permission');ok=r==='granted'}return ok}catch(e){return false}}
+ if(!('Notification' in window))return false;if(Notification.permission==='granted')return true;if(Notification.permission==='denied')return false;try{return(await Notification.requestPermission())==='granted'}catch(e){return false}}
+async function lembSchedule(r){if(!ANDR)return;try{await AT.invoke('plugin:notification|notify',{options:{id:r.id,title:'⏰ '+(r.text||'Lembrete'),body:r.nt?'Nota: '+r.nt:'Marginália Notes',schedule:{at:{date:new Date(r.at).toISOString(),repeating:false,allowWhileIdle:true}},extra:{noteId:r.noteId},autoCancel:true}})}catch(e){console.error('agendar',e);toast('Não consegui agendar no Android: '+e)}}
+async function lembCancelSys(r){if(!ANDR)return;try{await AT.invoke('plugin:notification|cancel',{notifications:[r.id]})}catch(e){}}
+async function lembAdd(noteId,at,text,line){const n=S.notes.find(x=>x.id===noteId);if(at<=Date.now()+5000){toast('Escolha um horário no futuro');return null}
+ const ok=await lembPerm();const r={id:(Date.now()%2000000000)+Math.floor(Math.random()*1000),noteId,at,text:text||('Voltar a: '+(n?n.title:'nota')),nt:n?n.title:'',line:line||'',fired:false};LEMB.push(r);lembSave();await lembSchedule(r);lembBadge();
+ toast('⏰ Lembrete '+lembFmt(at)+(ok?'':' — permita as notificações para o aviso aparecer'));if(ANDR&&!localStorage.getItem('ln:lembtip')){localStorage.setItem('ln:lembtip','1');setTimeout(()=>lembTip(),900)}return r}
+async function lembDel(id){const r=LEMB.find(x=>x.id===id);if(!r)return;await lembCancelSys(r);LEMB=LEMB.filter(x=>x.id!==id);lembSave();lembBadge()}
+function lembOpen(r){if(!S.notes.some(n=>n.id===r.noteId)){toast('A nota deste lembrete não existe mais');return}openId(r.noteId);r.ack=true;lembSave();
+ if(r.line)setTimeout(()=>{const v=window.cmView&&cmView();if(!v)return;const i=v.state.doc.toString().indexOf(r.line);if(i>=0){v.dispatch({selection:{anchor:i+r.line.length},scrollIntoView:true});v.focus()}},250)}
+function lembFire(r){r.fired=true;lembSave();lembBadge();
+ if(!ANDR){if(AT){AT.invoke('plugin:notification|notify',{options:{id:r.id,title:'⏰ '+r.text,body:r.nt?'Nota: '+r.nt:'Marginália Notes'}}).catch(()=>{})}else{try{if(window.Notification&&Notification.permission==='granted'){const nt=new Notification('⏰ '+r.text,{body:r.nt?'Nota: '+r.nt:'',tag:'lemb'+r.id});nt.onclick=()=>{window.focus();lembOpen(r)}}}catch(e){}}}
+ toast('⏰ '+r.text,'Abrir',()=>lembOpen(r));try{navigator.vibrate&&navigator.vibrate([120,60,120])}catch(e){}}
+setInterval(()=>{const t=Date.now();LEMB.filter(r=>!r.fired&&r.at<=t).forEach(lembFire);/* limpa antigos */const old=LEMB.length;LEMB=LEMB.filter(r=>!r.fired||t-r.at<7*864e5);if(LEMB.length!==old)lembSave()},15000);
+/* ao abrir o app: reagenda (o Android apaga alarmes ao reiniciar) e mostra o que disparou enquanto estava fechado */
+setTimeout(async()=>{const t=Date.now();if(ANDR)for(const r of LEMB.filter(x=>!x.fired&&x.at>t))await lembSchedule(r);
+ const miss=LEMB.filter(r=>!r.fired&&r.at<=t);miss.forEach(r=>{r.fired=true;r.missed=true});lembSave();const rec=LEMB.filter(r=>r.fired&&!r.ack&&t-r.at<3*36e5).sort((a,b)=>b.at-a.at)[0];
+ if(rec)toast('⏰ '+rec.text+' ('+lembFmt(rec.at)+')','Abrir nota',()=>lembOpen(rec));lembBadge();
+ try{const core=window.__TAURI__&&__TAURI__.core;if(core&&core.addPluginListener)await core.addPluginListener('notification','actionPerformed',ev=>{const id=ev&&ev.notification&&(ev.notification.extra||{}).noteId;const r=LEMB.find(x=>x.noteId===id&&x.fired)||LEMB.find(x=>x.noteId===id);if(r)lembOpen(r);else if(id)openId(id)})}catch(e){}},1500);
+/* ---------- interface ---------- */
+function lembBadge(){const n=cur(),b=$('#remb');if(!b)return;const k=n?LEMB.filter(r=>r.noteId===n.id&&!r.fired).length:0;b.innerHTML='⏰'+(k?'<sup>'+k+'</sup>':'');b.title=k?k+' lembrete(s) nesta nota':'Lembrar de voltar a esta nota';b.classList.toggle('on',k>0)}
+(function(){const w=$('#tdw');if(w)w.insertAdjacentHTML('beforebegin','<button class="cvbtn" id="remb" title="Lembrar">⏰</button>');
+ const ft=$('#ft'),att=ft&&ft.querySelector('[data-c="att"]');if(att)att.insertAdjacentHTML('beforebegin','<button data-c="rem" class="ji" title="Lembrete para esta tarefa ou nota" aria-label="Lembrete"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"/><path d="M12 9.5V13l2.5 1.5M5 4L2.5 6.5M19 4l2.5 2.5"/></svg></button>')})();
+HDK.push(['rem','Botão Lembrar (⏰)','#remb']);
+const _show19=show;show=function(){const r=_show19.apply(this,arguments);try{lembBadge()}catch(e){}return r};
+function lembDialog(pref){const n=cur();if(!n)return;const v=window.cmView&&cmView();let line='',txt='';
+ if(pref&&pref.task&&v){const ln=v.state.doc.lineAt(v.state.selection.main.head),m=ln.text.match(/^\s*[-*+]\s\[[ xX]\]\s+(.*)$/);if(m){line=ln.text.trim();txt=m[1].replace(/@\d{4}-\d{2}-\d{2}(\s+\d{1,2}:\d{2})?/g,'').trim()}else if(ln.text.trim()&&!/^#/.test(ln.text)){line=ln.text.trim().slice(0,120);txt=line.replace(/^[-*+>\s]+/,'').slice(0,80)}}
+ const d=new Date(),pad=x=>String(x).padStart(2,'0'),def=new Date(Date.now()+36e5),dv=def.getFullYear()+'-'+pad(def.getMonth()+1)+'-'+pad(def.getDate())+'T'+pad(def.getHours())+':'+pad(def.getMinutes());
+ const at18=new Date();at18.setHours(18,0,0,0);const am9=new Date(Date.now()+864e5);am9.setHours(9,0,0,0);const P=[['15 min',15*6e4],['30 min',30*6e4],['1 hora',36e5],['2 horas',72e5]];if(at18>d)P.push(['Hoje 18h',at18.getTime()-d.getTime()]);P.push(['Amanhã 9h',am9.getTime()-d.getTime()]);
+ const mine=LEMB.filter(r=>r.noteId===n.id&&!r.fired).sort((a,b)=>a.at-b.at);
+ const m=modal('remd','<div class="teh"><b>⏰ Lembrete</b><button data-remx aria-label="Fechar">×</button></div><label class="kbf">Mensagem do aviso<input id="remt" value="'+esc(txt||('Voltar a: '+n.title))+'"></label><input type="hidden" id="reml" value="'+esc(line)+'">'+
+  '<div class="remp">'+P.map(([l,ms])=>'<button data-remq="'+ms+'">'+l+'</button>').join('')+'</div><div class="remc"><input type="datetime-local" id="remdt" value="'+dv+'"><button id="remok" class="pri">Agendar</button></div>'+
+  (mine.length?'<div class="reml"><b>Lembretes desta nota</b>'+mine.map(r=>'<div class="remi"><span>'+esc(lembFmt(r.at))+' — '+esc(r.text)+'</span><button data-remdel="'+r.id+'" title="Cancelar" aria-label="Cancelar">×</button></div>').join('')+'</div>':'')+
+  '<small class="mu">'+(ANDR?'O aviso chega mesmo com o app fechado. No Honor, deixe o app rodar em segundo plano (Bateria → Inicialização de apps) para não atrasar.':AT?'No computador o aviso aparece enquanto o app estiver aberto (pode estar minimizado).':'Na versão web o aviso aparece enquanto a página estiver aberta.')+'</small>');
+ setTimeout(()=>{const t=$('#remt');t&&t.focus();t&&t.select()},30)}
+document.addEventListener('click',async e=>{const t=e.target;if(!t.closest)return;let b;
+ if(t.closest('#remb')){e.stopPropagation();lembDialog({task:false});return}
+ if(t.closest('[data-remx]')){$('#remd').hidden=true;return}
+ if(b=t.closest('[data-remq]')){e.stopPropagation();const n=cur();if(!n)return;$('#remd').hidden=true;await lembAdd(n.id,Date.now()+(+b.dataset.remq),$('#remt').value.trim(),$('#reml').value);return}
+ if(t.id==='remok'){e.stopPropagation();const n=cur(),v=$('#remdt').value;if(!n||!v)return;const at=new Date(v).getTime();const r=await lembAdd(n.id,at,$('#remt').value.trim(),$('#reml').value);if(r)$('#remd').hidden=true;return}
+ if(b=t.closest('[data-remdel]')){e.stopPropagation();await lembDel(+b.dataset.remdel);if($('#remd')&&!$('#remd').hidden)lembDialog({});if($('#stm')&&!$('#stm').hidden&&STPG==='lemb')stRefresh();return}
+ if(t.id==='remtest'){e.stopPropagation();const n=cur()||S.notes[0];await lembAdd(n.id,Date.now()+12000,'Teste do Marginália Notes');return}
+ if(t.id==='remtip'){e.stopPropagation();lembTip()}},true);
+document.addEventListener('keydown',e=>{if(e.target.id==='remt'&&e.key==='Enter'){e.preventDefault();$('#remok').click()}});
+const _cmd19=cmd;cmd=function(c){if(c==='rem'){lembDialog({task:true});return}return _cmd19.apply(this,arguments)};
+{const c0=CMDS;CMDS=()=>c0().concat([['Lembrete para esta nota…',()=>lembDialog({task:true})]])}
+/* menu ⋯ da nota */
+const _nmItems19=nmItems;nmItems=function(n){const G=_nmItems19(n);G[0].push({k:'hist',l:'Lembrar de voltar…',a:'rem'});return G};
+const _nmDo19=nmDo;nmDo=function(a,n){if(a==='rem'){openId(n.id);setTimeout(()=>lembDialog({}),80);return}return _nmDo19.apply(this,arguments)};
+function lembTip(){modal('remtipm','<div class="teh"><b>Para os avisos chegarem na hora (Honor)</b><button data-remtx aria-label="Fechar">×</button></div><ol class="remtipl"><li>Abra <b>Configurações do celular → Apps → Marginália Notes → Notificações</b> e deixe ligadas.</li><li>Em <b>Configurações → Bateria → Inicialização de apps</b>, desligue "Gerenciar automaticamente" para o Marginália e ligue <b>Execução em segundo plano</b>.</li><li>Se o Android perguntar sobre <b>Alarmes e lembretes</b>, permita.</li><li>Depois use <b>Testar notificação</b> em Configurações → Lembretes e feche o app: o aviso deve chegar em ~12 segundos.</li></ol>');}
+document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('[data-remtx]'))$('#remtipm').hidden=true});
+/* página nas configurações */
+STP.splice(STP.findIndex(p=>p[0]==='sync'),0,['lemb','Lembretes','<circle cx="12" cy="13" r="7.5"/><path d="M12 9.5V13l2.5 1.5M5 4L2.5 6.5M19 4l2.5 2.5"/>']);
+const _stPage19=stPage;stPage=function(p){if(p!=='lemb')return _stPage19(p);const up=LEMB.filter(r=>!r.fired).sort((a,b)=>a.at-b.at);
+ return'<h2>Lembretes</h2><p class="mu">'+(ANDR?'Os avisos são entregues pelo Android, mesmo com o app fechado.':'Os avisos aparecem enquanto o app estiver aberto.')+'</p>'+stRow('Testar notificação','Agenda um aviso para daqui a 12 segundos.','<button class="stb" id="remtest">Testar</button>'+(ANDR?'<button class="stb" id="remtip">Dicas para o Honor</button>':''))+
+  '<h3>Próximos</h3>'+(up.length?'<div class="stl">'+up.map(r=>{const n=S.notes.find(x=>x.id===r.noteId);return'<div class="sti"><span class="stn"><b>'+esc(lembFmt(r.at))+'</b> — '+esc(r.text)+(n?' <small class="mu">('+esc(n.title)+')</small>':'')+'</span><button class="stb" data-remdel="'+r.id+'">Cancelar</button></div>'}).join('')+'</div>':'<p class="mu">Nenhum lembrete agendado. Use o botão ⏰ no topo da nota ou na barra de formatação.</p>')};
 
 boot();
 </script>

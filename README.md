@@ -207,3 +207,9 @@ O arquivo `.github/workflows/compilar.yml` compila na nuvem o instalador do Wind
 - Links fixos (sempre a mais nova): `https://github.com/rafaelpalvador/notas-locais2/releases/latest/download/Marginalia-Android.apk` e `.../Marginalia-Windows-instalador.exe`.
 - **Android (Obtainium):** Adicionar app → `https://github.com/rafaelpalvador/notas-locais2`; como o repositório é privado, coloque um token do GitHub (fine-grained, só leitura de *Contents* deste repositório) nas configurações do Obtainium.
 - **Windows:** Configurações → Atualizações. O app verifica ao abrir, baixa o instalador e atualiza em modo passivo (`/P /R`), reabrindo sozinho. Com o repositório privado, cole o mesmo token ali.
+
+## Lembretes (⏰)
+- Botão ⏰ no topo da nota, na barra de formatação (pega a tarefa da linha do cursor) e no menu ⋯ da nota: atalhos 15 min, 30 min, 1 h, 2 h, hoje 18h, amanhã 9h ou data/hora livre.
+- **Android:** o lembrete é entregue ao agendador do sistema (plugin oficial de notificações do Tauri) e chega com o app fechado; o app reagenda tudo ao abrir. No Honor, permita execução em segundo plano.
+- **Windows / web:** o aviso aparece enquanto o app estiver aberto (pode estar minimizado).
+- Configurações → Lembretes: lista, cancelar e "Testar notificação".
