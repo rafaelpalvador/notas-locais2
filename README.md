@@ -213,3 +213,14 @@ O arquivo `.github/workflows/compilar.yml` compila na nuvem o instalador do Wind
 - **Android:** o lembrete é entregue ao agendador do sistema (plugin oficial de notificações do Tauri) e chega com o app fechado; o app reagenda tudo ao abrir. No Honor, permita execução em segundo plano.
 - **Windows / web:** o aviso aparece enquanto o app estiver aberto (pode estar minimizado).
 - Configurações → Lembretes: lista, cancelar e "Testar notificação".
+
+## Bancos de dados (estilo Logseq)
+- **+ ▾ → Banco de dados** ou **+** na seção "Bancos de dados" da barra lateral. Modelos: Livros, Projetos, Contatos, Tarefas ou em branco.
+- Campos tipados: Texto, Número, Data, Caixa, Seleção, Várias opções, Link e Nota (com ⚙ Campos: renomear leva os valores junto, reordenar, apagar, opções).
+- Visões **Tabela** (ordenar clicando no cabeçalho, editar no lugar), **Quadro** (agrupado por um campo de seleção, arrastar cartões pela alça ⠿) e **Lista** (padrão no celular). Filtro de texto.
+- Cada entrada é uma nota normal (valores ficam nas propriedades); nas notas do banco aparecem os campos tipados no topo. Qualquer nota com `#nome-do-banco` também entra.
+- Embutir em qualquer nota: bloco ` ```db Nome do banco ``` ` (menu ⋯ do banco → "Copiar bloco para embutir").
+- O esquema fica dentro da própria nota do banco (bloco `dbschema`), então sincroniza e exporta junto.
+
+## Celular: segurar = arrastar
+- Segurar uma nota/pasta e arrastar move para outra pasta. Segurar não abre menu nem seleção; as opções ficam no botão ⋯.

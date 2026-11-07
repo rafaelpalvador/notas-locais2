@@ -644,6 +644,47 @@ body.pdrag,body.pdrag *{cursor:grabbing!important;user-select:none!important}
 /* NEW21 */
 .tdarm{background:var(--acs)!important;transform:scale(.98);transition:transform .12s}
 @media(max-width:760px){#fl .tn,#fl .fr,#lv .cd{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}#msb{bottom:calc(10px + env(safe-area-inset-bottom,0px) + var(--kb,0px))}}
+/* NEW22 bancos de dados */
+#dbr{display:none}
+body.dbmode #ew,body.dbmode #ft,body.dbmode #jly,body.dbmode .jsw,body.dbmode #jrd,body.dbmode #tocb,body.dbmode #wcs,body.dbmode #bar [data-pop="im"],body.dbmode #rc,body.dbmode #cvb,body.dbmode #pr,body.dbmode #ti,body.dbmode #icb{display:none!important}
+body.dbmode #dbr{display:block;flex:1;min-height:0;overflow:auto;padding:18px 26px 80px}
+.dbtop h1{display:flex;align-items:center;gap:8px;margin:0 0 12px;font-size:28px}.dbtitle{flex:1;min-width:0;border:0;background:none;color:var(--ink);font:700 28px var(--ui);outline:none}
+.dbhd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}.dbhd .dbname{font:650 15px var(--ui);cursor:pointer;margin-right:4px}
+.dbvs{display:inline-flex;border:1px solid var(--bd);border-radius:9px;overflow:hidden}.dbvs button{white-space:nowrap;border:0;background:var(--sf);color:var(--mu);padding:6px 12px;font:500 13px var(--ui);cursor:pointer}.dbvs button+button{border-left:1px solid var(--bd)}.dbvs button.on{background:var(--gold);color:var(--on)}
+.dbq,.dbgrp{padding:6px 10px;border-radius:9px;border:1px solid var(--bd);background:var(--bg);color:var(--ink);font:13px var(--ui)}.dbq{width:160px}.dbcount{font-size:12.5px;margin-left:auto}
+.dbtw{overflow:auto;border:1px solid var(--bd);border-radius:12px;background:var(--sf);max-width:100%}
+.dbt2{border-collapse:collapse;width:100%;font:13.5px var(--ui);min-width:520px}
+.dbt2 th{position:sticky;top:0;background:var(--cd);text-align:left;font-weight:600;padding:8px 10px;border-bottom:1px solid var(--bd);white-space:nowrap;cursor:pointer;user-select:none;color:var(--ink)}.dbt2 th .dbty{opacity:.55;margin-right:5px;font-size:11px}
+.dbt2 td{border-bottom:1px solid var(--ln);padding:2px 4px;vertical-align:middle}.dbt2 tr:last-child td{border-bottom:0}.dbt2 tbody tr:hover{background:rgba(120,120,128,.06)}
+.dbt2 td:first-child,.dbt2 th:first-child{position:sticky;left:0;background:var(--sf);z-index:1;min-width:190px}.dbt2 th:first-child{background:var(--cd);z-index:2}
+.dbtt{display:flex;align-items:center;gap:2px}.dbtit{flex:1;min-width:0;border:0;background:none;color:var(--ink);font:600 13.5px var(--ui);padding:7px 6px;border-radius:6px}.dbtit:focus,.dbin:focus{outline:2px solid var(--ac);background:var(--bg)}
+.dbin{width:100%;min-width:110px;box-sizing:border-box;border:0;background:none;color:var(--ink);font:13.5px var(--ui);padding:7px 6px;border-radius:6px}
+.dbsel{appearance:none;-webkit-appearance:none;cursor:pointer;font-weight:600;color:var(--cc,var(--ink));background:color-mix(in srgb,var(--cc,transparent) 12%,transparent)}
+.dbck{width:18px;height:18px;margin:0 8px;accent-color:var(--ac)}
+.dbopen,.dbgo,.dbrx button,.dbadd button{border:0;background:none;color:var(--mu);cursor:pointer;padding:4px 6px;border-radius:6px;font-size:13px}.dbopen:hover,.dbgo:hover,.dbrx button:hover{background:rgba(120,120,128,.16);color:var(--ink)}
+.dbrx{width:28px}.dbrx button{opacity:.35}.dbt2 tr:hover .dbrx button{opacity:1}
+.dburl,.dbnote{display:flex;align-items:center}.dburl a{color:var(--ac);text-decoration:none;padding:0 6px}
+.dbchip{display:inline-block;padding:2px 9px;border-radius:999px;margin:1px 3px 1px 0;font:600 12px var(--ui);color:var(--cc);background:color-mix(in srgb,var(--cc) 15%,transparent);white-space:nowrap}
+.dbmul{display:flex;flex-wrap:wrap;gap:2px;align-items:center;width:100%;min-height:32px;border:0;background:none;cursor:pointer;text-align:left;padding:3px 6px;border-radius:6px}.dbmul:hover{background:rgba(120,120,128,.1)}
+.dbnew{margin-top:10px;padding:8px 14px;border-radius:9px;border:1px dashed var(--bd);background:none;color:var(--mu);font:500 13px var(--ui);cursor:pointer}.dbnew:hover{color:var(--ink);border-color:var(--ac)}.dbnew.sm{margin-top:6px;width:100%}
+.dbb{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px;align-items:flex-start}
+.dbcol{flex:0 0 260px;background:var(--cd);border-radius:12px;padding:10px;border:1px solid var(--bd)}.dbcol.dz{outline:2px dashed var(--ac)}
+.dbch{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.dbch small{color:var(--mu)}
+.dbcard{position:relative;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:9px 10px 9px 26px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.06)}.dbcard b{display:block;cursor:pointer;font:600 13.5px var(--ui);margin-bottom:3px}
+.dbgr{position:absolute;left:6px;top:9px;cursor:grab;color:var(--mu);touch-action:none;user-select:none}.dbcf{font-size:12px;margin-top:2px}.dbghost{position:fixed;z-index:130;width:240px;pointer-events:none;opacity:.92;box-shadow:0 12px 30px rgba(0,0,0,.3)}
+.dbl{display:flex;flex-direction:column;gap:10px}.dbli{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:8px 10px}.dblh{display:flex;align-items:center;border-bottom:1px solid var(--ln);margin-bottom:4px}.dblh .dbtit{font-size:15px}
+.dblf{display:grid;grid-template-columns:minmax(90px,35%) 1fr;align-items:center;gap:6px;font:13px var(--ui);padding:1px 0}.dblf>span{color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dbempty{padding:12px 0}
+.dbe{border:1px solid var(--bd);border-radius:14px;padding:12px;margin:.6em 0;background:color-mix(in srgb,var(--sf) 85%,transparent)}.dbe .dbtw{max-height:420px}
+.dbf{border:1px solid var(--bd);border-radius:12px;padding:8px 10px;margin:4px 0 10px;background:var(--sf)}.dbfh{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}.dbfh b{cursor:pointer;font:600 13.5px var(--ui)}
+#dbfm .mdb,#dbtm .mdb,#dbmm .mdb{max-width:620px}
+.dbfr{display:grid;grid-template-columns:1.2fr .9fr 1.6fr auto;gap:6px;align-items:center;margin-bottom:6px}.dbfr input,.dbfr select{padding:7px 9px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--ink);font:13px var(--ui);min-width:0}
+.dbfb{display:flex;gap:2px}.dbfb button{border:0;background:none;color:var(--mu);font-size:15px;cursor:pointer;padding:4px 6px;border-radius:6px}.dbfb .dng{color:#e5484d}
+.dbfa{margin:6px 0 12px}.dbfa button{padding:7px 12px;border-radius:9px;border:1px dashed var(--bd);background:none;color:var(--ink);cursor:pointer}
+.dbtpls{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-top:8px}.dbtpls button{display:flex;flex-direction:column;gap:4px;text-align:left;padding:12px;border-radius:12px;border:1px solid var(--bd);background:var(--sf);color:var(--ink);cursor:pointer}.dbtpls button:hover{border-color:var(--ac)}.dbtpls small{color:var(--mu);font-size:11.5px;line-height:1.35}
+.dbmo{display:flex;flex-direction:column;gap:6px;margin:8px 0}.dbmo label{display:flex;align-items:center;gap:8px}
+#dbsl .sbe{font-size:12.5px;padding:4px 12px}
+@media(max-width:760px){body.dbmode #dbr{padding:12px 10px 90px}.dbtop h1,.dbtitle{font-size:22px}.dbq{width:110px}.dbcount{display:none}.dbfr{grid-template-columns:1fr 1fr;}.dbfr>.dbfo,.dbfr>span:not(.dbfb){grid-column:1/-1}.dbcol{flex-basis:78vw}}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -2556,7 +2597,7 @@ const mdHL=C.HighlightStyle.define([
  {tag:C.tags.link,class:'cm-link'},{tag:C.tags.url,class:'cm-url'},{tag:C.tags.monospace,class:'cm-mono'},{tag:C.tags.quote,class:'cm-quote'},
  {tag:C.tags.processingInstruction,class:'cm-mk'},{tag:C.tags.contentSeparator,class:'cm-hr'},{tag:C.tags.labelName,class:'cm-mk'}]);
 /* ---------- utilidades ---------- */
-const SPECIAL=/^(draw|pdf|kanban|canvas|mermaid|audio|locked)\b/;
+const SPECIAL=/^(draw|pdf|kanban|canvas|mermaid|audio|locked|db|dbschema)\b/;
 const selTouches=(st,a,b)=>st.selection.ranges.some(r=>r.from<=b&&r.to>=a);
 const lineActive=(st,ln)=>st.selection.ranges.some(r=>r.from<=ln.to&&r.to>=ln.from);
 const RQ=[];let RQT=0;
@@ -3649,7 +3690,7 @@ window.HDR21=1;window.TD21=1;
  const _go21=go;go=function(){B.classList.remove('hdh');return _go21.apply(this,arguments)}})();
 /* ---------- 2) sair de blocos de código ---------- */
 function codeAt(st,pos){let n=CM.syntaxTree(st).resolveInner(pos,-1);while(n&&n.name!=='FencedCode')n=n.parent;if(!n)return null;const l1=st.doc.lineAt(n.from),lz=st.doc.lineAt(n.to);
- if(/^(draw|pdf|kanban|canvas|mermaid|audio|locked)\b/.test(l1.text.replace(/^\s*(`{3,}|~{3,})\s*/,'')))return null;return{from:n.from,to:n.to,open:l1,close:/^\s*(`{3,}|~{3,})\s*$/.test(lz.text)&&lz.number>l1.number?lz:null}}
+ if(/^(draw|pdf|kanban|canvas|mermaid|audio|locked|db|dbschema)\b/.test(l1.text.replace(/^\s*(`{3,}|~{3,})\s*/,'')))return null;return{from:n.from,to:n.to,open:l1,close:/^\s*(`{3,}|~{3,})\s*$/.test(lz.text)&&lz.number>l1.number?lz:null}}
 function codeExit(v,dropEmpty){const st=v.state,r=st.selection.main,c=codeAt(st,r.head);if(!c)return false;const doc=st.doc,ln=doc.lineAt(r.head);let ch=[],end;
  if(!c.close){ch.push({from:doc.length,insert:(doc.sliceString(doc.length-1)==='\n'?'':'\n')+'```\n'});v.dispatch({changes:ch,selection:{anchor:doc.length+(doc.sliceString(doc.length-1)==='\n'?4:5)},scrollIntoView:true});return true}
  if(ln.number===c.close.number)return false;
@@ -3679,12 +3720,136 @@ document.addEventListener('pointerdown',e=>{const v=window.cmView&&cmView();if(!
   const sb=$('#sb'),R=sb.getBoundingClientRect();if(t.clientY<R.top+60)sb.scrollTop-=10;else if(t.clientY>R.bottom-60)sb.scrollTop+=10},{passive:false,capture:true});
  const fin=cancel=>{clearTimeout(tm);const s=st,d=drag,g=tgt,p=pos;st=null;drag=false;tgt=null;clear();if(ghost){ghost.remove();ghost=null}document.body.classList.remove('pdrag');if(!s)return;s.el.classList.remove('tdarm','dragsrc');
   if(!s.armed)return;eat=true;window.__eat21=1;setTimeout(()=>{eat=false;window.__eat21=0},450);const sbo=$('#sb').classList.contains('open'),keep=()=>{if(sbo)setTimeout(()=>$('#sb').classList.add('open'),30)};
-  if(!d){if(s.id&&!cancel)selToggle(s.id);return}
+  if(!d)return;
   if(cancel||!g)return;const f=g.dataset.all?'':g.dataset.f;if(s.fd){dropFolder(s.fd,f,g.dataset.all?'in':p);keep()}else if(s.id){const ids=SELN.size>1&&SELN.has(s.id)?[...SELN]:[s.id];if(ids.length>1){ids.forEach(id=>{const n=S.notes.find(x=>x.id===id);if(n&&n.folder!==f){n.folder=f;n.updated=now();persistNew(n)}});save();SELN.clear();selPaint();renderSB();toast(ids.length+' notas movidas')}else moveNote(s.id,f)}keep()};
  document.addEventListener('touchend',()=>fin(false),{capture:true});document.addEventListener('touchcancel',()=>fin(true),{capture:true});
  document.addEventListener('click',e=>{if(eat&&e.target.closest&&e.target.closest(SRC)){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation()}},true);
  /* o "segurar" do Android não abre o menu de contexto em cima da seleção */
  window.addEventListener('contextmenu',e=>{if(Date.now()-(window.__lastTouch||0)<1500&&e.target.closest&&e.target.closest(SRC)){e.preventDefault();e.stopImmediatePropagation()}},true)})();
+
+/* NEW22: bancos de dados (como no Logseq): campos tipados, tabela / quadro / lista, edição no lugar, bloco embutido */
+const DBT={text:'Texto',number:'Número',date:'Data',check:'Caixa',select:'Seleção',multi:'Várias opções',url:'Link',note:'Nota'};
+const DBTPL={livros:['📚 Livros',[{k:'Autor',t:'text'},{k:'Status',t:'select',o:['Quero ler','Lendo','Lido']},{k:'Nota',t:'number'},{k:'Gêneros',t:'multi',o:['Romance','Técnico','Biografia','Ficção']},{k:'Terminei em',t:'date'}],'Status'],
+ projetos:['🚀 Projetos',[{k:'Status',t:'select',o:['Ideia','Em andamento','Pausado','Concluído']},{k:'Prazo',t:'date'},{k:'Prioridade',t:'select',o:['Alta','Média','Baixa']},{k:'Link',t:'url'}],'Status'],
+ contatos:['👤 Contatos',[{k:'Telefone',t:'text'},{k:'E-mail',t:'text'},{k:'Empresa',t:'text'},{k:'Aniversário',t:'date'}],''],
+ tarefas:['✅ Tarefas',[{k:'Feito',t:'check'},{k:'Prazo',t:'date'},{k:'Status',t:'select',o:['A fazer','Fazendo','Feito']},{k:'Projeto',t:'note'}],'Status'],vazio:['Em branco',[{k:'Status',t:'select',o:['A fazer','Fazendo','Feito']}],'Status']};
+const OPC=['#e8901a','#3b82f6','#16a34a','#dc2626','#9333ea','#0891b2','#ca8a04','#db2777'];
+const isDbNote=n=>!!n&&(n.props||{}).tipo==='db';
+const dbSlug=t=>nz(String(t||'').replace(/^[^\p{L}\d]+/u,'').trim()).replace(/\s+/g,'-');
+function dbSchema(n){const m=String(n.body||'').match(/```dbschema\n([\s\S]*?)\n```/);let j={};try{j=m?JSON.parse(m[1]):{}}catch(e){}j.fields=Array.isArray(j.fields)?j.fields:[];j.view=j.view||'table';j.sort=j.sort||{k:'',d:1};return j}
+function dbSave(db,j){const blk='```dbschema\n'+JSON.stringify(j)+'\n```';db.body=/```dbschema\n[\s\S]*?\n```/.test(db.body)?db.body.replace(/```dbschema\n[\s\S]*?\n```/,blk):'# '+db.title+'\n\n'+blk+'\n';db.updated=now();persistNew(db);save()}
+const dbList=()=>S.notes.filter(isDbNote).sort((a,b)=>a.title.localeCompare(b.title));
+const inDb=(n,db)=>!isDbNote(n)&&(String((n.props||{}).banco||'').split(',').includes(db.id)||tagsOf(n).includes(dbSlug(db.title)));
+const dbRecs=db=>S.notes.filter(n=>inDb(n,db));
+const dbOf=n=>dbList().filter(db=>inDb(n,db));
+RES.push('banco');
+const optColor=(f,v)=>{const i=(f.o||[]).indexOf(v);return OPC[(i<0?0:i)%OPC.length]};
+const chip=(f,v)=>'<span class="dbchip" style="--cc:'+optColor(f,v)+'">'+esc(v)+'</span>';
+function dbCell(f,rec,db){const v=String((rec.props||{})[f.k]??''),a='data-rid="'+rec.id+'" data-fk="'+esc(f.k)+'"';
+ switch(f.t){case'number':return'<input class="dbin" type="number" step="any" '+a+' value="'+esc(v)+'">';
+ case'date':return'<input class="dbin" type="date" '+a+' value="'+esc(v.slice(0,10))+'">';
+ case'check':return'<input class="dbck" type="checkbox" '+a+(v==='true'||v==='1'||v==='x'?' checked':'')+'>';
+ case'select':return'<select class="dbin dbsel" '+a+' style="--cc:'+(v?optColor(f,v):'var(--mu)')+'"><option value="">—</option>'+(f.o||[]).map(o=>'<option'+(o===v?' selected':'')+'>'+esc(o)+'</option>').join('')+'<option value="\u0001">+ Nova opção…</option></select>';
+ case'multi':{const vs=v?v.split(',').map(x=>x.trim()).filter(Boolean):[];return'<button class="dbmul" '+a+'>'+(vs.length?vs.map(x=>chip(f,x)).join(''):'<span class="mu">—</span>')+'</button>'}
+ case'url':return'<span class="dburl"><input class="dbin" type="url" '+a+' value="'+esc(v)+'" placeholder="https://">'+(v?'<a href="'+esc(v)+'" target="_blank" rel="noopener" title="Abrir link">↗</a>':'')+'</span>';
+ case'note':return'<span class="dbnote"><input class="dbin" list="dbnl" '+a+' value="'+esc(v)+'" placeholder="Nota…">'+(v?'<button class="dbgo" data-gonote="'+esc(v)+'" title="Abrir nota">↗</button>':'')+'</span>';
+ default:return'<input class="dbin" '+a+' value="'+esc(v)+'">'}}
+function dbRows(db,j,q){let rs=dbRecs(db);q=nz(q||'');if(q)rs=rs.filter(r=>nz(r.title+' '+j.fields.map(f=>(r.props||{})[f.k]||'').join(' ')).includes(q));
+ const k=j.sort.k,d=j.sort.d||1;if(k){const g=r=>k==='__t'?nz(r.title):k==='__u'?r.updated:String((r.props||{})[k]??'');const num=j.fields.find(f=>f.k===k&&f.t==='number');rs.sort((a,b)=>{let x=g(a),y=g(b);if(num){x=parseFloat(x)||0;y=parseFloat(y)||0}return(x<y?-1:x>y?1:0)*d})}else rs.sort((a,b)=>b.updated.localeCompare(a.updated));return rs}
+function dbView(db,opt){opt=opt||{};const j=dbSchema(db),view=opt.view||j.view||'table',q=opt.q||'',rs=dbRows(db,j,q),gf=j.fields.find(f=>f.k===j.group&&f.t==='select')||j.fields.find(f=>f.t==='select');
+ const ar=k=>j.sort.k===k?(j.sort.d>0?' ↑':' ↓'):'';let h='';
+ if(view==='table'){h='<div class="dbtw"><table class="dbt2"><thead><tr><th data-dbsort="__t">Nome'+ar('__t')+'</th>'+j.fields.map(f=>'<th data-dbsort="'+esc(f.k)+'"><span class="dbty">'+({text:'Aa',number:'#',date:'📅',check:'☑',select:'◉',multi:'☰',url:'🔗',note:'↗'}[f.t]||'')+'</span>'+esc(f.k)+ar(f.k)+'</th>').join('')+'<th class="dbadd"><button data-dbfields="'+db.id+'" title="Campos" aria-label="Campos">+</button></th></tr></thead><tbody>'+
+  rs.map(r=>'<tr data-rid="'+r.id+'"><td class="dbtt"><input class="dbtit" data-rid="'+r.id+'" value="'+esc(r.title)+'"><button class="dbopen" data-open="'+r.id+'" title="Abrir nota" aria-label="Abrir nota">↗</button></td>'+j.fields.map(f=>'<td>'+dbCell(f,r,db)+'</td>').join('')+'<td class="dbrx"><button data-dbdel="'+r.id+'" title="Apagar" aria-label="Apagar">×</button></td></tr>').join('')+
+  '</tbody></table></div><button class="dbnew" data-dbnew="'+db.id+'">+ Nova entrada</button>'}
+ else if(view==='board'){const cols=gf?(gf.o||[]).concat(['']):[''];h='<div class="dbb">'+cols.map(c=>{const it=rs.filter(r=>gf?String((r.props||{})[gf.k]||'')===c||(c===''&&!(gf.o||[]).includes(String((r.props||{})[gf.k]||''))):true);
+   return'<div class="dbcol" data-col="'+esc(c)+'"><div class="dbch">'+(c?chip(gf,c):'<span class="mu">Sem '+(gf?esc(gf.k):'grupo')+'</span>')+'<small>'+it.length+'</small></div>'+it.map(r=>'<div class="dbcard" data-rid="'+r.id+'"><span class="dbgr" title="Arrastar">⠿</span><b data-open="'+r.id+'">'+esc(r.title)+'</b>'+j.fields.filter(f=>f!==gf&&(r.props||{})[f.k]).slice(0,3).map(f=>'<div class="dbcf"><span class="mu">'+esc(f.k)+'</span> '+(f.t==='select'||f.t==='multi'?String(r.props[f.k]).split(',').map(x=>chip(f,x.trim())).join(''):f.t==='check'?'✔':esc(r.props[f.k]))+'</div>').join('')+'</div>').join('')+'<button class="dbnew sm" data-dbnew="'+db.id+'" data-val="'+esc(c)+'">+ Nova</button></div>'}).join('')+'</div>';if(!gf)h='<p class="mu">Para ver em quadro, crie um campo do tipo Seleção.</p>'+h}
+ else{h='<div class="dbl">'+rs.map(r=>'<div class="dbli" data-rid="'+r.id+'"><div class="dblh"><input class="dbtit" data-rid="'+r.id+'" value="'+esc(r.title)+'"><button class="dbopen" data-open="'+r.id+'" aria-label="Abrir nota">↗</button></div>'+j.fields.map(f=>'<label class="dblf"><span>'+esc(f.k)+'</span>'+dbCell(f,r,db)+'</label>').join('')+'</div>').join('')+'</div><button class="dbnew" data-dbnew="'+db.id+'">+ Nova entrada</button>'}
+ if(!rs.length&&view!=='board')h='<p class="mu dbempty">'+(q?'Nada encontrado.':'Ainda não há entradas. Toque em “+ Nova entrada”, ou marque qualquer nota com #'+esc(dbSlug(db.title))+'.')+'</p>'+h;
+ return h}
+function dbHead(db,embed){const j=dbSchema(db);return'<div class="dbhd">'+(embed?'<b class="dbname" data-open="'+db.id+'">🗃 '+esc(db.title)+'</b>':'')+'<div class="seg dbvs">'+[['table','Tabela'],['board','Quadro'],['list','Lista']].map(([k,l])=>'<button data-dbview="'+k+'" data-db="'+db.id+'"'+(j.view===k?' class="on"':'')+'>'+l+'</button>').join('')+'</div>'+
+ '<input class="dbq" data-db="'+db.id+'" placeholder="Filtrar…" aria-label="Filtrar">'+(j.view==='board'?'<select class="dbgrp" data-db="'+db.id+'" aria-label="Agrupar por">'+j.fields.filter(f=>f.t==='select').map(f=>'<option'+(f.k===j.group?' selected':'')+'>'+esc(f.k)+'</option>').join('')+'</select>':'')+'<button class="stb" data-dbfields="'+db.id+'">⚙ Campos</button><span class="mu dbcount">'+dbRecs(db).length+' entradas</span></div>'}
+const dbFind=key=>{const k=String(key||'').trim();return dbList().find(d=>d.id===k)||dbList().find(d=>nz(d.title)===nz(k))||dbList().find(d=>dbSlug(d.title)===dbSlug(k))};
+function dbNoteList(){let dl=$('#dbnl');if(!dl){dl=document.createElement('datalist');dl.id='dbnl';document.body.appendChild(dl)}dl.innerHTML=S.notes.filter(n=>!isDbNote(n)).slice(0,400).map(n=>'<option value="'+esc(n.title)+'">').join('')}
+const DBQ={};
+function dbRender(){dbNoteList();const n=cur(),R=$('#dbr');if(R&&isDbNote(n)&&document.body.classList.contains('dbmode')){const ae=document.activeElement;if(ae&&ae.closest&&ae.closest('#dbr')&&ae.matches('input:not([type=checkbox]),textarea'))return;
+  R.innerHTML='<div class="dbtop"><h1>🗃 <input class="dbtitle" value="'+esc(n.title)+'" aria-label="Nome do banco"></h1>'+dbHead(n)+'</div><div class="dbbody">'+dbView(n,{q:DBQ[n.id]||''})+'</div>';const qi=R.querySelector('.dbq');if(qi)qi.value=DBQ[n.id]||''}
+ document.querySelectorAll('.dbe[data-db]').forEach(el=>{const ae=document.activeElement;if(ae&&el.contains(ae)&&ae.matches('input:not([type=checkbox])'))return;const db=dbFind(el.dataset.db);
+  el.innerHTML=db?dbHead(db,true)+'<div class="dbbody">'+dbView(db,{q:DBQ[db.id]||'',view:dbSchema(db).view==='board'&&innerWidth<600?'list':undefined})+'</div>':'<p class="mu">Banco de dados “'+esc(el.dataset.db)+'” não encontrado.</p>'})}
+function dbSetVal(rid,k,v){const r=S.notes.find(x=>x.id===rid);if(!r)return;r.props=r.props||{};if(v===''||v==null)delete r.props[k];else r.props[k]=v;r.updated=now();persistNew(r);save();if(r.id===curId&&!isDbNote(r))renderPr()}
+async function dbNew(db,val){const j=dbSchema(db),n=mk('Sem título',db.folder||'','');n.props={banco:db.id};j.fields.forEach(f=>{if(f.t==='check')n.props[f.k]='false'});const gf=j.fields.find(f=>f.k===j.group&&f.t==='select')||j.fields.find(f=>f.t==='select');if(val&&gf)n.props[gf.k]=val;
+ S.notes.unshift(n);persistNew(n);save();renderSB();dbRender();setTimeout(()=>{const i=document.querySelector('.dbtit[data-rid="'+n.id+'"]');if(i){i.focus();i.select()}},40);return n}
+function dbCreate(tpl){const t=DBTPL[tpl]||DBTPL.vazio;let name=(prompt('Nome do banco de dados',tpl==='vazio'?'':t[0].replace(/^\S+\s/,''))||'').trim();if(!name)return;
+ const fo=view.t==='f'?view.f:(cur()&&cur().folder)||'',db=mk(name,fo,'');db.props={tipo:'db'};dbSave(db,{fields:JSON.parse(JSON.stringify(t[1])),view:innerWidth<600?'list':'table',group:t[2],sort:{k:'',d:1}});S.notes.unshift(db);persistNew(db);save();openId(db.id);toast('Banco de dados criado')}
+function dbTplPick(){modal('dbtm','<div class="teh"><b>🗃 Novo banco de dados</b><button data-dbtx aria-label="Fechar">×</button></div><p class="mu">Escolha um modelo. Dá para mudar os campos depois.</p><div class="dbtpls">'+Object.entries(DBTPL).map(([k,[l,fs]])=>'<button data-dbtpl="'+k+'"><b>'+esc(l)+'</b><small>'+fs.map(f=>esc(f.k)).join(' · ')+'</small></button>').join('')+'</div>')}
+/* editor de campos */
+function dbFields(db,draft){const fs=draft||dbSchema(db).fields.map(f=>({...f,ok:f.k}));modal('dbfm','<div class="teh"><b>Campos de “'+esc(db.title)+'”</b><button data-dbfx aria-label="Fechar">×</button></div><div class="dbfl" data-db="'+db.id+'">'+fs.map((f,i)=>'<div class="dbfr" data-i="'+i+'" data-ok="'+esc(f.ok||'')+'"><input class="dbfk" value="'+esc(f.k)+'" aria-label="Nome do campo"><select class="dbft" aria-label="Tipo">'+Object.entries(DBT).map(([k,l])=>'<option value="'+k+'"'+(f.t===k?' selected':'')+'>'+l+'</option>').join('')+'</select>'+
+ (f.t==='select'||f.t==='multi'?'<input class="dbfo" value="'+esc((f.o||[]).join(', '))+'" placeholder="Opções, separadas por vírgula" aria-label="Opções">':'<span></span>')+'<span class="dbfb"><button data-fmv="-1" aria-label="Subir">↑</button><button data-fmv="1" aria-label="Descer">↓</button><button data-fdel class="dng" aria-label="Apagar campo">×</button></span></div>').join('')+
+ '</div><div class="dbfa"><button data-fadd>+ Campo</button></div><div class="mb2"><button class="pri" data-fsave="'+db.id+'">Salvar campos</button></div>')}
+function dbFieldsRead(){return[...document.querySelectorAll('#dbfm .dbfr')].map(r=>({k:r.querySelector('.dbfk').value.trim(),t:r.querySelector('.dbft').value,o:(r.querySelector('.dbfo')||{value:''}).value.split(',').map(x=>x.trim()).filter(Boolean),ok:r.dataset.ok}))}
+const dbFm=()=>S.notes.find(x=>x.id===$('#dbfm .dbfl').dataset.db);
+/* ---------- abrir banco como página própria ---------- */
+const _show22=show;show=function(){const r=_show22.apply(this,arguments);try{const n=cur(),on=isDbNote(n)&&view.t==='n';document.body.classList.toggle('dbmode',on);let R=$('#dbr');if(on){if(!R){R=document.createElement('div');R.id='dbr';$('#ew').after(R)}dbRender()}else if(R)R.innerHTML=''}catch(e){console.error(e)}return r};
+const _go22=go;go=function(v){const r=_go22.apply(this,arguments);if(!v||v.t!=='n')document.body.classList.remove('dbmode');return r};
+/* bloco embutido: ```db Nome``` */
+const _md22=md;md=function(src){src=String(src??'');if(!/^```db\s+\S/m.test(src))return _md22.call(this,src);const L=src.split('\n');for(let i=0;i<L.length;i++){const m=L[i].match(/^```db\s+(.+?)\s*$/);if(!m)continue;let j=i+1;while(j<L.length&&!/^```\s*$/.test(L[j]))j++;L[i]='\u0007DB'+m[1].replace(/\u0007/g,'')+'\u0007';for(let q=i+1;q<=j&&q<L.length;q++)L[q]='';i=j}
+ return _md22.call(this,L.join('\n')).replace(/<p[^>]*>\u0007DB([^\u0007]*)\u0007<\/p>/g,(_,nm)=>'<div class="dbe" data-db="'+esc(nm)+'"></div>').replace(/\u0007DB([^\u0007]*)\u0007/g,(_,nm)=>'<div class="dbe" data-db="'+esc(nm)+'"></div>')};
+const _hyd22=hydrate;hydrate=function(){const r=_hyd22.apply(this,arguments);try{if(document.querySelector('.dbe[data-db]:empty'))dbRender()}catch(e){}return r};
+new MutationObserver(()=>{if(document.querySelector('.dbe[data-db]:empty'))dbRender()}).observe(document.body,{childList:true,subtree:true});
+/* campos tipados no topo das notas que fazem parte de um banco */
+const _renderPr22=renderPr;renderPr=function(){_renderPr22.apply(this,arguments);const n=cur(),el=$('#pr');if(!n||!el||isDbNote(n))return;const dbs=dbOf(n);if(!dbs.length)return;const keys=new Set();
+ const html=dbs.map(db=>{const j=dbSchema(db);j.fields.forEach(f=>keys.add(f.k));return'<div class="dbf"><div class="dbfh"><b data-open="'+db.id+'">🗃 '+esc(db.title)+'</b><button class="stb" data-dbfields="'+db.id+'">⚙</button></div>'+j.fields.map(f=>'<label class="dblf"><span>'+esc(f.k)+'</span>'+dbCell(f,n,db)+'</label>').join('')+'</div>'}).join('');
+ el.querySelectorAll('.prr').forEach(r=>{const k=r.querySelector('[data-pk]');if(k&&keys.has(k.dataset.pk))r.remove()});const prl=el.querySelector('.prl');if(prl)prl.insertAdjacentHTML('afterbegin',html);const d=el.querySelector('details');if(d)d.open=true;dbNoteList()};
+/* ---------- eventos ---------- */
+document.addEventListener('change',e=>{const t=e.target;if(!t.closest)return;
+ if(t.matches('.dbin[data-rid],.dbck[data-rid]')){let v=t.type==='checkbox'?(t.checked?'true':'false'):t.value;const rid=t.dataset.rid,k=t.dataset.fk;
+  if(t.classList.contains('dbsel')&&v==='\u0001'){const db=dbList().find(d=>{const r=S.notes.find(x=>x.id===rid);return r&&inDb(r,d)&&dbSchema(d).fields.some(f=>f.k===k)}),nv=(prompt('Nova opção')||'').trim();if(!db||!nv){dbRender();renderPr();return}const j=dbSchema(db),f=j.fields.find(x=>x.k===k);f.o=(f.o||[]).concat(nv);dbSave(db,j);v=nv}
+  dbSetVal(rid,k,v);setTimeout(()=>{dbRender()},0);return}
+ if(t.matches('.dbtit')){const r=S.notes.find(x=>x.id===t.dataset.rid);if(r&&t.value.trim()&&t.value.trim()!==r.title){r.title=t.value.trim();r.updated=now();persistNew(r);save();renderSB()}return}
+ if(t.matches('.dbtitle')){const n=cur();if(n&&t.value.trim()){n.title=t.value.trim();n.updated=now();persistNew(n);save();renderSB()}return}
+ if(t.matches('.dbgrp')){const db=S.notes.find(x=>x.id===t.dataset.db);if(!db)return;const j=dbSchema(db);j.group=t.value;dbSave(db,j);dbRender()}
+ if(t.matches('#dbfm .dbft')){const db=dbFm(),fs=dbFieldsRead();dbFields(db,fs)}},true);
+document.addEventListener('input',e=>{const t=e.target;if(t.matches&&t.matches('.dbq')){DBQ[t.dataset.db]=t.value;const db=S.notes.find(x=>x.id===t.dataset.db);const body=t.closest('.dbe,#dbr').querySelector('.dbbody');if(db&&body)body.innerHTML=dbView(db,{q:t.value,view:t.closest('.dbe')&&dbSchema(db).view==='board'&&innerWidth<600?'list':undefined})}
+ else if(t.matches&&t.matches('.dbtit')){const r=S.notes.find(x=>x.id===t.dataset.rid);if(r&&t.value.trim()){r.title=t.value.trim();r.updated=now();clearTimeout(t._tm);t._tm=setTimeout(()=>{persistNew(r);save();renderSB()},500)}}});
+document.addEventListener('keydown',e=>{const t=e.target;if(t.matches&&t.matches('.dbtit,.dbin')&&e.key==='Enter'){e.preventDefault();t.blur()}});
+document.addEventListener('click',async e=>{const t=e.target;if(!t.closest)return;let b;
+ if(b=t.closest('[data-dbview]')){e.stopPropagation();const db=S.notes.find(x=>x.id===b.dataset.db);const j=dbSchema(db);j.view=b.dataset.dbview;dbSave(db,j);dbRender();return}
+ if(b=t.closest('[data-dbsort]')){e.stopPropagation();const eb=b.closest('.dbe'),db=eb?dbFind(eb.dataset.db):(isDbNote(cur())?cur():null);if(!db)return;const j=dbSchema(db),k=b.dataset.dbsort;j.sort=j.sort.k===k?{k,d:-j.sort.d}:{k,d:1};dbSave(db,j);dbRender();return}
+ if(b=t.closest('[data-dbnew]')){e.stopPropagation();const db=S.notes.find(x=>x.id===b.dataset.dbnew);if(db)dbNew(db,b.dataset.val||'');return}
+ if(b=t.closest('[data-dbdel]')){e.stopPropagation();const r=S.notes.find(x=>x.id===b.dataset.dbdel);if(!r||!confirm('Apagar a entrada “'+r.title+'”? (vai para a lixeira)'))return;trash(r);if(FH)fsDel(r.id);if(AT)AT.invoke('delete_note',{id:r.id}).catch(()=>{});S.notes=S.notes.filter(x=>x.id!==r.id);save();renderSB();dbRender();toast('Entrada apagada','Desfazer',()=>{restoreNote(r.id);save();dbRender()});return}
+ if(b=t.closest('[data-open]')){if(t.closest('input'))return;e.preventDefault();e.stopPropagation();openId(b.dataset.open);return}
+ if(b=t.closest('[data-gonote]')){e.stopPropagation();const n=S.notes.find(x=>nz(x.title)===nz(b.dataset.gonote));if(n)openId(n.id);else toast('Nota não encontrada');return}
+ if(b=t.closest('[data-dbfields]')){e.stopPropagation();const db=S.notes.find(x=>x.id===b.dataset.dbfields);if(db)dbFields(db);return}
+ if(t.closest('[data-dbfx]')){$('#dbfm').hidden=true;return}
+ if(t.closest('[data-dbtx]')){$('#dbtm').hidden=true;return}
+ if(b=t.closest('[data-dbtpl]')){$('#dbtm').hidden=true;dbCreate(b.dataset.dbtpl);return}
+ if(b=t.closest('#dbfm [data-fadd]')){const db=dbFm(),fs=dbFieldsRead();let k='Campo',i=2;while(fs.some(f=>f.k===k))k='Campo '+i++;fs.push({k,t:'text',o:[],ok:''});dbFields(db,fs);const ins=[...document.querySelectorAll('#dbfm .dbfk')].pop();ins&&(ins.focus(),ins.select());return}
+ if(b=t.closest('#dbfm [data-fmv]')){const db=dbFm(),fs=dbFieldsRead(),i=+b.closest('.dbfr').dataset.i,j2=i+(+b.dataset.fmv);if(j2<0||j2>=fs.length)return;[fs[i],fs[j2]]=[fs[j2],fs[i]];dbFields(db,fs);return}
+ if(b=t.closest('#dbfm [data-fdel]')){const db=dbFm(),fs=dbFieldsRead(),i=+b.closest('.dbfr').dataset.i;fs.splice(i,1);dbFields(db,fs);return}
+ if(b=t.closest('[data-fsave]')){const db=S.notes.find(x=>x.id===b.dataset.fsave),old=dbSchema(db),fs=dbFieldsRead().filter(f=>f.k);const seen=new Set();if(fs.some(f=>{if(seen.has(f.k))return true;seen.add(f.k)})){toast('Dois campos com o mesmo nome');return}
+  const recs=dbRecs(db);fs.forEach(f=>{if(f.ok&&f.ok!==f.k)recs.forEach(r=>{if(r.props&&f.ok in r.props){r.props[f.k]=r.props[f.ok];delete r.props[f.ok];r.updated=now();persistNew(r)}})});
+  const j={...old,fields:fs.map(f=>({k:f.k,t:f.t,...(f.t==='select'||f.t==='multi'?{o:f.o}:{})}))};if(j.group&&!j.fields.some(f=>f.k===j.group))j.group=(j.fields.find(f=>f.t==='select')||{}).k||'';dbSave(db,j);$('#dbfm').hidden=true;dbRender();renderPr();toast('Campos salvos');return}
+ if(b=t.closest('.dbmul')){e.stopPropagation();const rid=b.dataset.rid,k=b.dataset.fk,r=S.notes.find(x=>x.id===rid),db=dbList().find(d=>inDb(r,d)&&dbSchema(d).fields.some(f=>f.k===k));if(!db)return;const j=dbSchema(db),f=j.fields.find(x=>x.k===k),cur0=String((r.props||{})[k]||'').split(',').map(x=>x.trim()).filter(Boolean);
+  modal('dbmm','<div class="teh"><b>'+esc(k)+'</b><button data-dbmx aria-label="Fechar">×</button></div><div class="dbmo">'+(f.o||[]).map(o=>'<label><input type="checkbox" value="'+esc(o)+'"'+(cur0.includes(o)?' checked':'')+'> '+chip(f,o)+'</label>').join('')+'</div><div class="remc"><input id="dbmn" placeholder="Nova opção"><button class="pri" data-dbmok="'+rid+'" data-fk="'+esc(k)+'" data-db="'+db.id+'">Pronto</button></div>');return}
+ if(t.closest('[data-dbmx]')){$('#dbmm').hidden=true;return}
+ if(b=t.closest('[data-dbmok]')){const db=S.notes.find(x=>x.id===b.dataset.db),j=dbSchema(db),f=j.fields.find(x=>x.k===b.dataset.fk),nv=$('#dbmn').value.trim();const vs=[...document.querySelectorAll('#dbmm .dbmo input:checked')].map(i=>i.value);if(nv){if(!(f.o||[]).includes(nv)){f.o=(f.o||[]).concat(nv);dbSave(db,j)}vs.push(nv)}dbSetVal(b.dataset.dbmok,b.dataset.fk,vs.join(', '));$('#dbmm').hidden=true;dbRender();return}},true);
+/* arrastar cartões no quadro (mouse e dedo pela alça ⠿) */
+(function(){let d=null,gh=null;document.addEventListener('pointerdown',e=>{const g=e.target.closest&&e.target.closest('.dbcard .dbgr');if(!g)return;e.preventDefault();d=g.closest('.dbcard');gh=d.cloneNode(true);gh.classList.add('dbghost');document.body.appendChild(gh);d.classList.add('dragsrc');g.setPointerCapture&&g.setPointerCapture(e.pointerId)},true);
+ document.addEventListener('pointermove',e=>{if(!d)return;gh.style.left=(e.clientX-20)+'px';gh.style.top=(e.clientY-14)+'px';document.querySelectorAll('.dbcol.dz').forEach(x=>x.classList.remove('dz'));const u=document.elementFromPoint(e.clientX,e.clientY),c=u&&u.closest&&u.closest('.dbcol');if(c)c.classList.add('dz')},true);
+ const up=e=>{if(!d)return;const u=document.elementFromPoint(e.clientX,e.clientY),c=u&&u.closest&&u.closest('.dbcol');document.querySelectorAll('.dbcol.dz').forEach(x=>x.classList.remove('dz'));gh.remove();d.classList.remove('dragsrc');const rid=d.dataset.rid;d=null;
+  if(!c)return;const box=c.closest('.dbe,#dbr'),dbid=box&&(box.id==='dbr'?curId:(dbFind(box.dataset.db)||{}).id),db=S.notes.find(x=>x.id===dbid);if(!db)return;const j=dbSchema(db),gf=j.fields.find(f=>f.k===j.group&&f.t==='select')||j.fields.find(f=>f.t==='select');if(gf){dbSetVal(rid,gf.k,c.dataset.col);dbRender()}};
+ document.addEventListener('pointerup',up,true);document.addEventListener('pointercancel',()=>{if(d){gh.remove();d.classList.remove('dragsrc');d=null}},true)})();
+/* ---------- barra lateral, menu Criar, menu da nota, paleta ---------- */
+(function(){const fl=$('#s-fl');if(fl&&!$('#s-db')){fl.insertAdjacentHTML('afterend','<section class="sec" id="s-db"><h4 class="sec-t">Bancos de dados<span class="ftb"><button data-dbnewdb title="Novo banco de dados" aria-label="Novo banco de dados">+</button></span></h4><div id="dbsl"></div></section>')}SECN['s-db']='Bancos de dados';
+ const crm=$('#crm');if(crm){const k=crm.querySelector('[data-cr="kanban"]');k&&k.insertAdjacentHTML('beforebegin','<button data-cr="db"><span class="cri">🗃️</span>Banco de dados</button>')}})();
+function dbSb(){const el=$('#dbsl');if(!el)return;const L=dbList();el.innerHTML=L.length?L.map(db=>'<div class="it'+(curId===db.id&&view.t==='n'?' on':'')+'" data-id="'+db.id+'"><span class="u">🗃 '+esc(db.title)+'</span><small>'+dbRecs(db).length+'</small></div>').join(''):'<div class="mu sbe">Nenhum ainda. Toque em + para criar (ex.: Livros, Projetos).</div>'}
+const _rs22=renderSB;renderSB=function(){_rs22.apply(this,arguments);try{dbSb();nmButtons()}catch(e){}};
+document.addEventListener('click',e=>{if(e.target.closest&&(e.target.closest('[data-dbnewdb]')||e.target.closest('[data-cr="db"]'))){e.stopPropagation();const p=e.target.closest('.pop');if(p)p.hidden=true;dbTplPick()}},true);
+const _nmItems22=nmItems;nmItems=function(n){const G=_nmItems22(n);if(!isDbNote(n)&&dbList().length)G[1].push({k:'dir',l:'Adicionar a um banco de dados…',a:'todb'});if(isDbNote(n))G[2].push({k:'link',l:'Copiar bloco para embutir',a:'dbemb'});return G};
+const _nmDo22=nmDo;nmDo=function(a,n){if(a==='todb'){nmPick('Adicionar “'+n.title+'” a…',dbList().map(d=>[d.id,'🗃 '+d.title]),id=>{const s0=String((n.props||{}).banco||'').split(',').filter(Boolean);if(!s0.includes(id))s0.push(id);n.props=n.props||{};n.props.banco=s0.join(',');n.updated=now();persistNew(n);save();renderSB();if(n.id===curId)renderPr();toast('Adicionada ao banco de dados')});return}
+ if(a==='dbemb'){clip('```db '+n.title+'\n```').then(()=>toast('Cole numa nota para embutir este banco'));return}return _nmDo22.apply(this,arguments)};
+{const c0=CMDS;CMDS=()=>c0().concat([['Novo banco de dados…',()=>dbTplPick()],...dbList().map(d=>['Abrir banco: '+d.title,()=>openId(d.id)])])}
+/* ícone no explorador */
+const _noteRow22=noteRow;noteRow=function(n,dp){let h=_noteRow22(n,dp);if(isDbNote(n))h=h.replace(/<svg class="fic"[\s\S]*?<\/svg>/,'<i class="nic2">🗃</i>');else if(isPdfNote(n))h=h.replace(/<svg class="fic"[\s\S]*?<\/svg>/,'<i class="nic2">📄</i>');return h};
 
 boot();
 </script>
