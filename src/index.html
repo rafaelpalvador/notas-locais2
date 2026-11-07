@@ -641,6 +641,9 @@ body.pdrag,body.pdrag *{cursor:grabbing!important;user-select:none!important}
 .dragsrc{opacity:.45}
 #fl .dz{background:var(--acs)!important;outline:2px dashed var(--ac);outline-offset:-2px;border-radius:7px}
 #fl .dz-b{box-shadow:inset 0 3px 0 var(--ac)}#fl .dz-a{box-shadow:inset 0 -3px 0 var(--ac)}
+/* NEW21 */
+.tdarm{background:var(--acs)!important;transform:scale(.98);transition:transform .12s}
+@media(max-width:760px){#fl .tn,#fl .fr,#lv .cd{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}#msb{bottom:calc(10px + env(safe-area-inset-bottom,0px) + var(--kb,0px))}}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -2816,6 +2819,7 @@ const _cmd12=cmd;cmd=function(c){const v=window.cmView&&cmView();
  const go=(a,b)=>{if((typeof ST!=='undefined'&&ST.syncScroll===false)||document.body.dataset.m!=='split'||document.body.classList.contains('pvmin')||lock)return;lock=1;to(b,fr(a));clearTimeout(tm);tm=setTimeout(()=>lock=0,60)};
  const hook=()=>{const s=sc();if(!s){setTimeout(hook,300);return}s.addEventListener('scroll',()=>go(s,pv),{passive:true});pv.addEventListener('scroll',()=>go(pv,s),{passive:true})};hook()})();
 
+window.HDR21=1;window.TD21=1;
 /* NEW13: menus no celular viram painel inferior com barra de fechar; cabeçalho some ao rolar (como Obsidian/Joplin) */
 (function(){const mq=matchMedia('(max-width:760px)'),B=document.body;
  const ttl=p=>{const t=document.querySelector('[data-pop="'+p.id+'"]');return(t&&(t.getAttribute('title')||t.getAttribute('aria-label')||t.textContent.trim()))||'Menu'};
@@ -2826,12 +2830,12 @@ const _cmd12=cmd;cmd=function(c){const v=window.cmView&&cmView();
  ['pointerdown','mousedown','touchstart','click'].forEach(t=>addEventListener(t,shut,{capture:true,passive:false}));
  /* cabeçalho que sobe com o texto */
  let last=new WeakMap(),acc=0;const HS=['#tabs','#cv','#bar','#pr'];
- const onS=e=>{if(!mq.matches||B.classList.contains('stnohdr'))return;const el=e.target;if(!(el instanceof Element))return;if(!el.closest('#mn'))return;const y=el.scrollTop,p=last.get(el)??y;last.set(el,y);const d=y-p;
+ const onS=e=>{if(window.HDR21||!mq.matches||B.classList.contains('stnohdr'))return;const el=e.target;if(!(el instanceof Element))return;if(!el.closest('#mn'))return;const y=el.scrollTop,p=last.get(el)??y;last.set(el,y);const d=y-p;
   if(y<24){B.classList.remove('hdh');acc=0;return}acc=(acc>0)===(d>0)?acc+d:d;if(acc>28)B.classList.add('hdh');else if(acc<-36)B.classList.remove('hdh')};
  document.addEventListener('scroll',onS,true);
  const _go13=go;go=function(){B.classList.remove('hdh');return _go13.apply(this,arguments)};
  /* barra de formatação colada ao teclado */
- const vv=window.visualViewport;if(vv){const f=()=>{const kb=Math.max(0,innerHeight-vv.height-vv.offsetTop);B.style.setProperty('--kb',kb+'px');B.classList.toggle('kbo',kb>80)};vv.addEventListener('resize',f);vv.addEventListener('scroll',f);f()}
+ const vv=window.visualViewport;if(vv&&!window.HDR21){const f=()=>{if(window.HDR21)return;const kb=Math.max(0,innerHeight-vv.height-vv.offsetTop);B.style.setProperty('--kb',kb+'px');B.classList.toggle('kbo',kb>80)};vv.addEventListener('resize',f);vv.addEventListener('scroll',f);f()}
 })();
 
 /* NEW14: recursos inspirados no Joplin */
@@ -3037,9 +3041,9 @@ function selPaint(){document.querySelectorAll('.tn[data-id],.cd[data-id]').forEa
   '<button data-ms="tag">+ Tag</button><button data-ms="pin">📌 Fixar</button><button data-ms="unpin">Desafixar</button><button data-ms="todo">☐ Tarefa</button><button data-ms="all">Todas</button><button data-ms="del" class="dng">Excluir</button><button data-ms="x" aria-label="Cancelar">✕</button>'}
 function selToggle(id,range){if(range&&SELA){const it=selItems().map(e=>e.dataset.id),a=it.indexOf(SELA),z=it.indexOf(id);if(a>=0&&z>=0){const[i,j]=a<z?[a,z]:[z,a];it.slice(i,j+1).forEach(x=>SELN.add(x));selPaint();return}}
  SELN.has(id)?SELN.delete(id):SELN.add(id);SELA=id;selPaint()}
-document.addEventListener('click',e=>{const el=e.target.closest&&e.target.closest('#fl .tn[data-id],#lv .cd[data-id]');if(!el||e.target.closest('[data-tdid]'))return;
+document.addEventListener('click',e=>{if(window.__eat21)return;const el=e.target.closest&&e.target.closest('#fl .tn[data-id],#lv .cd[data-id]');if(!el||e.target.closest('[data-tdid]'))return;
  if(e.ctrlKey||e.metaKey||e.shiftKey||SELN.size){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();selToggle(el.dataset.id,e.shiftKey)}},true);
-document.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch')return;const el=e.target.closest&&e.target.closest('#fl .tn[data-id],#lv .cd[data-id]');if(!el)return;clearTimeout(LPT);
+document.addEventListener('pointerdown',e=>{if(window.TD21||e.pointerType!=='touch')return;const el=e.target.closest&&e.target.closest('#fl .tn[data-id],#lv .cd[data-id]');if(!el)return;clearTimeout(LPT);
  LPT=setTimeout(()=>{LPT='fired';selToggle(el.dataset.id);try{navigator.vibrate&&navigator.vibrate(15)}catch(x){}},520)},true);
 ['pointerup','pointercancel','pointermove'].forEach(t=>document.addEventListener(t,e=>{if(t==='pointermove'&&e.pointerType==='touch'&&LPT&&LPT!=='fired'&&(Math.abs(e.movementX)+Math.abs(e.movementY)>6))clearTimeout(LPT);else if(t!=='pointermove'){if(LPT!=='fired')clearTimeout(LPT);else setTimeout(()=>LPT=null,50)}},true));
 document.addEventListener('click',e=>{if(LPT==='fired'&&e.target.closest&&e.target.closest('#fl .tn,#lv .cd')){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation()}},true);
@@ -3625,6 +3629,62 @@ const _stPage19=stPage;stPage=function(p){if(p!=='lemb')return _stPage19(p);cons
  document.addEventListener('pointerup',end,true);document.addEventListener('pointercancel',end,true);
  document.addEventListener('click',e=>{if(noClick){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();noClick=false}},true);
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drag){tgt=null;end({type:'pointercancel'})}})})();
+
+/* NEW21: correções do celular */
+window.HDR21=1;window.TD21=1;
+/* ---------- 1) cabeçalho: some pelo gesto do dedo e quando o teclado abre (sem depender da rolagem, que gerava vaivém) ---------- */
+(function(){const B=document.body,mq=matchMedia('(max-width:760px)');let y0=null,last=0,acc=0,lock=0,maxH=innerHeight;
+ const set=h=>{if(Date.now()<lock||B.classList.contains('stnohdr'))return;if(h===B.classList.contains('hdh'))return;B.classList.toggle('hdh',h);lock=Date.now()+380;acc=0};
+ const scr=()=>{const v=window.cmView&&cmView();if(document.body.dataset.m!=='read'&&v&&v.scrollDOM.offsetParent)return v.scrollDOM;return document.querySelector('#pdfr .pv2')||$('#pv')};
+ document.addEventListener('touchstart',e=>{if(!mq.matches)return;const t=e.target;if(!t.closest||!t.closest('#ew,#pdfr,#lv'))return;y0=e.touches[0].clientY;last=y0;acc=0},{passive:true});
+ document.addEventListener('touchmove',e=>{if(y0==null||!mq.matches)return;const y=e.touches[0].clientY,d=last-y;last=y;acc=(acc>=0)===(d>=0)?acc+d:d;
+  if(acc>42)set(true);else if(acc<-70){const s=scr();if(!s||s.scrollTop<40||acc<-140)set(false)}},{passive:true});
+ document.addEventListener('touchend',()=>{y0=null},{passive:true});
+ /* teclado aberto = mais espaço para escrever */
+ const vv=window.visualViewport;const kbCheck=()=>{const ih=innerHeight,vh=vv?vv.height:ih;if(!document.activeElement||!document.activeElement.closest||!document.activeElement.closest('input,textarea,[contenteditable="true"],.cm-content'))maxH=Math.max(maxH,ih);
+  const open=mq.matches&&(ih<maxH*.8||vh<ih*.8),kb=vv?Math.max(0,ih-vv.height-vv.offsetTop):0;B.style.setProperty('--kb',kb+'px');
+  if(open!==B.classList.contains('kbo')){B.classList.toggle('kbo',open);const ae=document.activeElement;if(open&&ae&&ae.closest&&ae.closest('#cmw,#pv'))set(true);else if(!open)set(false)}};
+ addEventListener('resize',kbCheck);if(vv){vv.addEventListener('resize',kbCheck);vv.addEventListener('scroll',kbCheck)}addEventListener('orientationchange',()=>{maxH=0;setTimeout(()=>{maxH=innerHeight;kbCheck()},500)});
+ document.addEventListener('focusin',e=>{if(mq.matches&&e.target.closest&&e.target.closest('#cmw')&&B.classList.contains('kbo'))set(true)});
+ const _go21=go;go=function(){B.classList.remove('hdh');return _go21.apply(this,arguments)}})();
+/* ---------- 2) sair de blocos de código ---------- */
+function codeAt(st,pos){let n=CM.syntaxTree(st).resolveInner(pos,-1);while(n&&n.name!=='FencedCode')n=n.parent;if(!n)return null;const l1=st.doc.lineAt(n.from),lz=st.doc.lineAt(n.to);
+ if(/^(draw|pdf|kanban|canvas|mermaid|audio|locked)\b/.test(l1.text.replace(/^\s*(`{3,}|~{3,})\s*/,'')))return null;return{from:n.from,to:n.to,open:l1,close:/^\s*(`{3,}|~{3,})\s*$/.test(lz.text)&&lz.number>l1.number?lz:null}}
+function codeExit(v,dropEmpty){const st=v.state,r=st.selection.main,c=codeAt(st,r.head);if(!c)return false;const doc=st.doc,ln=doc.lineAt(r.head);let ch=[],end;
+ if(!c.close){ch.push({from:doc.length,insert:(doc.sliceString(doc.length-1)==='\n'?'':'\n')+'```\n'});v.dispatch({changes:ch,selection:{anchor:doc.length+(doc.sliceString(doc.length-1)==='\n'?4:5)},scrollIntoView:true});return true}
+ if(ln.number===c.close.number)return false;
+ let cut=0;if(dropEmpty&&!ln.text.trim()&&ln.number===c.close.number-1&&ln.number>c.open.number+1){ch.push({from:ln.from-1,to:ln.to});cut=ln.to-ln.from+1}
+ const nx=c.close.number<doc.lines?doc.line(c.close.number+1):null;
+ if(nx&&!nx.text.trim()){v.dispatch({changes:ch,selection:{anchor:nx.from-cut},scrollIntoView:true})}else{ch.push({from:c.close.to,insert:'\n'});v.dispatch({changes:ch,selection:{anchor:c.close.to+1-cut},scrollIntoView:true})}return true}
+document.addEventListener('keydown',e=>{if(e.key!=='Enter'||e.isComposing)return;const v=window.cmView&&cmView();if(!v||!e.target.closest||!e.target.closest('#cmw .cm-content'))return;
+ const st=v.state,r=st.selection.main;if(!r.empty)return;const c=codeAt(st,r.head);if(!c)return;const ln=st.doc.lineAt(r.head);
+ if(e.shiftKey||e.ctrlKey||e.metaKey){if(codeExit(v,false)){e.preventDefault();e.stopPropagation()}return}
+ /* Enter numa linha vazia no fim do bloco = sair do bloco */
+ if(!ln.text.trim()&&(!c.close||ln.number===c.close.number-1)&&ln.number>c.open.number+1){if(codeExit(v,true)){e.preventDefault();e.stopPropagation()}}},true);
+/* toque/clique abaixo do fim da nota: cria uma linha livre fora de blocos */
+document.addEventListener('pointerdown',e=>{const v=window.cmView&&cmView();if(!v||!e.target.closest||!e.target.closest('#cmw'))return;if(e.target.closest('.cm-line,.cm-blk,button,input'))return;
+ const doc=v.state.doc,last=doc.line(doc.lines),co=v.coordsAtPos(last.to);if(!co||e.clientY<=co.bottom+4)return;e.preventDefault();
+ const inCode=!!codeAt(v.state,last.to),needs=last.text.trim()!==''||inCode;const ch=needs?[{from:doc.length,insert:'\n'}]:[];v.dispatch({changes:ch,selection:{anchor:doc.length+(needs?1:0)},scrollIntoView:true});v.focus()},true);
+/* ---------- 3) arrastar notas com o dedo: segure e arraste; segure e solte = selecionar ---------- */
+(function(){const SRC='#fl .tn[data-id],#fl .fr[data-fd],#lv .cd[data-id],#sb .it[data-id]',SKIP='button,input,select,textarea,a,.fco,.nmo,.fx,.fnn,.fmv,.tdc2,.sbg';
+ let st=null,tm=null,drag=false,ghost=null,tgt=null,pos='in',eat=false;
+ const clear=()=>document.querySelectorAll('.dz,.dz-b,.dz-a').forEach(x=>x.classList.remove('dz','dz-b','dz-a'));
+ document.addEventListener('touchstart',e=>{window.__lastTouch=Date.now();const el=e.target.closest&&e.target.closest(SRC);if(!el||e.target.closest(SKIP)||e.touches.length>1)return;const t=e.touches[0];
+  st={el,x:t.clientX,y:t.clientY,id:el.dataset.id||null,fd:el.dataset.fd||null,armed:false};clearTimeout(tm);tm=setTimeout(()=>{if(!st)return;st.armed=true;el.classList.add('tdarm');try{navigator.vibrate&&navigator.vibrate(18)}catch(x){}},430)},{passive:true,capture:true});
+ document.addEventListener('touchmove',e=>{if(!st)return;const t=e.touches[0],dx=t.clientX-st.x,dy=t.clientY-st.y;
+  if(!st.armed){if(Math.hypot(dx,dy)>10){clearTimeout(tm);st=null}return}
+  e.preventDefault();if(!drag&&Math.hypot(dx,dy)>6){drag=true;ghost=document.createElement('div');ghost.id='dragg';const n=st.id&&S.notes.find(x=>x.id===st.id);ghost.textContent=st.fd?'📁 '+basn(st.fd):'📄 '+(n?n.title:'');document.body.appendChild(ghost);document.body.classList.add('pdrag');st.el.classList.add('dragsrc')}
+  if(!drag)return;ghost.style.left=Math.min(innerWidth-180,t.clientX+12)+'px';ghost.style.top=(t.clientY-44)+'px';const u=document.elementFromPoint(t.clientX,t.clientY),g=u&&u.closest&&u.closest('#fl .it[data-f],#fl [data-all]');clear();tgt=null;
+  if(g&&!(st.fd&&g.dataset.f===st.fd)){tgt=g;if(st.fd&&!g.dataset.all){const r=g.getBoundingClientRect(),y=(t.clientY-r.top)/(r.height||1);pos=y<.25?'before':y>.75?'after':'in';g.classList.add(pos==='in'?'dz':pos==='before'?'dz-b':'dz-a')}else{pos='in';g.classList.add('dz')}}
+  const sb=$('#sb'),R=sb.getBoundingClientRect();if(t.clientY<R.top+60)sb.scrollTop-=10;else if(t.clientY>R.bottom-60)sb.scrollTop+=10},{passive:false,capture:true});
+ const fin=cancel=>{clearTimeout(tm);const s=st,d=drag,g=tgt,p=pos;st=null;drag=false;tgt=null;clear();if(ghost){ghost.remove();ghost=null}document.body.classList.remove('pdrag');if(!s)return;s.el.classList.remove('tdarm','dragsrc');
+  if(!s.armed)return;eat=true;window.__eat21=1;setTimeout(()=>{eat=false;window.__eat21=0},450);const sbo=$('#sb').classList.contains('open'),keep=()=>{if(sbo)setTimeout(()=>$('#sb').classList.add('open'),30)};
+  if(!d){if(s.id&&!cancel)selToggle(s.id);return}
+  if(cancel||!g)return;const f=g.dataset.all?'':g.dataset.f;if(s.fd){dropFolder(s.fd,f,g.dataset.all?'in':p);keep()}else if(s.id){const ids=SELN.size>1&&SELN.has(s.id)?[...SELN]:[s.id];if(ids.length>1){ids.forEach(id=>{const n=S.notes.find(x=>x.id===id);if(n&&n.folder!==f){n.folder=f;n.updated=now();persistNew(n)}});save();SELN.clear();selPaint();renderSB();toast(ids.length+' notas movidas')}else moveNote(s.id,f)}keep()};
+ document.addEventListener('touchend',()=>fin(false),{capture:true});document.addEventListener('touchcancel',()=>fin(true),{capture:true});
+ document.addEventListener('click',e=>{if(eat&&e.target.closest&&e.target.closest(SRC)){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation()}},true);
+ /* o "segurar" do Android não abre o menu de contexto em cima da seleção */
+ window.addEventListener('contextmenu',e=>{if(Date.now()-(window.__lastTouch||0)<1500&&e.target.closest&&e.target.closest(SRC)){e.preventDefault();e.stopImmediatePropagation()}},true)})();
 
 boot();
 </script>
