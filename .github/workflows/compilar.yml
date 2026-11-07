@@ -22,6 +22,11 @@ jobs:
       - uses: swatinem/rust-cache@v2
         with:
           workspaces: src-tauri
+      - name: Número da versão (0.1.N, sobe a cada compilação)
+        shell: bash
+        run: |
+          node -e "const f='src-tauri/tauri.conf.json',j=JSON.parse(require('fs').readFileSync(f,'utf8'));j.version='0.1.${{ github.run_number }}';require('fs').writeFileSync(f,JSON.stringify(j,null,1))"
+          grep '"version"' src-tauri/tauri.conf.json
       - name: Instalar dependências
         run: npm install
       - name: Ícones do app
@@ -65,6 +70,11 @@ jobs:
       - uses: swatinem/rust-cache@v2
         with:
           workspaces: src-tauri
+      - name: Número da versão (0.1.N, sobe a cada compilação)
+        shell: bash
+        run: |
+          node -e "const f='src-tauri/tauri.conf.json',j=JSON.parse(require('fs').readFileSync(f,'utf8'));j.version='0.1.${{ github.run_number }}';require('fs').writeFileSync(f,JSON.stringify(j,null,1))"
+          grep '"version"' src-tauri/tauri.conf.json
       - name: Instalar dependências
         run: npm install
       - name: Gerar projeto Android
@@ -111,12 +121,23 @@ jobs:
           ls -la saida
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: build-${{ github.run_number }}
-          name: Marginália Notes (teste ${{ github.run_number }})
+          tag_name: v0.1.${{ github.run_number }}
+          name: Marginália Notes 0.1.${{ github.run_number }}
           body: |
-            Versão de teste gerada automaticamente a partir do commit ${{ github.sha }}.
-            - **Android:** baixe `Marginalia-Android.apk` no celular e abra (permita instalar de fontes desconhecidas).
-            - **Windows:** baixe `Marginalia-Windows-instalador.exe` e execute (em "O Windows protegeu o computador", clique em Mais informações → Executar assim mesmo).
-          prerelease: true
+            Versão 0.1.${{ github.run_number }} (commit ${{ github.sha }}).
+            - **Android:** `Marginalia-Android.apk` — no Obtainium, use o endereço do repositório para receber as atualizações sozinho.
+            - **Windows:** `Marginalia-Windows-instalador.exe` — depois de instalado, o próprio app avisa e instala as versões novas (Configurações → Atualizações).
+            Links fixos (sempre a versão mais nova):
+            - https://github.com/${{ github.repository }}/releases/latest/download/Marginalia-Android.apk
+            - https://github.com/${{ github.repository }}/releases/latest/download/Marginalia-Windows-instalador.exe
+          prerelease: false
           make_latest: true
           files: saida/*
+      - name: Apagar versões antigas (fica só a mais nova)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          KEEP=v0.1.${{ github.run_number }}
+          gh release list --repo ${{ github.repository }} --limit 200 --json tagName -q '.[].tagName' | while read -r T; do
+            if [ "$T" != "$KEEP" ]; then echo "apagando $T"; gh release delete "$T" --repo ${{ github.repository }} --cleanup-tag -y || true; fi
+          done

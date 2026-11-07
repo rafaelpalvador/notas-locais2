@@ -257,6 +257,29 @@ fn ext_reveal(app: tauri::AppHandle, id: String) -> Result<(), String> {
         Ok(())
     }
 }
+
+// ---------- atualização automática (Windows): baixa o instalador da versão nova e roda em modo passivo ----------
+#[tauri::command]
+async fn update_install(url: String, token: Option<String>) -> Result<(), String> {
+    #[cfg(not(target_os = "windows"))]
+    { let _ = (&url, &token); return Err("A atualização automática pelo app é só para Windows".into()); }
+    #[cfg(target_os = "windows")]
+    {
+        let client = reqwest::Client::builder().timeout(std::time::Duration::from_secs(300)).build().map_err(|e| e.to_string())?;
+        let mut rq = client.get(&url).header("User-Agent", "MarginaliaNotes").header("Accept", "application/octet-stream");
+        if let Some(t) = token.filter(|t| !t.trim().is_empty()) { rq = rq.header("Authorization", format!("Bearer {}", t.trim())); }
+        let rs = rq.send().await.map_err(|e| e.to_string())?;
+        if !rs.status().is_success() { return Err(format!("Download falhou ({})", rs.status())); }
+        let bytes = rs.bytes().await.map_err(|e| e.to_string())?;
+        if bytes.len() < 100_000 { return Err("Arquivo do instalador inválido".into()); }
+        let path = std::env::temp_dir().join("Marginalia-atualizacao.exe");
+        fs::write(&path, &bytes).map_err(|e| e.to_string())?;
+        use std::os::windows::process::CommandExt;
+        std::process::Command::new(&path).args(["/P", "/R"]).creation_flags(0x00000008).spawn().map_err(|e| e.to_string())?;
+        std::thread::spawn(|| { std::thread::sleep(std::time::Duration::from_millis(700)); std::process::exit(0); });
+        Ok(())
+    }
+}
 #[tauri::command]
 fn ext_poll(app: tauri::AppHandle, id: String) -> Result<ExtOut, String> {
     let p = note_file(&app, &id)?;
@@ -269,7 +292,7 @@ fn ext_poll(app: tauri::AppHandle, id: String) -> Result<ExtOut, String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![load_vault, save_note, delete_note, create_folder, save_asset, read_asset, set_vault, rename_folder, delete_folder, http_req, ext_open, ext_poll, ext_reveal])
+        .invoke_handler(tauri::generate_handler![load_vault, save_note, delete_note, create_folder, save_asset, read_asset, set_vault, rename_folder, delete_folder, http_req, ext_open, ext_poll, ext_reveal, update_install])
         .run(tauri::generate_context!())
         .expect("erro ao iniciar o app");
 }

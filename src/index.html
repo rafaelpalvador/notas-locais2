@@ -613,13 +613,14 @@ body.audrag,body.audrag *{cursor:grabbing!important;user-select:none}
 .stth{margin-bottom:14px}.stth .seg{display:flex;flex-wrap:wrap;gap:8px}.stth .seg button{display:flex;align-items:center;gap:7px;padding:8px 12px;border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--ink);cursor:pointer}.stth .seg button.on{outline:2px solid var(--ac)}
 #stfp .row{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}#stfp input{padding:8px 10px;border-radius:9px;border:1px solid var(--bd);background:var(--bg);color:var(--ink)}#stfp button{padding:8px 12px;border-radius:9px;border:1px solid var(--bd);background:var(--sf);color:var(--ink);cursor:pointer;margin:2px 4px 2px 0}
 /* NEW17 */
+#sb .sh{gap:6px}#sb .sh .sbtn{flex:none}#sb .sh .brand{flex:1 1 auto;min-width:0}
 .mrg-logo .mrg-page{fill:color-mix(in srgb,var(--gold) 14%,var(--sf));stroke:var(--ink);stroke-width:1.5;opacity:.95}
 .mrg-logo .mrg-margin{stroke:var(--ac);stroke-width:1.6}
 .mrg-logo .mrg-lines{stroke:var(--mu);stroke-width:1.5;stroke-linecap:round;fill:none}
 .mrg-logo .mrg-quill{fill:var(--gold);stroke:var(--ink);stroke-width:.7;stroke-linejoin:round}
 .mrg-logo .mrg-nib{stroke:var(--ink);stroke-width:1.3;stroke-linecap:round}
-.mrg-word{display:flex;align-items:baseline;gap:5px;font-weight:760;letter-spacing:-.02em;font-size:21px;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif;color:var(--ink);white-space:nowrap}
-.mrg-word small{font:700 10.5px var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--ac)}
+.mrg-word{display:flex;flex-direction:column;align-items:flex-start;gap:1px;line-height:1;min-width:0;overflow:hidden;font-weight:760;letter-spacing:-.02em;font-size:19px;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif;color:var(--ink);white-space:nowrap}
+.mrg-word small{font:700 8.5px var(--ui);letter-spacing:.32em;margin-left:1px;text-transform:uppercase;color:var(--ac)}
 #sbft{display:flex;align-items:center;gap:4px;margin-top:6px}#sbft .wdst{flex:1;margin-top:0}#sbft .ib{flex:none}
 #tgp input,#tgr,#tgcn,#te input,#te select,#te span,#te label{color:var(--ink)!important}
 #tgp input,#te input:not([type=checkbox]):not([type=color]){background:var(--bg)!important;border:1px solid var(--bd)}
@@ -3494,6 +3495,39 @@ document.addEventListener('click',e=>{if(e.target.id!=='fcok')return;e.stopPropa
  FCLR[f]=v;fsv();if(!FCP.includes(v)&&!ST.fcCustom.includes(v)){ST.fcCustom.unshift(v);ST.fcCustom=ST.fcCustom.slice(0,12);stSave()}$('#xm').hidden=true;renderSB();toast('Cor aplicada à pasta')},true);
 document.addEventListener('keydown',e=>{if(e.target.id==='fct'&&e.key==='Enter'){e.preventDefault();$('#fcok').click()}});
 
+
+/* NEW18: atualizações automáticas */
+const UPD={repo:'rafaelpalvador/notas-locais2',cur:'',latest:null,err:'',busy:false};
+const updTok=()=>{try{return localStorage.getItem('ln:ghtok')||''}catch(e){return''}};
+const isWin=/Windows/i.test(navigator.userAgent)&&!!AT;
+const vNum=v=>String(v||'').replace(/^v/i,'').split('.').map(x=>parseInt(x)||0);
+const vNewer=(a,b)=>{const A=vNum(a),B=vNum(b);for(let i=0;i<Math.max(A.length,B.length);i++){if((A[i]||0)!==(B[i]||0))return(A[i]||0)>(B[i]||0)}return false};
+(async()=>{try{if(window.__TAURI__&&__TAURI__.app&&__TAURI__.app.getVersion)UPD.cur=await __TAURI__.app.getVersion()}catch(e){}})();
+async function updCheck(manual){if(UPD.busy)return;UPD.busy=true;UPD.err='';const t=updTok(),h={'Accept':'application/vnd.github+json','User-Agent':'MarginaliaNotes'};if(t)h.Authorization='Bearer '+t;
+ const url='https://api.github.com/repos/'+UPD.repo+'/releases/latest';
+ try{let st,body;if(AT){const r=await AT.invoke('http_req',{method:'GET',url,headers:h,body:null});st=r.status;body=new TextDecoder().decode(Uint8Array.from(atob(r.body),c=>c.charCodeAt(0)))}else{const r=await fetch(url,{headers:t?{Authorization:'Bearer '+t,Accept:h.Accept}:{Accept:h.Accept}});st=r.status;body=await r.text()}
+  if(st===404)throw new Error(t?'Não encontrei a versão. Confira se o token tem acesso a este repositório.':'O repositório é privado: cole um token do GitHub abaixo.');
+  if(st===401||st===403)throw new Error('Token do GitHub inválido ou sem permissão.');if(st>=300)throw new Error('GitHub respondeu '+st);
+  const j=JSON.parse(body);UPD.latest={v:j.tag_name,name:j.name,date:j.published_at,exe:(j.assets||[]).find(a=>/Windows-instalador\.exe$/i.test(a.name)),apk:(j.assets||[]).find(a=>/\.apk$/i.test(a.name))};
+  if(manual)toast(UPD.cur&&!vNewer(UPD.latest.v,UPD.cur)?'Você já está na versão mais nova ('+UPD.cur+')':'Versão disponível: '+UPD.latest.v.replace(/^v/,''))}
+ catch(e){UPD.err=e.message||String(e);if(manual)toast(UPD.err)}finally{UPD.busy=false;if($('#stm')&&!$('#stm').hidden&&STPG==='atual')stRefresh()}
+ if(!manual&&isWin&&UPD.latest&&UPD.cur&&vNewer(UPD.latest.v,UPD.cur))toast('Nova versão '+UPD.latest.v.replace(/^v/,'')+' disponível','Atualizar',()=>updInstall())}
+async function updInstall(){if(!isWin){toast('A instalação automática pelo app é no Windows. No Android use o Obtainium.');return}if(!UPD.latest||!UPD.latest.exe){await updCheck(true);if(!UPD.latest||!UPD.latest.exe)return}
+ if(!confirm('Instalar a versão '+UPD.latest.v.replace(/^v/,'')+' agora? O app fecha, atualiza e abre de novo sozinho. Suas notas não são afetadas.'))return;
+ try{save();toast('Baixando a atualização…');await AT.invoke('update_install',{url:UPD.latest.exe.url,token:updTok()||null})}catch(e){toast('Não foi possível atualizar: '+e)}}
+STP.splice(STP.findIndex(p=>p[0]==='sync')+1,0,['atual','Atualizações','<path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/>']);
+const _stPage18=stPage;stPage=function(p){if(p!=='atual')return _stPage18(p);const L=UPD.latest,tok=updTok(),repoUrl='https://github.com/'+UPD.repo,nv=L&&UPD.cur&&vNewer(L.v,UPD.cur);
+ return'<h2>Atualizações</h2>'+stRow('Versão instalada',UPD.cur||(AT?'…':'Versão web (atualiza sozinha)'),'')+
+  stRow('Versão mais nova no GitHub',UPD.err?'<span style="color:#e5484d">'+esc(UPD.err)+'</span>':L?esc(L.v.replace(/^v/,''))+' · '+new Date(L.date).toLocaleString(loc())+(nv?' — <b>nova!</b>':' — você está em dia'):'Ainda não verificado.',stBtn('updchk','Verificar agora')+(isWin&&nv?stBtn('updins','Atualizar agora','pri'):''))+
+  (isWin?stRow('Verificar ao abrir o app','Avisa quando sair uma versão nova e instala com um clique.',stTog('updAuto',ST.updAuto!==false)):'')+
+  stRow('Token do GitHub','Necessário enquanto o repositório for privado. Fica só neste aparelho.','<input type="password" id="updtok" placeholder="github_pat_…" value="'+esc(tok)+'" style="width:220px;padding:6px 9px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--ink)">'+stBtn('updtoksave','Salvar'))+
+  '<h3>Android com Obtainium</h3><p class="mu">No Obtainium: <b>Adicionar app</b> → cole <code>'+esc(repoUrl)+'</code> → em Configurações do Obtainium coloque o mesmo token do GitHub. Ele baixa o <code>Marginalia-Android.apk</code> da versão mais nova e avisa quando sair outra.</p>'+
+  '<h3>Links fixos</h3><p class="mu">Sempre a versão mais nova:<br><code>'+esc(repoUrl)+'/releases/latest/download/Marginalia-Android.apk</code><br><code>'+esc(repoUrl)+'/releases/latest/download/Marginalia-Windows-instalador.exe</code></p>'};
+document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#stm [data-sta]');if(!a)return;const k=a.dataset.sta;
+ if(k==='updchk'){e.stopPropagation();updCheck(true)}else if(k==='updins'){e.stopPropagation();updInstall()}
+ else if(k==='updtoksave'){e.stopPropagation();try{localStorage.setItem('ln:ghtok',$('#updtok').value.trim())}catch(x){}toast('Token salvo');updCheck(true)}},true);
+setTimeout(()=>{if(isWin&&ST.updAuto!==false)updCheck(false)},8000);
+{const c0=CMDS;CMDS=()=>c0().concat([['Verificar atualizações',()=>{stOpen('atual');updCheck(true)}]])}
 
 boot();
 </script>

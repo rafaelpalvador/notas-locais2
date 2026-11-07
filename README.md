@@ -201,3 +201,9 @@ O arquivo `.github/workflows/compilar.yml` compila na nuvem o instalador do Wind
 
 - Cor de pasta personalizada: no ⋯ da pasta, escolha uma cor ou digite `#hex`, `rgb()` ou `hsl()`.
 - Tabelas: clique numa célula para editar no lugar (Enter desce, Tab avança, Esc cancela).
+
+## Versões e atualizações
+- Cada compilação gera a versão **0.1.N** (N = número da compilação) e publica **uma única** Release `v0.1.N`; as antigas são apagadas automaticamente.
+- Links fixos (sempre a mais nova): `https://github.com/rafaelpalvador/notas-locais2/releases/latest/download/Marginalia-Android.apk` e `.../Marginalia-Windows-instalador.exe`.
+- **Android (Obtainium):** Adicionar app → `https://github.com/rafaelpalvador/notas-locais2`; como o repositório é privado, coloque um token do GitHub (fine-grained, só leitura de *Contents* deste repositório) nas configurações do Obtainium.
+- **Windows:** Configurações → Atualizações. O app verifica ao abrir, baixa o instalador e atualiza em modo passivo (`/P /R`), reabrindo sozinho. Com o repositório privado, cole o mesmo token ali.
