@@ -1,6 +1,6 @@
 {
  "$schema": "https://schema.tauri.app/config/2",
- "productName": "Notas Locais",
+ "productName": "Lume",
  "version": "0.1.0",
  "identifier": "app.notaslocais",
  "build": {
@@ -10,7 +10,7 @@
   "withGlobalTauri": true,
   "windows": [
    {
-    "title": "Notas Locais",
+    "title": "Lume",
     "width": 1100,
     "height": 740,
     "minWidth": 420,

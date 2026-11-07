@@ -1,4 +1,4 @@
-# Notas Locais (Tauri 2)
+# Lume — notas locais em Markdown
 
 ## Stack e por quê
 - **Tauri 2 + Rust**: instalador de poucos MB, acesso nativo ao disco (leitura/escrita de `.md` sem backend), mesma base para desktop e, depois, Android/iOS.
@@ -186,3 +186,15 @@ O arquivo `.github/workflows/compilar.yml` compila na nuvem o instalador do Wind
 - **⚙ Configurações** (botão no topo da barra lateral ou Ctrl + ,): Aparência, Interface, Editor, Arquivos e links, Barra de ferramentas, Sincronização, Atalhos e Avançado, com busca.
 - **Menu da nota** (botão ⋯ ou clique direito em qualquer nota da barra lateral, das abas ou da lista): abrir em nova aba / ao lado, copiar, mover, favoritar, fixar, virar tarefa, mesclar, copiar link, histórico, abrir no app padrão, mostrar na pasta, exportar, renomear, apagar.
 - **Blocos móveis**: arraste pela alça ⠿ qualquer bloco da barra lateral; esconda blocos e reorganize os botões da barra de formatação em Configurações.
+
+## Lume (identidade)
+- Nome do app: **Lume**. Ícone em `src-tauri/icons/lume.svg` (chama âmbar sobre fundo noturno); o logo na barra lateral usa as cores do tema escolhido.
+- Temas da marca: **Lume Dia** (padrão em instalações novas) e **Lume Noite**; os outros temas continuam disponíveis.
+- O identificador do app continua `app.notaslocais`, então atualizar não apaga nem duplica as notas.
+
+## Leitor de PDF
+- **+ ▾ → Importar PDF (leitor)** ou Configurações → Backup: cria uma nota só para o PDF.
+- Barra própria: páginas, página atual, mão (rolar), caneta, marca-texto, borracha, grifar texto, caixa de texto, cor, desfazer, zoom, favoritar página, configurar páginas e exportar com anotações.
+- **Páginas**: organizador com miniaturas — arrastar para reordenar, excluir/restaurar, favoritar, girar, filtro "só favoritas".
+- **Configurar páginas**: rolagem vertical ou horizontal (deslizar) e página em retrato/paisagem.
+- Ordem, páginas excluídas, rotação e favoritos ficam nas propriedades da nota; o arquivo PDF original não é alterado.

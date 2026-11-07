@@ -24,6 +24,8 @@ jobs:
           workspaces: src-tauri
       - name: Instalar dependências
         run: npm install
+      - name: Ícones do app (Lume)
+        run: npx tauri icon src-tauri/icons/icon.png
       - name: Compilar
         run: npx tauri build
       - uses: actions/upload-artifact@v4
@@ -84,12 +86,12 @@ jobs:
           IN=$(find src-tauri/gen/android/app/build/outputs/apk -name "*release*.apk" | head -1)
           echo "APK: $IN"
           "$BT/zipalign" -p -f 4 "$IN" alinhado.apk
-          "$BT/apksigner" sign --ks android-assinatura/notaslocais-teste.jks --ks-key-alias notaslocais --ks-pass pass:notaslocais-teste --key-pass pass:notaslocais-teste --out NotasLocais-Android.apk alinhado.apk
-          "$BT/apksigner" verify NotasLocais-Android.apk && ls -la NotasLocais-Android.apk
+          "$BT/apksigner" sign --ks android-assinatura/notaslocais-teste.jks --ks-key-alias notaslocais --ks-pass pass:notaslocais-teste --key-pass pass:notaslocais-teste --out Lume-Android.apk alinhado.apk
+          "$BT/apksigner" verify Lume-Android.apk && ls -la Lume-Android.apk
       - uses: actions/upload-artifact@v4
         with:
           name: NotasLocais-Android
-          path: NotasLocais-Android.apk
+          path: Lume-Android.apk
           if-no-files-found: error
 
   publicar:
@@ -103,18 +105,18 @@ jobs:
       - name: Organizar arquivos
         run: |
           mkdir -p saida
-          find arquivos -name "*.apk" | head -1 | xargs -I{} cp {} "saida/NotasLocais-Android.apk"
-          find arquivos -name "*-setup.exe" | head -1 | xargs -I{} cp {} "saida/NotasLocais-Windows-instalador.exe"
-          find arquivos -name "*.msi" | head -1 | xargs -I{} cp {} "saida/NotasLocais-Windows.msi"
+          find arquivos -name "*.apk" | head -1 | xargs -I{} cp {} "saida/Lume-Android.apk"
+          find arquivos -name "*-setup.exe" | head -1 | xargs -I{} cp {} "saida/Lume-Windows-instalador.exe"
+          find arquivos -name "*.msi" | head -1 | xargs -I{} cp {} "saida/Lume-Windows.msi"
           ls -la saida
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
-          name: Notas Locais (teste ${{ github.run_number }})
+          name: Lume (teste ${{ github.run_number }})
           body: |
             Versão de teste gerada automaticamente a partir do commit ${{ github.sha }}.
-            - **Android:** baixe `NotasLocais-Android.apk` no celular e abra (permita instalar de fontes desconhecidas).
-            - **Windows:** baixe `NotasLocais-Windows-instalador.exe` e execute (em "O Windows protegeu o computador", clique em Mais informações → Executar assim mesmo).
+            - **Android:** baixe `Lume-Android.apk` no celular e abra (permita instalar de fontes desconhecidas).
+            - **Windows:** baixe `Lume-Windows-instalador.exe` e execute (em "O Windows protegeu o computador", clique em Mais informações → Executar assim mesmo).
           prerelease: true
           make_latest: true
           files: saida/*
