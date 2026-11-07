@@ -75,7 +75,10 @@ jobs:
         run: |
           mkdir -p saida
           cp "$(find src-tauri/target/release/bundle/appimage -name '*.AppImage' | head -1)" saida/Marginalia-Linux.AppImage
-          cp "$(find src-tauri/target/release/bundle/deb -name '*.deb' | head -1)" saida/Marginalia-Linux.deb
+          D=$(find src-tauri/target/release/bundle/deb -name '*.deb' | head -1)
+          rm -rf debx && dpkg-deb -R "$D" debx
+          sed -i 's/^Package: .*/Package: marginalia-notes/' debx/DEBIAN/control
+          dpkg-deb --root-owner-group -b debx saida/Marginalia-Linux.deb
           chmod +x saida/Marginalia-Linux.AppImage
           ls -la saida
           dpkg-deb -I saida/Marginalia-Linux.deb | head -20
