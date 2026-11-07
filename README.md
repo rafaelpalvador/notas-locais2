@@ -204,9 +204,10 @@ O arquivo `.github/workflows/compilar.yml` compila na nuvem o instalador do Wind
 
 ## Versões e atualizações
 - Cada compilação gera a versão **0.1.N** (N = número da compilação) e publica **uma única** Release `v0.1.N`; as antigas são apagadas automaticamente.
-- Links fixos (sempre a mais nova): `https://github.com/rafaelpalvador/notas-locais2/releases/latest/download/Marginalia-Android.apk` e `.../Marginalia-Windows-instalador.exe`.
+- Links fixos (sempre a mais nova): `https://github.com/rafaelpalvador/notas-locais2/releases/latest/download/Marginalia-Android.apk` e `.../Marginalia-Windows-instalador.exe`, `.../Marginalia-Linux.AppImage`, `.../Marginalia-Linux.deb`.
 - **Android (Obtainium):** Adicionar app → `https://github.com/rafaelpalvador/notas-locais2`; como o repositório é privado, coloque um token do GitHub (fine-grained, só leitura de *Contents* deste repositório) nas configurações do Obtainium.
 - **Windows:** Configurações → Atualizações. O app verifica ao abrir, baixa o instalador e atualiza em modo passivo (`/P /R`), reabrindo sozinho. Com o repositório privado, cole o mesmo token ali.
+- **Linux:** baixe `Marginalia-Linux.AppImage` (qualquer distribuição; `chmod +x` e abra) ou `Marginalia-Linux.deb` (`sudo apt install ./Marginalia-Linux.deb`). No AppImage, Configurações → Atualizações baixa a versão nova, troca o arquivo e reabre. No .deb, instale o pacote novo por cima.
 
 ## Lembretes (⏰)
 - Botão ⏰ no topo da nota, na barra de formatação (pega a tarefa da linha do cursor) e no menu ⋯ da nota: atalhos 15 min, 30 min, 1 h, 2 h, hoje 18h, amanhã 9h ou data/hora livre.
@@ -224,3 +225,9 @@ O arquivo `.github/workflows/compilar.yml` compila na nuvem o instalador do Wind
 
 ## Celular: segurar = arrastar
 - Segurar uma nota/pasta e arrastar move para outra pasta. Segurar não abre menu nem seleção; as opções ficam no botão ⋯.
+
+## Verificação geral (v0.1.18)
+- Testes de integridade: notas, bancos de dados, lembretes e configurações sobrevivem a recarregar; nota com senha não vaza texto no histórico nem no .zip; exportar → importar em perfil limpo recupera tudo.
+- Corrigido: alterações feitas menos de 0,3 s antes de fechar o app podiam se perder — agora tudo é gravado ao fechar/minimizar.
+- Observadores de página agrupados por quadro (menos trabalho ao digitar em notas longas); buscas e listas com mapas (O(n)).
+- Sem IDs duplicados no DOM; varredura de ~70 controles por modo (computador e celular) sem erros.

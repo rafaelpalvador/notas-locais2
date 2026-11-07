@@ -215,7 +215,7 @@ fn note_file(app: &tauri::AppHandle, id: &str) -> Result<PathBuf, String> {
 fn ext_open(app: tauri::AppHandle, id: String, with: Option<String>) -> Result<ExtOut, String> {
     let p = note_file(&app, &id)?;
     #[cfg(mobile)]
-    { let _ = &with; return Err("Editor externo não está disponível no celular".into()); }
+    { let _ = (&with, &p); return Err("Editor externo não está disponível no celular".into()); }
     #[cfg(not(mobile))]
     {
         let ps = p.to_string_lossy().to_string();
@@ -261,21 +261,36 @@ fn ext_reveal(app: tauri::AppHandle, id: String) -> Result<(), String> {
 // ---------- atualização automática (Windows): baixa o instalador da versão nova e roda em modo passivo ----------
 #[tauri::command]
 async fn update_install(url: String, token: Option<String>) -> Result<(), String> {
-    #[cfg(not(target_os = "windows"))]
-    { let _ = (&url, &token); return Err("A atualização automática pelo app é só para Windows".into()); }
-    #[cfg(target_os = "windows")]
+    #[cfg(not(any(target_os = "windows", target_os = "linux")))]
+    { let _ = (&url, &token); return Err("A atualização automática pelo app é só para Windows e Linux (AppImage)".into()); }
+    #[cfg(any(target_os = "windows", target_os = "linux"))]
     {
+        #[cfg(target_os = "linux")]
+        let target = match std::env::var_os("APPIMAGE") { Some(a) => PathBuf::from(a), None => return Err("Instalado pelo .deb: baixe o pacote novo na página de versões".into()) };
         let client = reqwest::Client::builder().timeout(std::time::Duration::from_secs(300)).build().map_err(|e| e.to_string())?;
         let mut rq = client.get(&url).header("User-Agent", "MarginaliaNotes").header("Accept", "application/octet-stream");
         if let Some(t) = token.filter(|t| !t.trim().is_empty()) { rq = rq.header("Authorization", format!("Bearer {}", t.trim())); }
         let rs = rq.send().await.map_err(|e| e.to_string())?;
         if !rs.status().is_success() { return Err(format!("Download falhou ({})", rs.status())); }
         let bytes = rs.bytes().await.map_err(|e| e.to_string())?;
-        if bytes.len() < 100_000 { return Err("Arquivo do instalador inválido".into()); }
-        let path = std::env::temp_dir().join("Marginalia-atualizacao.exe");
-        fs::write(&path, &bytes).map_err(|e| e.to_string())?;
-        use std::os::windows::process::CommandExt;
-        std::process::Command::new(&path).args(["/P", "/R"]).creation_flags(0x00000008).spawn().map_err(|e| e.to_string())?;
+        if bytes.len() < 100_000 { return Err("Arquivo de atualização inválido".into()); }
+        #[cfg(target_os = "windows")]
+        {
+            let path = std::env::temp_dir().join("Marginalia-atualizacao.exe");
+            fs::write(&path, &bytes).map_err(|e| e.to_string())?;
+            use std::os::windows::process::CommandExt;
+            std::process::Command::new(&path).args(["/P", "/R"]).creation_flags(0x00000008).spawn().map_err(|e| e.to_string())?;
+        }
+        #[cfg(target_os = "linux")]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            if &bytes[..4] != b"\x7fELF" { return Err("Arquivo AppImage inválido".into()); }
+            let tmp = target.with_extension("novo");
+            fs::write(&tmp, &bytes).map_err(|e| format!("Sem permissão para gravar ao lado do AppImage: {e}"))?;
+            fs::set_permissions(&tmp, fs::Permissions::from_mode(0o755)).map_err(|e| e.to_string())?;
+            fs::rename(&tmp, &target).map_err(|e| e.to_string())?;
+            std::process::Command::new(&target).spawn().map_err(|e| e.to_string())?;
+        }
         std::thread::spawn(|| { std::thread::sleep(std::time::Duration::from_millis(700)); std::process::exit(0); });
         Ok(())
     }

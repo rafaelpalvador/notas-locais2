@@ -786,8 +786,11 @@ function seed(){const d=k=>new Date(Date.now()-k*864e5).toISOString().slice(0,19
 function load(){try{const j=localStorage.getItem('ln:v1');if(j)S=JSON.parse(j)}catch(e){}if(!S.notes||!S.notes.length)seed()}
 const TA=window.__TAURI__&&window.__TAURI__.core,inv=(c,a)=>TA.invoke(c,a);
 const persist=n=>inv('save_note',{note:{id:n.id,title:n.title,folder:n.folder,created:n.created,updated:n.updated,body:n.body,tags:tagsOf(n),props:n.props||{}}}).catch(e=>console.error(e));
-function save(){clearTimeout(tm);tm=setTimeout(()=>{if(TA){const n=cur();n&&persist(n);return}try{localStorage.setItem('ln:v1',JSON.stringify(S))}catch(e){}},300)}
-const cur=()=>S.notes.find(n=>n.id===curId);
+function saveNow(){if(TA){const n=cur();n&&persist(n);return}try{localStorage.setItem('ln:v1',JSON.stringify(S))}catch(e){}}
+function save(){clearTimeout(tm);tm=setTimeout(()=>{tm=0;saveNow()},300)}
+function saveFlush(){if(tm){clearTimeout(tm);tm=0;saveNow()}}
+['pagehide','beforeunload'].forEach(ev=>window.addEventListener(ev,saveFlush));document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveFlush()});
+let CURC={i:-1,n:null};const cur=()=>{const c=CURC;if(c.n&&c.n.id===curId&&S.notes[c.i]===c.n)return c.n;const i=S.notes.findIndex(n=>n.id===curId);CURC={i,n:i<0?null:S.notes[i]};return CURC.n||undefined};
 const tagsOf=n=>[...new Set((n.body.match(/(?:^|\s)#([\p{L}\w-]+)/gu)||[]).map(t=>t.trim().slice(1).toLowerCase()))];
 const inF=(n,f)=>n.folder===f||n.folder.startsWith(f+'/');
 function calc(e){e=e.replace(/,/g,'.').replace(/×/g,'*').replace(/÷/g,'/');
@@ -1038,7 +1041,7 @@ function ens(){const ids=new Set(S.notes.map(n=>n.id));[...TKS.keys()].forEach(i
 function search(q){ens();const qs=tok(q);if(!qs.length)return S.notes.slice();let res=null;
  for(const w of qs){const hit=new Map();for(const[t,m]of IX)if(t.startsWith(w))m.forEach((v,id)=>hit.set(id,(hit.get(id)||0)+v*(t===w?2:1)));
   res=res?new Map([...res].filter(([id])=>hit.has(id)).map(([id,v])=>[id,v+hit.get(id)])):hit}
- return[...res].sort((a,b)=>b[1]-a[1]).map(([id])=>S.notes.find(n=>n.id===id)).filter(Boolean)}
+ {const M=new Map(S.notes.map(n=>[n.id,n]));return[...res].sort((a,b)=>b[1]-a[1]).map(([id])=>M.get(id)).filter(Boolean)}}
 function runQ(q){const tg=[],fo=[],w=[];q.split(/\s+/).filter(Boolean).forEach(x=>{const m=x.match(/^(?:#|tag:)(.+)/i),p=x.match(/^(?:pasta|folder):(.+)/i);m?tg.push(nz(m[1])):p?fo.push(nz(p[1])):w.push(x)});
  return(w.length?search(w.join(' ')):S.notes.slice()).filter(n=>tg.every(t=>tagsOf(n).includes(t))&&fo.every(f=>nz(n.folder).includes(f)))}
 function snip(n,q){const b=clean(n.body).replace(/[#>*`\[\]|=\-]/g,' ').replace(/\s+/g,' ').trim(),w=q?tok(q.split(/\s+/).filter(x=>!/^(#|tag:|pasta:)/i.test(x)).join(' '))[0]:null;
@@ -2355,11 +2358,11 @@ function icSet(v){const n=cur();if(!n)return;n.props=n.props||{};if(v)n.props.ic
 document.addEventListener('click',e=>{const t=e.target;if(!t.closest)return;if(t.id==='icb'){e.stopImmediatePropagation();if(document.body.dataset.m==='read')return;const p=$('#icp'),r=t.getBoundingClientRect();p.hidden=!p.hidden;p.style.left=Math.min(r.left,innerWidth-330)+'px';p.style.top=(r.bottom+6)+'px';if(!p.hidden)setTimeout(()=>$('#ici').focus(),0)}
  else if(t.dataset&&t.dataset.ic){$('#icp').hidden=true;icSet(t.dataset.ic)}else if(t.id==='icx'){$('#icp').hidden=true;icSet('')}else if(!t.closest('#icp'))$('#icp').hidden=true},true);
 document.addEventListener('keydown',e=>{if(e.target.id==='ici'&&e.key==='Enter'){e.preventDefault();const v=[...e.target.value.trim()].slice(0,2).join('');$('#icp').hidden=true;e.target.value='';if(v)icSet(v)}});
-function icDeco(){document.querySelectorAll('#sb [data-id],#lv .cd[data-id],#lv .dbn[data-id],#lv .kc b[data-id],#blp .wl[data-id],#rel .wl[data-id]').forEach(el=>{const n=S.notes.find(x=>x.id===el.dataset.id),i=icOf(n),tgt=el.matches('.cd')?el.querySelector('b'):el.querySelector('span.u')||el;if(!tgt)return;let s=tgt.querySelector(':scope>.nic');if(!i){if(s)s.remove();return}if(!s){s=document.createElement('span');s.className='nic';tgt.prepend(s)}s.textContent=i})}
+function icDeco(){const M=new Map();for(const x of S.notes)M.set(x.id,x);document.querySelectorAll('#sb [data-id],#lv .cd[data-id],#lv .dbn[data-id],#lv .kc b[data-id],#blp .wl[data-id],#rel .wl[data-id]').forEach(el=>{const n=M.get(el.dataset.id),i=icOf(n),tgt=el.matches('.cd')?el.querySelector('b'):el.querySelector('span.u')||el;if(!tgt)return;let s=tgt.querySelector(':scope>.nic');if(!i){if(s)s.remove();return}if(!s){s=document.createElement('span');s.className='nic';tgt.prepend(s)}s.textContent=i})}
 const _renderSB9=renderSB;renderSB=function(){_renderSB9.apply(this,arguments);icDeco();fcCount()};
 const _go9=go;go=function(){_go9.apply(this,arguments);icDeco()};
 const _tabsRender=tabsRender;tabsRender=function(){_tabsRender.apply(this,arguments);document.querySelectorAll('#tabs [data-tab]').forEach(el=>{const n=S.notes.find(x=>x.id===TABS[+el.dataset.tab]),i=icOf(n);if(i){const sp=el.querySelector('span');if(sp&&!sp.querySelector('.nic'))sp.insertAdjacentHTML('afterbegin','<span class="nic">'+esc(i)+'</span>')}})};
-const _gData=gData;gData=function(){const d=_gData.apply(this,arguments);d.N.forEach(x=>{if(x.k==='n'){const n=S.notes.find(y=>y.id===x.id),i=icOf(n);if(i)x.l=i+' '+x.l}});return d};
+const _gData=gData;gData=function(){const d=_gData.apply(this,arguments),M=new Map(S.notes.map(y=>[y.id,y]));d.N.forEach(x=>{if(x.k==='n'){const n=M.get(x.id),i=icOf(n);if(i)x.l=i+' '+x.l}});return d};
 
 /* ===== 5. Diagramas Mermaid ===== */
 let MMP=null;const MMC={};
@@ -3216,7 +3219,7 @@ function stPage(p){const ths=[...document.querySelectorAll('#ap .seg[data-k="the
  switch(p){
  case'sobre':return'<h2>Lume</h2><p class="mu">Suas notas em Markdown, guardadas no seu aparelho. Sem conta, sem nuvem obrigatória.</p>'+
   stRow('Notas',S.notes.length+' notas em '+S.folders.length+' pastas','')+stRow('Onde ficam os dados',AT?'Na pasta do app (Pasta de notas no topo da barra lateral).':'No armazenamento deste navegador.','<button class="stb" data-sta="fp">Pasta de notas…</button>')+
-  stRow('Versões novas','Os instaladores para Windows e Android ficam na página de Releases do GitHub.','')+stRow('Atalho','Abra as configurações com Ctrl + ,','');
+  stRow('Versões novas','Os instaladores para Windows, Linux e Android ficam na página de Releases do GitHub.','')+stRow('Atalho','Abra as configurações com Ctrl + ,','');
  case'apar':return'<h2>Aparência</h2>'+stRow('Tema','Cores do app.',stSel('ui.theme',UI.theme,ths.length?ths:[['auto','Automático'],['light','Claro'],['dark','Escuro']]))+
   stRow('Cor de destaque','Cor dos botões ativos, links e seleção.','<input type="color" data-st="accent" value="'+(ST.accent||'#f5c400')+'">'+stBtn('accent0','Padrão'))+
   stRow('Tamanho do texto','Tamanho da fonte das notas.','<input type="range" min="13" max="24" data-st="ui.fz" value="'+UI.fz+'"><span class="stv">'+UI.fz+'px</span>')+
@@ -3465,7 +3468,7 @@ function auDel(name){const n=cur();if(!n)return;const L=n.body.split('\n'),r=auR
  bodySet(n,L.slice(0,r[0]).concat(L.slice(e)).join('\n'),'Áudio excluído da nota')}
 function auBar(){document.querySelectorAll('.au[data-a]').forEach(a=>{if(a.querySelector(':scope>.aut'))return;a.insertAdjacentHTML('afterbegin','<div class="aut"><span class="aug" title="Arraste para mover o áudio" data-aum="drag">⠿</span><span class="aul">🎙 Áudio</span><span class="sp"></span><button data-aum="sp" title="Velocidade">1×</button><button data-aum="up" title="Mover para cima" aria-label="Mover para cima">↑</button><button data-aum="down" title="Mover para baixo" aria-label="Mover para baixo">↓</button><button data-aum="dl" title="Baixar áudio" aria-label="Baixar">⬇</button><button data-aum="del" class="dng" title="Excluir da nota" aria-label="Excluir da nota">🗑</button></div>')})}
 const _hyd16=hydrate;hydrate=function(){const r=_hyd16.apply(this,arguments);try{auBar()}catch(e){}return r};
-new MutationObserver(()=>{if(document.querySelector('.au[data-a]:not(:has(>.aut))'))auBar()}).observe(document.body,{childList:true,subtree:true});
+{let q=0;new MutationObserver(()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;if(document.querySelector('.au[data-a]:not(:has(>.aut))'))auBar()})}).observe(document.body,{childList:true,subtree:true});}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.aut [data-aum]');if(!b)return;e.preventDefault();e.stopPropagation();const au=b.closest('.au'),name=au.dataset.a,k=b.dataset.aum;
  if(k==='up'||k==='down')auMove(name,k);else if(k==='del')auDel(name);
  else if(k==='sp'){const v=au.querySelector('audio'),s=[1,1.25,1.5,2,.75],i=(s.indexOf(v.playbackRate)+1)%s.length;v.playbackRate=s[i];b.textContent=s[i]+'×'}
@@ -3557,20 +3560,20 @@ document.addEventListener('keydown',e=>{if(e.target.id==='fct'&&e.key==='Enter')
 /* NEW18: atualizações automáticas */
 const UPD={repo:'rafaelpalvador/notas-locais2',cur:'',latest:null,err:'',busy:false};
 const updTok=()=>{try{return localStorage.getItem('ln:ghtok')||''}catch(e){return''}};
-const isWin=/Windows/i.test(navigator.userAgent)&&!!AT;
+const isLnx=!/Android/i.test(navigator.userAgent)&&/Linux|X11/i.test(navigator.userAgent)&&!!AT,isWin=(/Windows/i.test(navigator.userAgent)&&!!AT)||isLnx;
 const vNum=v=>String(v||'').replace(/^v/i,'').split('.').map(x=>parseInt(x)||0);
 const vNewer=(a,b)=>{const A=vNum(a),B=vNum(b);for(let i=0;i<Math.max(A.length,B.length);i++){if((A[i]||0)!==(B[i]||0))return(A[i]||0)>(B[i]||0)}return false};
-(async()=>{try{if(window.__TAURI__&&__TAURI__.app&&__TAURI__.app.getVersion)UPD.cur=await __TAURI__.app.getVersion()}catch(e){}})();
+(async()=>{try{if(window.__TAURI__&&window.__TAURI__.app&&window.__TAURI__.app.getVersion)UPD.cur=await window.__TAURI__.app.getVersion()}catch(e){}})();
 async function updCheck(manual){if(UPD.busy)return;UPD.busy=true;UPD.err='';const t=updTok(),h={'Accept':'application/vnd.github+json','User-Agent':'MarginaliaNotes'};if(t)h.Authorization='Bearer '+t;
  const url='https://api.github.com/repos/'+UPD.repo+'/releases/latest';
  try{let st,body;if(AT){const r=await AT.invoke('http_req',{method:'GET',url,headers:h,body:null});st=r.status;body=new TextDecoder().decode(Uint8Array.from(atob(r.body),c=>c.charCodeAt(0)))}else{const r=await fetch(url,{headers:t?{Authorization:'Bearer '+t,Accept:h.Accept}:{Accept:h.Accept}});st=r.status;body=await r.text()}
   if(st===404)throw new Error(t?'Não encontrei a versão. Confira se o token tem acesso a este repositório.':'O repositório é privado: cole um token do GitHub abaixo.');
   if(st===401||st===403)throw new Error('Token do GitHub inválido ou sem permissão.');if(st>=300)throw new Error('GitHub respondeu '+st);
-  const j=JSON.parse(body);UPD.latest={v:j.tag_name,name:j.name,date:j.published_at,exe:(j.assets||[]).find(a=>/Windows-instalador\.exe$/i.test(a.name)),apk:(j.assets||[]).find(a=>/\.apk$/i.test(a.name))};
+  const j=JSON.parse(body);UPD.latest={v:j.tag_name,name:j.name,date:j.published_at,exe:(j.assets||[]).find(a=>isLnx?/Linux\.AppImage$/i.test(a.name):/Windows-instalador\.exe$/i.test(a.name)),apk:(j.assets||[]).find(a=>/\.apk$/i.test(a.name))};
   if(manual)toast(UPD.cur&&!vNewer(UPD.latest.v,UPD.cur)?'Você já está na versão mais nova ('+UPD.cur+')':'Versão disponível: '+UPD.latest.v.replace(/^v/,''))}
  catch(e){UPD.err=e.message||String(e);if(manual)toast(UPD.err)}finally{UPD.busy=false;if($('#stm')&&!$('#stm').hidden&&STPG==='atual')stRefresh()}
  if(!manual&&isWin&&UPD.latest&&UPD.cur&&vNewer(UPD.latest.v,UPD.cur))toast('Nova versão '+UPD.latest.v.replace(/^v/,'')+' disponível','Atualizar',()=>updInstall())}
-async function updInstall(){if(!isWin){toast('A instalação automática pelo app é no Windows. No Android use o Obtainium.');return}if(!UPD.latest||!UPD.latest.exe){await updCheck(true);if(!UPD.latest||!UPD.latest.exe)return}
+async function updInstall(){if(!isWin){toast('A instalação automática pelo app é no Windows e no Linux (AppImage). No Android use o Obtainium.');return}if(!UPD.latest||!UPD.latest.exe){await updCheck(true);if(!UPD.latest||!UPD.latest.exe)return}
  if(!confirm('Instalar a versão '+UPD.latest.v.replace(/^v/,'')+' agora? O app fecha, atualiza e abre de novo sozinho. Suas notas não são afetadas.'))return;
  try{save();toast('Baixando a atualização…');await AT.invoke('update_install',{url:UPD.latest.exe.url,token:updTok()||null})}catch(e){toast('Não foi possível atualizar: '+e)}}
 STP.splice(STP.findIndex(p=>p[0]==='sync')+1,0,['atual','Atualizações','<path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/>']);
@@ -3580,7 +3583,7 @@ const _stPage18=stPage;stPage=function(p){if(p!=='atual')return _stPage18(p);con
   (isWin?stRow('Verificar ao abrir o app','Avisa quando sair uma versão nova e instala com um clique.',stTog('updAuto',ST.updAuto!==false)):'')+
   stRow('Token do GitHub','Necessário enquanto o repositório for privado. Fica só neste aparelho.','<input type="password" id="updtok" placeholder="github_pat_…" value="'+esc(tok)+'" style="width:220px;padding:6px 9px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--ink)">'+stBtn('updtoksave','Salvar'))+
   '<h3>Android com Obtainium</h3><p class="mu">No Obtainium: <b>Adicionar app</b> → cole <code>'+esc(repoUrl)+'</code> → em Configurações do Obtainium coloque o mesmo token do GitHub. Ele baixa o <code>Marginalia-Android.apk</code> da versão mais nova e avisa quando sair outra.</p>'+
-  '<h3>Links fixos</h3><p class="mu">Sempre a versão mais nova:<br><code>'+esc(repoUrl)+'/releases/latest/download/Marginalia-Android.apk</code><br><code>'+esc(repoUrl)+'/releases/latest/download/Marginalia-Windows-instalador.exe</code></p>'};
+  '<h3>Links fixos</h3><p class="mu">Sempre a versão mais nova:<br><code>'+esc(repoUrl)+'/releases/latest/download/Marginalia-Android.apk</code><br><code>'+esc(repoUrl)+'/releases/latest/download/Marginalia-Windows-instalador.exe</code><br><code>'+esc(repoUrl)+'/releases/latest/download/Marginalia-Linux.AppImage</code></p>'};
 document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#stm [data-sta]');if(!a)return;const k=a.dataset.sta;
  if(k==='updchk'){e.stopPropagation();updCheck(true)}else if(k==='updins'){e.stopPropagation();updInstall()}
  else if(k==='updtoksave'){e.stopPropagation();try{localStorage.setItem('ln:ghtok',$('#updtok').value.trim())}catch(x){}toast('Token salvo');updCheck(true)}},true);
@@ -3610,7 +3613,7 @@ setInterval(()=>{const t=Date.now();LEMB.filter(r=>!r.fired&&r.at<=t).forEach(le
 setTimeout(async()=>{const t=Date.now();if(ANDR)for(const r of LEMB.filter(x=>!x.fired&&x.at>t))await lembSchedule(r);
  const miss=LEMB.filter(r=>!r.fired&&r.at<=t);miss.forEach(r=>{r.fired=true;r.missed=true});lembSave();const rec=LEMB.filter(r=>r.fired&&!r.ack&&t-r.at<3*36e5).sort((a,b)=>b.at-a.at)[0];
  if(rec)toast('⏰ '+rec.text+' ('+lembFmt(rec.at)+')','Abrir nota',()=>lembOpen(rec));lembBadge();
- try{const core=window.__TAURI__&&__TAURI__.core;if(core&&core.addPluginListener)await core.addPluginListener('notification','actionPerformed',ev=>{const id=ev&&ev.notification&&(ev.notification.extra||{}).noteId;const r=LEMB.find(x=>x.noteId===id&&x.fired)||LEMB.find(x=>x.noteId===id);if(r)lembOpen(r);else if(id)openId(id)})}catch(e){}},1500);
+ try{const core=window.__TAURI__&&window.__TAURI__.core;if(core&&core.addPluginListener)await core.addPluginListener('notification','actionPerformed',ev=>{const id=ev&&ev.notification&&(ev.notification.extra||{}).noteId;const r=LEMB.find(x=>x.noteId===id&&x.fired)||LEMB.find(x=>x.noteId===id);if(r)lembOpen(r);else if(id)openId(id)})}catch(e){}},1500);
 /* ---------- interface ---------- */
 function lembBadge(){const n=cur(),b=$('#remb');if(!b)return;const k=n?LEMB.filter(r=>r.noteId===n.id&&!r.fired).length:0;b.innerHTML='⏰'+(k?'<sup>'+k+'</sup>':'');b.title=k?k+' lembrete(s) nesta nota':'Lembrar de voltar a esta nota';b.classList.toggle('on',k>0)}
 (function(){const w=$('#tdw');if(w)w.insertAdjacentHTML('beforebegin','<button class="cvbtn" id="remb" title="Lembrar">⏰</button>');
@@ -3794,7 +3797,7 @@ const _go22=go;go=function(v){const r=_go22.apply(this,arguments);if(!v||v.t!=='
 const _md22=md;md=function(src){src=String(src??'');if(!/^```db\s+\S/m.test(src))return _md22.call(this,src);const L=src.split('\n');for(let i=0;i<L.length;i++){const m=L[i].match(/^```db\s+(.+?)\s*$/);if(!m)continue;let j=i+1;while(j<L.length&&!/^```\s*$/.test(L[j]))j++;L[i]='\u0007DB'+m[1].replace(/\u0007/g,'')+'\u0007';for(let q=i+1;q<=j&&q<L.length;q++)L[q]='';i=j}
  return _md22.call(this,L.join('\n')).replace(/<p[^>]*>\u0007DB([^\u0007]*)\u0007<\/p>/g,(_,nm)=>'<div class="dbe" data-db="'+esc(nm)+'"></div>').replace(/\u0007DB([^\u0007]*)\u0007/g,(_,nm)=>'<div class="dbe" data-db="'+esc(nm)+'"></div>')};
 const _hyd22=hydrate;hydrate=function(){const r=_hyd22.apply(this,arguments);try{if(document.querySelector('.dbe[data-db]:empty'))dbRender()}catch(e){}return r};
-new MutationObserver(()=>{if(document.querySelector('.dbe[data-db]:empty'))dbRender()}).observe(document.body,{childList:true,subtree:true});
+{let q=0;new MutationObserver(()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;if(document.querySelector('.dbe[data-db]:empty'))dbRender()})}).observe(document.body,{childList:true,subtree:true});}
 /* campos tipados no topo das notas que fazem parte de um banco */
 const _renderPr22=renderPr;renderPr=function(){_renderPr22.apply(this,arguments);const n=cur(),el=$('#pr');if(!n||!el||isDbNote(n))return;const dbs=dbOf(n);if(!dbs.length)return;const keys=new Set();
  const html=dbs.map(db=>{const j=dbSchema(db);j.fields.forEach(f=>keys.add(f.k));return'<div class="dbf"><div class="dbfh"><b data-open="'+db.id+'">🗃 '+esc(db.title)+'</b><button class="stb" data-dbfields="'+db.id+'">⚙</button></div>'+j.fields.map(f=>'<label class="dblf"><span>'+esc(f.k)+'</span>'+dbCell(f,n,db)+'</label>').join('')+'</div>'}).join('');
