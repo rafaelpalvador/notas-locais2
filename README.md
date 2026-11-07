@@ -158,3 +158,11 @@ Dê dois cliques em **Abrir Notas Locais.bat**: o app abre numa janela própria 
 
 ## APK e instalador compilados pelo GitHub (sem instalar nada)
 O arquivo `.github/workflows/compilar.yml` compila na nuvem o instalador do Windows (`.exe`/`.msi`) e o APK do Android (assinado com chave de teste, para instalar no seu celular). Envie a pasta para um repositório no GitHub, abra a aba **Actions** e baixe os arquivos em **Artifacts** quando terminar.
+
+## Editor estilo Obsidian e explorador em árvore
+- O editor agora é o CodeMirror 6 (`src/vendor/cm/cm.min.js`, gerado pela ação "vendor-codemirror" a partir de `tools/cm`).
+- **Escrita** (padrão) = visualização ao vivo, como no Obsidian: a marcação (`#`, `**`, `[[ ]]`) some fora da linha do cursor; tabelas, desenhos, PDF, kanban, Mermaid, fórmulas `$$` e embeds aparecem renderizados, com o botão `</>` para editar o texto do bloco.
+- Blocos de código com destaque de sintaxe por linguagem, rótulo da linguagem e botão copiar; callouts `> [!tipo]` com cor e ícone.
+- **Markdown** = texto-fonte com destaque; **Leitura** = somente leitura. O modo escolhido fica salvo.
+- A seção **Arquivos** da barra lateral é uma árvore: pastas expandem e mostram as notas dentro; `+` cria nota na pasta; arraste notas e pastas; botão direito (ou toque longo) numa nota abre Abrir / Abrir ao lado / Renomear / Duplicar / Excluir.
+- Celular: a gaveta lateral agora tem uma camada escura real — tocar fora fecha a gaveta sem mexer na nota; o texto da barra não fica mais selecionável; o fundo do app no Android é opaco (`src-tauri/tauri.android.conf.json`).
