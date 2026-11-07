@@ -5,6 +5,9 @@ on:
   push:
     branches: [main, master]
 
+permissions:
+  contents: write
+
 jobs:
   windows:
     name: Windows (instalador .exe e .msi)
@@ -79,3 +82,30 @@ jobs:
           name: NotasLocais-Android
           path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
           if-no-files-found: error
+
+  publicar:
+    name: Publicar em Releases
+    needs: [windows, android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: arquivos
+      - name: Organizar arquivos
+        run: |
+          mkdir -p saida
+          find arquivos -name "*.apk" | head -1 | xargs -I{} cp {} "saida/NotasLocais-Android.apk"
+          find arquivos -name "*-setup.exe" | head -1 | xargs -I{} cp {} "saida/NotasLocais-Windows-instalador.exe"
+          find arquivos -name "*.msi" | head -1 | xargs -I{} cp {} "saida/NotasLocais-Windows.msi"
+          ls -la saida
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Notas Locais (teste ${{ github.run_number }})
+          body: |
+            Versão de teste gerada automaticamente a partir do commit ${{ github.sha }}.
+            - **Android:** baixe `NotasLocais-Android.apk` no celular e abra (permita instalar de fontes desconhecidas).
+            - **Windows:** baixe `NotasLocais-Windows-instalador.exe` e execute (em "O Windows protegeu o computador", clique em Mais informações → Executar assim mesmo).
+          prerelease: true
+          make_latest: true
+          files: saida/*
