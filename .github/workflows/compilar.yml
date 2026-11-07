@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main, master]
+    paths-ignore: ['tools/**', '.github/workflows/vendor-codemirror.yml']
 
 permissions:
   contents: write

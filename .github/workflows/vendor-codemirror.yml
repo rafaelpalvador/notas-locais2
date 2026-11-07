@@ -1,0 +1,30 @@
+name: Empacotar CodeMirror (vendor)
+on:
+  workflow_dispatch:
+  push:
+    paths: ['tools/cm/**']
+permissions:
+  contents: write
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Empacotar
+        working-directory: tools/cm
+        run: |
+          npm install --no-audit --no-fund
+          npx esbuild entry.js --bundle --minify --format=iife --global-name=CM --target=es2020 --outfile=../../src/vendor/cm/cm.min.js
+          node -e "const fs=require('fs');const p=require('./package-lock.json').packages;const v=Object.entries(p).filter(([k])=>/node_modules\/@(codemirror|lezer)\//.test(k)).map(([k,x])=>k.replace('node_modules/','')+' '+x.version).join('\n');fs.writeFileSync('../../src/vendor/cm/VERSIONS.txt',v+'\n')"
+          ls -la ../../src/vendor/cm
+          cp node_modules/@codemirror/view/LICENSE ../../src/vendor/cm/LICENSE
+      - name: Salvar no repositório
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/vendor/cm
+          git diff --cached --quiet || git commit -m "vendor: CodeMirror 6 empacotado [skip ci]"
+          git push
