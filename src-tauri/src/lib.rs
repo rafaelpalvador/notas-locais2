@@ -182,10 +182,76 @@ fn delete_folder(app: tauri::AppHandle, path: String) -> Result<(), String> {
     if p != r { prune_empty(&p); }
     Ok(())
 }
+// ---------- HTTP (WebDAV) sem limites de CORS ----------
+#[derive(Serialize)]
+struct HttpOut { status: u16, body: String, headers: std::collections::BTreeMap<String, String> }
+#[tauri::command]
+async fn http_req(method: String, url: String, headers: std::collections::BTreeMap<String, String>, body: Option<String>) -> Result<HttpOut, String> {
+    use base64::Engine;
+    let b64 = base64::engine::general_purpose::STANDARD;
+    let m = reqwest::Method::from_bytes(method.as_bytes()).map_err(|e| e.to_string())?;
+    let client = reqwest::Client::builder().timeout(std::time::Duration::from_secs(60)).build().map_err(|e| e.to_string())?;
+    let mut rq = client.request(m, &url);
+    for (k, v) in headers.iter() { rq = rq.header(k.as_str(), v.as_str()); }
+    if let Some(b) = body { rq = rq.body(b64.decode(b).map_err(|e| e.to_string())?); }
+    let rs = rq.send().await.map_err(|e| e.to_string())?;
+    let status = rs.status().as_u16();
+    let mut hs = std::collections::BTreeMap::new();
+    for (k, v) in rs.headers().iter() { if let Ok(s) = v.to_str() { hs.insert(k.as_str().to_string(), s.to_string()); } }
+    let bytes = rs.bytes().await.map_err(|e| e.to_string())?;
+    Ok(HttpOut { status, body: b64.encode(&bytes), headers: hs })
+}
+// ---------- editor externo ----------
+#[derive(Serialize)]
+struct ExtOut { path: String, mtime: u64, body: String }
+fn mtime_ms(p: &Path) -> u64 {
+    fs::metadata(p).and_then(|m| m.modified()).ok().and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok()).map(|d| d.as_millis() as u64).unwrap_or(0)
+}
+fn note_file(app: &tauri::AppHandle, id: &str) -> Result<PathBuf, String> {
+    let r = root(app)?;
+    find(&r, id).ok_or_else(|| "Nota ainda não salva no disco".to_string())
+}
+#[tauri::command]
+fn ext_open(app: tauri::AppHandle, id: String, with: Option<String>) -> Result<ExtOut, String> {
+    let p = note_file(&app, &id)?;
+    #[cfg(mobile)]
+    { let _ = &with; return Err("Editor externo não está disponível no celular".into()); }
+    #[cfg(not(mobile))]
+    {
+        let ps = p.to_string_lossy().to_string();
+        let w = with.unwrap_or_default();
+        let mut cmd: std::process::Command;
+        #[cfg(target_os = "windows")]
+        {
+            use std::os::windows::process::CommandExt;
+            if w.is_empty() { cmd = std::process::Command::new("cmd"); cmd.args(["/C", "start", "", ps.as_str()]); }
+            else { cmd = std::process::Command::new("cmd"); cmd.args(["/C", w.as_str(), ps.as_str()]); }
+            cmd.creation_flags(0x08000000);
+        }
+        #[cfg(target_os = "macos")]
+        { cmd = std::process::Command::new("open"); if !w.is_empty() { cmd.args(["-a", w.as_str()]); } cmd.arg(&ps); }
+        #[cfg(all(unix, not(target_os = "macos")))]
+        { if w.is_empty() { cmd = std::process::Command::new("xdg-open"); cmd.arg(&ps); } else { cmd = std::process::Command::new(&w); cmd.arg(&ps); } }
+        cmd.spawn().map_err(|e| e.to_string())?;
+        let t = fs::read_to_string(&p).map_err(|e| e.to_string())?.replace("\r\n", "\n");
+        let stem = p.file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
+        let n = parse(&t, "", &stem);
+        Ok(ExtOut { path: ps, mtime: mtime_ms(&p), body: n.body })
+    }
+}
+#[tauri::command]
+fn ext_poll(app: tauri::AppHandle, id: String) -> Result<ExtOut, String> {
+    let p = note_file(&app, &id)?;
+    let t = fs::read_to_string(&p).map_err(|e| e.to_string())?.replace("\r\n", "\n");
+    let stem = p.file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
+    let n = parse(&t, "", &stem);
+    Ok(ExtOut { path: p.to_string_lossy().into(), mtime: mtime_ms(&p), body: n.body })
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![load_vault, save_note, delete_note, create_folder, save_asset, read_asset, set_vault, rename_folder, delete_folder])
+        .invoke_handler(tauri::generate_handler![load_vault, save_note, delete_note, create_folder, save_asset, read_asset, set_vault, rename_folder, delete_folder, http_req, ext_open, ext_poll])
         .run(tauri::generate_context!())
         .expect("erro ao iniciar o app");
 }

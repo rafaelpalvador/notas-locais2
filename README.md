@@ -172,3 +172,12 @@ O arquivo `.github/workflows/compilar.yml` compila na nuvem o instalador do Wind
 - No Markdown, o botão de layout alterna **Dividido → Só editor → Só visualização** (rolagem sincronizada no dividido).
 - Botão **Leitura** separado: abre a nota só para ler e, clicando de novo, volta ao editor anterior.
 - Barra de ferramentas com ícones: link, listas, tarefas, título, citação, linha, data/hora e anexo.
+
+## Recursos inspirados no Joplin
+- **Sincronização WebDAV** (Nextcloud, ownCloud, Koofr, kDrive, pCloud…) com **criptografia de ponta a ponta** opcional (AES-256-GCM, chave PBKDF2). Barra lateral → "☁ Sincronizar" ou Aparência → Sincronização. Notas em `notes/<id>.json`, anexos em `assets/`, índice `index.json` (com ETag para evitar sobrescrita). Conflitos geram uma cópia "(conflito …)".
+- **Notas-tarefa**: botão "☐ Tarefa" no cabeçalho, caixa de concluir, alarme com aviso; pasta inteligente "Tarefas (notas)".
+- **Busca com filtros**: `tag:` `pasta:` `title:` `body:` `created:` `updated:` (2026-11, day-7, week, month, year-1) `type:todo|note` `iscompleted:0|1` `fixada:1` `any:1` `-palavra` `"frase exata"`, com busca aproximada quando nada bate.
+- **Editor externo** (Windows/macOS/Linux): menu ≡ → "Abrir no editor externo" ou "Abrir no Bloco de Notas"; o app acompanha as mudanças salvas lá.
+- **Markdown extra**: notas de rodapé `[^1]`, `H~2~O`, `x^2^`, emojis `:rocket:`, sumário `[toc]`, listas de definição (`Termo` + `: definição`).
+- **Seleção múltipla**: Ctrl/Shift+clique (ou toque longo no celular) para mover, marcar tag, fixar, virar tarefa ou excluir várias notas.
+- **Ordenação e fixar**: botão de ordenar na seção Arquivos (título, atualização, criação; crescente/decrescente) e "📌 Fixar no topo".
