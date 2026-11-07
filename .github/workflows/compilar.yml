@@ -75,12 +75,20 @@ jobs:
             grep -q "android.permission.$P" "$M" || perl -0pi -e "s#(<manifest[^>]*>)#\$1\n    <uses-permission android:name=\"android.permission.$P\" />#" "$M"
           done
           grep -n "uses-permission" "$M"
-      - name: Compilar APK (assinado com a chave de teste)
-        run: npx tauri android build --apk --debug --target aarch64 --target armv7
+      - name: Compilar APK otimizado
+        run: npx tauri android build --apk --target aarch64 --target armv7
+      - name: Assinar APK
+        run: |
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          IN=$(find src-tauri/gen/android/app/build/outputs/apk -name "*release*.apk" | head -1)
+          echo "APK: $IN"
+          "$BT/zipalign" -p -f 4 "$IN" alinhado.apk
+          "$BT/apksigner" sign --ks android-assinatura/notaslocais-teste.jks --ks-key-alias notaslocais --ks-pass pass:notaslocais-teste --key-pass pass:notaslocais-teste --out NotasLocais-Android.apk alinhado.apk
+          "$BT/apksigner" verify NotasLocais-Android.apk && ls -la NotasLocais-Android.apk
       - uses: actions/upload-artifact@v4
         with:
           name: NotasLocais-Android
-          path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+          path: NotasLocais-Android.apk
           if-no-files-found: error
 
   publicar:
