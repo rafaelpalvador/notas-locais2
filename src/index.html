@@ -3594,7 +3594,7 @@ async function updCheck(manual){if(UPD.busy)return;UPD.busy=true;UPD.err='';cons
  if(!manual&&isWin&&UPD.latest&&UPD.cur&&vNewer(UPD.latest.v,UPD.cur))toast('Nova versão '+UPD.latest.v.replace(/^v/,'')+' disponível','Atualizar',()=>updInstall())}
 async function updInstall(){if(!isWin){toast('A instalação automática pelo app é no Windows e no Linux (AppImage). No Android use o Obtainium.');return}if(!UPD.latest||!UPD.latest.exe){await updCheck(true);if(!UPD.latest||!UPD.latest.exe)return}
  if(!confirm('Instalar a versão '+UPD.latest.v.replace(/^v/,'')+' agora? O app fecha, atualiza e abre de novo sozinho. Suas notas não são afetadas.'))return;
- try{save();toast('Baixando a atualização…');await AT.invoke('update_install',{url:UPD.latest.exe.url,token:updTok()||null})}catch(e){toast('Não foi possível atualizar: '+e)}}
+ try{if(typeof saveFlush==='function')saveFlush();else save();toast(isLnx?'Atualizando… o app vai fechar e abrir sozinho em instantes':'Baixando a atualização… o app vai fechar e abrir sozinho');await AT.invoke('update_install',{url:UPD.latest.exe.url,token:updTok()||null})}catch(e){toast('Não foi possível atualizar: '+e)}}
 STP.splice(STP.findIndex(p=>p[0]==='sync')+1,0,['atual','Atualizações','<path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/>']);
 const _stPage18=stPage;stPage=function(p){if(p!=='atual')return _stPage18(p);const L=UPD.latest,tok=updTok(),repoUrl='https://github.com/'+UPD.repo,nv=L&&UPD.cur&&vNewer(L.v,UPD.cur);
  return'<h2>Atualizações</h2>'+stRow('Versão instalada',UPD.cur||(AT?'…':'Versão web (atualiza sozinha)'),'')+

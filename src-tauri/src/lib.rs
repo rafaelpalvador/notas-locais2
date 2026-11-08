@@ -266,7 +266,24 @@ async fn update_install(url: String, token: Option<String>) -> Result<(), String
     #[cfg(any(target_os = "windows", target_os = "linux"))]
     {
         #[cfg(target_os = "linux")]
-        let target = match std::env::var_os("APPIMAGE") { Some(a) => PathBuf::from(a), None => return Err("Para atualizar esta instalação, rode no terminal: marginalia-atualizar".into()) };
+        let target = match std::env::var_os("APPIMAGE") {
+            Some(a) => PathBuf::from(a),
+            None => {
+                // instalado pelo comando do terminal: o próprio script baixa, troca e reabre o app
+                let home = std::env::var_os("HOME").map(PathBuf::from).unwrap_or_default();
+                let script = home.join(".local/bin/marginalia-atualizar");
+                if !script.exists() { return Err("Para atualizar esta instalação, rode no terminal: marginalia-atualizar".into()); }
+                use std::os::unix::process::CommandExt;
+                let log = fs::File::create(std::env::temp_dir().join("marginalia-atualizar.log")).map_err(|e| e.to_string())?;
+                let log2 = log.try_clone().map_err(|e| e.to_string())?;
+                std::process::Command::new("bash").arg(&script).arg("--relancar")
+                    .env_remove("APPDIR").env_remove("APPIMAGE").env_remove("LD_LIBRARY_PATH").env_remove("GIO_MODULE_DIR").env_remove("GDK_PIXBUF_MODULE_FILE").env_remove("GST_PLUGIN_SYSTEM_PATH").env_remove("GST_PLUGIN_SYSTEM_PATH_1_0").env_remove("GTK_PATH").env_remove("XDG_DATA_DIRS")
+                    .stdin(std::process::Stdio::null()).stdout(log).stderr(log2).process_group(0)
+                    .spawn().map_err(|e| e.to_string())?;
+                let _ = (&url, &token);
+                return Ok(());
+            }
+        };
         let client = reqwest::Client::builder().timeout(std::time::Duration::from_secs(300)).build().map_err(|e| e.to_string())?;
         let mut rq = client.get(&url).header("User-Agent", "MarginaliaNotes").header("Accept", "application/octet-stream");
         if let Some(t) = token.filter(|t| !t.trim().is_empty()) { rq = rq.header("Authorization", format!("Bearer {}", t.trim())); }

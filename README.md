@@ -246,7 +246,7 @@ curl -fsSL https://raw.githubusercontent.com/rafaelpalvador/notas-locais2/main/s
 ```
 No Linux o app vai para `~/.local/share/marginalia-notes`, com atalho no menu de aplicativos e o comando `marginalia-notes`. Não precisa de FUSE nem de sudo.
 
-**Depois disso, sempre que quiser atualizar:** `marginalia-atualizar`
+**Depois disso, dá para atualizar pelo próprio app** (Configurações → Atualizações → Atualizar agora, ou no aviso que aparece ao abrir) **ou pelo terminal:** `marginalia-atualizar`
 (opções: `--forcar` / `-Forcar` reinstala; no Linux `--remover` desinstala sem apagar as notas; `--token` / `-Token` só se o repositório voltar a ser privado).
 
 ## Tabelas de outros apps
