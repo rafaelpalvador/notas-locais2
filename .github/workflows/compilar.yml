@@ -135,8 +135,15 @@ jobs:
             grep -q "android.permission.$P" "$M" || perl -0pi -e "s#(<manifest[^>]*>)#\$1\n    <uses-permission android:name=\"android.permission.$P\" />#" "$M"
           done
           grep -n "uses-permission" "$M"
-      - name: Compilar APK otimizado
-        run: npx tauri android build --apk --target aarch64 --target armv7
+      - name: Compilar APK otimizado (tenta de novo se a rede falhar)
+        run: |
+          P=src-tauri/gen/android/gradle/wrapper/gradle-wrapper.properties
+          [ -f "$P" ] && (grep -q networkTimeout "$P" && sed -i 's/^networkTimeout=.*/networkTimeout=120000/' "$P" || echo "networkTimeout=120000" >> "$P")
+          for i in 1 2 3; do
+            npx tauri android build --apk --target aarch64 --target armv7 && exit 0
+            echo "Tentativa $i falhou; esperando 30 s"; sleep 30
+          done
+          exit 1
       - name: Assinar APK
         run: |
           BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
