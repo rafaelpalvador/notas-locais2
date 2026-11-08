@@ -1,7 +1,7 @@
 # Marginalia Notes - instala ou atualiza pelo terminal do Windows (PowerShell).
 # Uso: marginalia-atualizar            (atualiza se houver versao nova)
 #      marginalia-atualizar -Forcar    (reinstala mesmo na mesma versao)
-#      marginalia-atualizar -Token     (troca o token salvo)
+#      marginalia-atualizar -Token     (so se o repositorio voltar a ser privado)
 param([switch]$Forcar, [switch]$Token)
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
@@ -18,24 +18,28 @@ function Ok($m)  { Write-Host "OK  $m" -ForegroundColor Green }
 function Inf($m) { Write-Host ".. $m" -ForegroundColor Cyan }
 function Fail($m){ Write-Host "ERRO $m" -ForegroundColor Red; exit 1 }
 
-# token: variavel MARGINALIA_TOKEN, ou o salvo (criptografado para o seu usuario do Windows), ou pergunta
+# o repositorio e publico: o token e opcional (so se ele voltar a ser privado)
 $tok = $env:MARGINALIA_TOKEN
 if (-not $tok -and -not $Token -and (Test-Path $TokF)) {
   try { $sec = Get-Content $TokF | ConvertTo-SecureString; $tok = [Net.NetworkCredential]::new('', $sec).Password } catch { $tok = $null }
 }
-if (-not $tok) {
-  $sec = Read-Host 'Cole o token do GitHub (somente leitura, o mesmo do Obtainium)' -AsSecureString
-  $tok = [Net.NetworkCredential]::new('', $sec).Password
+function PedeToken {
+  $sec = Read-Host 'Cole o token do GitHub (somente leitura)' -AsSecureString
+  $script:tok = ([Net.NetworkCredential]::new('', $sec).Password).Trim()
+  if (-not $script:tok) { Fail 'Sem token.' }
+  ConvertTo-SecureString $script:tok -AsPlainText -Force | ConvertFrom-SecureString | Set-Content -Path $TokF
 }
-$tok = "$tok".Trim()
-if (-not $tok) { Fail 'Sem token nao da para baixar do repositorio privado.' }
-ConvertTo-SecureString $tok -AsPlainText -Force | ConvertFrom-SecureString | Set-Content -Path $TokF
-
-$H = @{ Authorization = "Bearer $tok"; 'User-Agent' = 'MarginaliaNotes'; 'X-GitHub-Api-Version' = '2022-11-28' }
+if ($Token) { PedeToken }
+function Hdr { $h = @{ 'User-Agent' = 'MarginaliaNotes'; 'X-GitHub-Api-Version' = '2022-11-28' }; if ($script:tok) { $h.Authorization = "Bearer $($script:tok)" }; return $h }
+$H = Hdr
 
 Inf 'Procurando a versao mais nova...'
 try { $rel = Invoke-RestMethod -Uri "$Api/releases/latest" -Headers ($H + @{ Accept = 'application/vnd.github+json' }) }
-catch { Fail 'O GitHub recusou o token (confira se ele ainda vale e tem acesso a Contents).' }
+catch {
+  if ($tok) { Fail 'Nao consegui falar com o GitHub (sem internet ou token invalido: rode marginalia-atualizar -Token).' }
+  PedeToken; $H = Hdr
+  try { $rel = Invoke-RestMethod -Uri "$Api/releases/latest" -Headers ($H + @{ Accept = 'application/vnd.github+json' }) } catch { Fail 'O GitHub recusou o token.' }
+}
 $a = $rel.assets | Where-Object { $_.name -eq $Asset } | Select-Object -First 1
 if (-not $a) { Fail "Nao achei $Asset na versao mais nova." }
 $nova = $rel.tag_name -replace '^v', ''
@@ -62,7 +66,7 @@ if ($atual -eq $nova -and -not $Forcar) {
 
 # guarda este script como o comando "marginalia-atualizar"
 try {
-  $src = Invoke-RestMethod -Uri "$Api/contents/scripts/atualizar-windows.ps1" -Headers ($H + @{ Accept = 'application/vnd.github.raw' })
+  $src = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/$Repo/main/scripts/atualizar-windows.ps1" -Headers (Hdr)
   if ($src -match 'Marginalia Notes') {
     [IO.File]::WriteAllText((Join-Path $Dir 'atualizar.ps1'), $src, [Text.UTF8Encoding]::new($true))
     $apps = Join-Path $env:LOCALAPPDATA 'Microsoft\WindowsApps'

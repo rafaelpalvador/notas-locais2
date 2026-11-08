@@ -233,21 +233,21 @@ O arquivo `.github/workflows/compilar.yml` compila na nuvem o instalador do Wind
 - Sem IDs duplicados no DOM; varredura de ~70 controles por modo (computador e celular) sem erros.
 
 ## Atualizar pelo terminal (Windows e Linux)
-Precisa do token do GitHub (o mesmo do Obtainium, só leitura). Ele fica salvo no computador — criptografado no Windows, com permissão só sua no Linux.
+O repositório é público: não precisa de token.
 
 **Windows (PowerShell), só na 1.ª vez:**
 ```powershell
-$t=Read-Host 'Token'; $f="$env:TEMP\m.ps1"; irm https://api.github.com/repos/rafaelpalvador/notas-locais2/contents/scripts/atualizar-windows.ps1 -Headers @{Authorization="Bearer $t";Accept='application/vnd.github.raw'} -OutFile $f; $env:MARGINALIA_TOKEN=$t; powershell -NoProfile -ExecutionPolicy Bypass -File $f
+irm https://raw.githubusercontent.com/rafaelpalvador/notas-locais2/main/scripts/atualizar-windows.ps1 -OutFile $env:TEMP\m.ps1; powershell -NoProfile -ExecutionPolicy Bypass -File $env:TEMP\m.ps1
 ```
 
 **Linux (openSUSE, Pop!_OS, CachyOS, qualquer um; funciona também no fish), só na 1.ª vez:**
 ```bash
-bash -c 'read -rsp "Token: " T; echo; curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.github.raw" https://api.github.com/repos/rafaelpalvador/notas-locais2/contents/scripts/atualizar-linux.sh | MARGINALIA_TOKEN="$T" bash'
+curl -fsSL https://raw.githubusercontent.com/rafaelpalvador/notas-locais2/main/scripts/atualizar-linux.sh | bash
 ```
 No Linux o app vai para `~/.local/share/marginalia-notes`, com atalho no menu de aplicativos e o comando `marginalia-notes`. Não precisa de FUSE nem de sudo.
 
 **Depois disso, sempre que quiser atualizar:** `marginalia-atualizar`
-(opções: `--forcar` / `-Forcar` reinstala; `--token` / `-Token` troca o token; no Linux `--remover` desinstala sem apagar as notas).
+(opções: `--forcar` / `-Forcar` reinstala; no Linux `--remover` desinstala sem apagar as notas; `--token` / `-Token` só se o repositório voltar a ser privado).
 
 ## Tabelas de outros apps
 - Colar texto com colunas separadas por tab (Honor Notas, Excel, Planilhas Google, sites) vira tabela automaticamente.

@@ -2,7 +2,7 @@
 # Marginália Notes — instala ou atualiza pelo terminal (qualquer distribuição Linux).
 # Uso: marginalia-atualizar            (atualiza se houver versão nova)
 #      marginalia-atualizar --forcar   (reinstala mesmo na mesma versão)
-#      marginalia-atualizar --token    (troca o token salvo)
+#      marginalia-atualizar --token    (só se o repositório voltar a ser privado)
 #      marginalia-atualizar --remover  (desinstala; as notas ficam onde estão)
 set -euo pipefail
 
@@ -37,22 +37,22 @@ command -v curl >/dev/null || err "Instale o curl (openSUSE: sudo zypper in curl
 
 mkdir -p "$CFG" "$APPDIR" "$BIN" "$(dirname "$DESK")"; chmod 700 "$CFG"
 TOKF="$CFG/token"
+# o repositório é público: o token é opcional (só se ele voltar a ser privado)
 TOK="${MARGINALIA_TOKEN:-}"
-[ "$NOVOTOKEN" = 1 ] && TOK=""
 if [ -z "$TOK" ] && [ "$NOVOTOKEN" = 0 ] && [ -f "$TOKF" ]; then TOK="$(cat "$TOKF")"; fi
-if [ -z "$TOK" ]; then
-  [ -r /dev/tty ] || err "Defina MARGINALIA_TOKEN com o token do GitHub."
-  printf 'Cole o token do GitHub (somente leitura, o mesmo do Obtainium): ' >/dev/tty
+pede_token() {
+  [ -r /dev/tty ] || err "O repositório não está acessível sem token. Defina MARGINALIA_TOKEN."
+  printf 'Cole o token do GitHub (somente leitura): ' >/dev/tty
   IFS= read -rs TOK </dev/tty; echo >/dev/tty
-fi
-TOK="$(printf %s "$TOK" | tr -d '[:space:]')"
-[ -n "$TOK" ] || err "Sem token não dá para baixar do repositório privado."
-( umask 077; printf %s "$TOK" > "$TOKF" )
-
-H=(-H "Authorization: Bearer $TOK" -H "User-Agent: MarginaliaNotes" -H "X-GitHub-Api-Version: 2022-11-28")
+  TOK="$(printf %s "$TOK" | tr -d '[:space:]')"; [ -n "$TOK" ] || err "Sem token."
+  ( umask 077; printf %s "$TOK" > "$TOKF" )
+}
+[ "$NOVOTOKEN" = 1 ] && pede_token
+hdr() { H=(-H "User-Agent: MarginaliaNotes" -H "X-GitHub-Api-Version: 2022-11-28"); [ -n "$TOK" ] && H+=(-H "Authorization: Bearer $TOK"); return 0; }
+hdr
 
 inf "Procurando a versão mais nova…"
-J="$(curl -fsSL "${H[@]}" -H "Accept: application/vnd.github+json" "$API/releases/latest")" || err "O GitHub recusou o token (confira se ele ainda vale e tem acesso a Contents)."
+J="$(curl -fsSL "${H[@]}" -H "Accept: application/vnd.github+json" "$API/releases/latest")" || { if [ -z "$TOK" ]; then pede_token; hdr; J="$(curl -fsSL "${H[@]}" -H "Accept: application/vnd.github+json" "$API/releases/latest")" || err "O GitHub recusou o token."; else err "Não consegui falar com o GitHub (sem internet ou token inválido: rode marginalia-atualizar --token)."; fi; }
 TAG="$(printf %s "$J" | grep -o '"tag_name": *"[^"]*"' | head -1 | sed 's/.*"\([^"]*\)"$/\1/')"
 URL="$(printf %s "$J" | grep -o '"url": *"[^"]*/releases/assets/[0-9]*"\|"name": *"[^"]*"' | awk -v want="$ASSET" '
   /"url"/ { gsub(/.*"url": *"|"$/, ""); u=$0; next }
@@ -98,7 +98,7 @@ EOS
 fi
 
 # guarda este script como o comando "marginalia-atualizar"
-if curl -fsSL "${H[@]}" -H "Accept: application/vnd.github.raw" "$API/contents/scripts/atualizar-linux.sh" -o "$BIN/.marginalia-atualizar.novo" 2>/dev/null && head -1 "$BIN/.marginalia-atualizar.novo" | grep -q bash; then
+if curl -fsSL "${H[@]}" "https://raw.githubusercontent.com/$REPO/main/scripts/atualizar-linux.sh" -o "$BIN/.marginalia-atualizar.novo" 2>/dev/null && head -1 "$BIN/.marginalia-atualizar.novo" | grep -q bash; then
   mv -f "$BIN/.marginalia-atualizar.novo" "$BIN/marginalia-atualizar"; chmod +x "$BIN/marginalia-atualizar"
 else rm -f "$BIN/.marginalia-atualizar.novo"; fi
 case ":$PATH:" in *":$BIN:"*) ;; *) inf "Adicione $BIN ao PATH para usar os comandos (ex.: echo 'export PATH=\"\$HOME/.local/bin:\$PATH\"' >> ~/.bashrc)";; esac
