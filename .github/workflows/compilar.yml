@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main, master]
-    paths-ignore: ['tools/**', '.github/workflows/vendor-codemirror.yml']
+    paths-ignore: ['tools/**', '.github/workflows/vendor-codemirror.yml', 'ceu-tempo/**', '.github/workflows/ceu-tempo.yml']
 
 permissions:
   contents: write
@@ -192,5 +192,5 @@ jobs:
         run: |
           KEEP=v0.1.${{ github.run_number }}
           gh release list --repo ${{ github.repository }} --limit 200 --json tagName -q '.[].tagName' | while read -r T; do
-            if [ "$T" != "$KEEP" ]; then echo "apagando $T"; gh release delete "$T" --repo ${{ github.repository }} --cleanup-tag -y || true; fi
+            if [[ "$T" == v* ]] && [ "$T" != "$KEEP" ]; then echo "apagando $T"; gh release delete "$T" --repo ${{ github.repository }} --cleanup-tag -y || true; fi
           done

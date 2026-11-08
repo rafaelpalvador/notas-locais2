@@ -1,0 +1,16 @@
+{
+ "name": "ceu-tempo",
+ "private": true,
+ "version": "0.1.0",
+ "scripts": {
+  "dev": "tauri dev",
+  "build": "tauri build",
+  "tauri": "tauri",
+  "android:init": "tauri android init",
+  "android:dev": "tauri android dev",
+  "android:build": "tauri android build --apk"
+ },
+ "devDependencies": {
+  "@tauri-apps/cli": "^2"
+ }
+}
