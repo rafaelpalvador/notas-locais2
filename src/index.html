@@ -3867,6 +3867,25 @@ const _nmDo22=nmDo;nmDo=function(a,n){if(a==='todb'){nmPick('Adicionar “'+n.ti
 /* ícone no explorador */
 const _noteRow22=noteRow;noteRow=function(n,dp){let h=_noteRow22(n,dp);if(isDbNote(n))h=h.replace(/<svg class="fic"[\s\S]*?<\/svg>/,'<i class="nic2">🗃</i>');else if(isPdfNote(n))h=h.replace(/<svg class="fic"[\s\S]*?<\/svg>/,'<i class="nic2">📄</i>');return h};
 
+/* NEW23: colar tarefas de outros apps (Honor Notas, Samsung Notes, Google Keep…) */
+(function(){
+ const OPEN=/^[ \t]*(?:[☐□▢◻⬜◽❏❑]|\[ \]|- \[ \])[ \t]*/u,DONE=/^[ \t]*(?:[☑✅✓✔☒✗✘❎]|\[[xX✓]\]|- \[[xX]\])[ \t]*/u;
+ const conv=t=>t.split('\n').map(l=>{if(/^\s*- \[( |x|X)\] /.test(l))return l;if(DONE.test(l))return'- [x] '+l.replace(DONE,'');if(OPEN.test(l))return'- [ ] '+l.replace(OPEN,'');return l}).join('\n');
+ const hasBox=t=>t.split('\n').some(l=>!/^\s*- \[/.test(l)&&(OPEN.test(l)||DONE.test(l)));
+ window.pasteTasksConv=conv;
+ const toTasks=(v,from,to)=>{const d=v.state.doc,a=d.lineAt(from).number,b=d.lineAt(Math.max(from,to-1)).number,ch=[];let n=0;
+  for(let i=a;i<=b;i++){const ln=d.line(i),t=ln.text;if(!t.trim()||/^\s*- \[( |x|X)\] /.test(t))continue;const body=t.replace(/^\s*(?:[-*+•·▪◦‣–—]|\d+[.)])\s+/,'').trim();ch.push({from:ln.from,to:ln.to,insert:'- [ ] '+body});n++}
+  if(n){v.dispatch({changes:ch});toast(n+' linha(s) viraram tarefas')}};
+ window.linesToTasks=()=>{const v=window.cmView&&cmView();if(!v)return;const r=v.state.selection.main;toTasks(v,r.from,r.to||v.state.doc.lineAt(r.from).to)};
+ document.addEventListener('paste',e=>{const v=window.cmView&&cmView();if(!v||!e.target.closest||!e.target.closest('#cmw'))return;
+  const dt=e.clipboardData;if(!dt||[...(dt.files||[])].length)return;const h=dt.getData('text/html');if(h&&/<(h[1-6]|ul|ol|table|li|strong|b|a)\b/i.test(h))return;
+  let t=(dt.getData('text/plain')||'').replace(/\r\n?/g,'\n');if(!t)return;const lines=t.split('\n').filter(x=>x.trim()).length;if(lines<2&&!hasBox(t))return;
+  e.preventDefault();e.stopImmediatePropagation();const boxed=hasBox(t);if(boxed)t=conv(t);const from=v.state.selection.main.from;v.dispatch(v.state.replaceSelection(t));const to=from+t.length;
+  if(boxed){toast('Tarefas coladas como caixas de seleção ☐')}else if(lines>=2)toast(lines+' linhas coladas','Virar tarefas',()=>toTasks(v,from,to))},true);
+ // também no menu de comandos (Ctrl+K)
+ {const c0=CMDS;CMDS=()=>c0().concat([['Transformar linhas selecionadas em tarefas',()=>window.linesToTasks()]])}
+})();
+
 boot();
 </script>
 </body>
