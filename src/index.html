@@ -695,6 +695,9 @@ body.dbmode #dbr{display:block;flex:1;min-height:0;overflow:auto;padding:18px 26
  #xm .fxa{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}#xm .fxa button{padding:12px 8px!important;font-weight:600}#xm .fxa #xmd{grid-column:1/-1}
 }
 #xm .fxa{display:flex;flex-direction:column;gap:4px;margin:6px 0}
+#tim .mdb{max-width:760px;width:min(760px,96vw)}.tiopt{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0;font-size:13px}.tiopt select,.tiopt input[type=number]{padding:5px 6px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--ink)}
+.tip{max-height:38vh;overflow:auto;border:1px solid var(--bd);border-radius:10px}.tip:empty{display:none}.tip table{border-collapse:collapse;width:100%;font-size:13px}.tip td,.tip th{border:1px solid var(--ln);padding:5px 8px;text-align:left;white-space:nowrap}.tip th{background:var(--cd)}
+#tgp #tgimp{display:block;width:100%;margin-top:6px;text-align:left}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -3596,7 +3599,7 @@ const _stPage18=stPage;stPage=function(p){if(p!=='atual')return _stPage18(p);con
   (isWin?stRow('Verificar ao abrir o app','Avisa quando sair uma versão nova e instala com um clique.',stTog('updAuto',ST.updAuto!==false)):'')+
   stRow('Token do GitHub','Necessário enquanto o repositório for privado. Fica só neste aparelho.','<input type="password" id="updtok" placeholder="github_pat_…" value="'+esc(tok)+'" style="width:220px;padding:6px 9px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--ink)">'+stBtn('updtoksave','Salvar'))+
   '<h3>Android com Obtainium</h3><p class="mu">No Obtainium: <b>Adicionar app</b> → cole <code>'+esc(repoUrl)+'</code> → em Configurações do Obtainium coloque o mesmo token do GitHub. Ele baixa o <code>Marginalia-Android.apk</code> da versão mais nova e avisa quando sair outra.</p>'+
-  '<h3>Links fixos</h3><p class="mu">Sempre a versão mais nova:<br><code>'+esc(repoUrl)+'/releases/latest/download/Marginalia-Android.apk</code><br><code>'+esc(repoUrl)+'/releases/latest/download/Marginalia-Windows-instalador.exe</code><br><code>'+esc(repoUrl)+'/releases/latest/download/Marginalia-Linux.AppImage</code></p>'};
+  '<h3>Links fixos</h3><p class="mu">Sempre a versão mais nova:<br><code>'+esc(repoUrl)+'/releases/latest/download/Marginalia-Android.apk</code><br><code>'+esc(repoUrl)+'/releases/latest/download/Marginalia-Windows-instalador.exe</code><br><code>'+esc(repoUrl)+'/releases/latest/download/Marginalia-Linux.AppImage</code></p>'+'<h3>Pelo terminal</h3><p class="mu">Depois da 1.ª vez (veja o README), basta digitar <code>marginalia-atualizar</code> no terminal do Windows ou do Linux. Ele baixa a versão nova e instala sozinho.</p>'};
 document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#stm [data-sta]');if(!a)return;const k=a.dataset.sta;
  if(k==='updchk'){e.stopPropagation();updCheck(true)}else if(k==='updins'){e.stopPropagation();updInstall()}
  else if(k==='updtoksave'){e.stopPropagation();try{localStorage.setItem('ln:ghtok',$('#updtok').value.trim())}catch(x){}toast('Token salvo');updCheck(true)}},true);
@@ -3878,12 +3881,66 @@ const _noteRow22=noteRow;noteRow=function(n,dp){let h=_noteRow22(n,dp);if(isDbNo
   if(n){v.dispatch({changes:ch});toast(n+' linha(s) viraram tarefas')}};
  window.linesToTasks=()=>{const v=window.cmView&&cmView();if(!v)return;const r=v.state.selection.main;toTasks(v,r.from,r.to||v.state.doc.lineAt(r.from).to)};
  document.addEventListener('paste',e=>{const v=window.cmView&&cmView();if(!v||!e.target.closest||!e.target.closest('#cmw'))return;
-  const dt=e.clipboardData;if(!dt||[...(dt.files||[])].length)return;const h=dt.getData('text/html');if(h&&/<(h[1-6]|ul|ol|table|li|strong|b|a)\b/i.test(h))return;
-  let t=(dt.getData('text/plain')||'').replace(/\r\n?/g,'\n');if(!t)return;const lines=t.split('\n').filter(x=>x.trim()).length;if(lines<2&&!hasBox(t))return;
+  const dt=e.clipboardData;if(!dt||[...(dt.files||[])].length)return;const h=dt.getData('text/html');const rich=h&&/<(h[1-6]|ul|ol|table|li|strong|b|a)\b/i.test(h);
+  let t=(dt.getData('text/plain')||'').replace(/\r\n?/g,'\n');if(!t)return;
+  if(!(h&&/<table\b/i.test(h))&&window.tabsToTables){const r=tabsToTables(t);if(r.made){e.preventDefault();e.stopImmediatePropagation();v.dispatch(v.state.replaceSelection(r.text));toast(r.made>1?r.made+' tabelas coladas':'Tabela colada');return}}
+  if(rich)return;const lines=t.split('\n').filter(x=>x.trim()).length;if(lines<2&&!hasBox(t))return;
   e.preventDefault();e.stopImmediatePropagation();const boxed=hasBox(t);if(boxed)t=conv(t);const from=v.state.selection.main.from;v.dispatch(v.state.replaceSelection(t));const to=from+t.length;
   if(boxed){toast('Tarefas coladas como caixas de seleção ☐')}else if(lines>=2)toast(lines+' linhas coladas','Virar tarefas',()=>toTasks(v,from,to))},true);
  // também no menu de comandos (Ctrl+K)
  {const c0=CMDS;CMDS=()=>c0().concat([['Transformar linhas selecionadas em tarefas',()=>window.linesToTasks()]])}
+})();
+
+/* NEW24: importar tabelas (texto colado, colunas por tab/;/espaços, uma célula por linha, ou foto/print com OCR) */
+(function(){
+ const esc2=x=>String(x).replace(/\|/g,'\\|').replace(/\n+/g,' ').trim();
+ const tiMd=(rows,head)=>{rows=rows.filter(r=>r.some(c=>c.trim()));if(!rows.length)return'';const n=Math.max(...rows.map(r=>r.length));rows=rows.map(r=>{r=r.slice();while(r.length<n)r.push('');return r});
+  if(!head)rows.unshift(Array.from({length:n},(_,i)=>'Coluna '+(i+1)));return['| '+rows[0].map(esc2).join(' | ')+' |','|'+Array(n).fill('---').join('|')+'|',...rows.slice(1).map(r=>'| '+r.map(esc2).join(' | ')+' |')].join('\n')};
+ const RE={tab:/\t/,semi:/;/,comma:/,(?=(?:[^"]*"[^"]*")*[^"]*$)/,sp:/ {2,}|\t/,pipe:/\|/};
+ const cnt=(l,re)=>l.split(re).length-1;
+ const detect=ls=>{if(ls.length<1)return'cell';const ok=(re,min)=>{const c=ls.map(l=>cnt(l,re));const m=c.filter(x=>x>=min);return m.length>=Math.max(1,Math.ceil(ls.length*.6))};
+  if(ok(/\t/,1))return'tab';if(ls.filter(l=>/^\s*\|.*\|\s*$/.test(l)).length>=ls.length*.6)return'pipe';if(ok(/;/,1))return'semi';if(ok(/ {2,}/,1))return'sp';if(ok(RE.comma,1)&&ls.length>1)return'comma';return'cell'};
+ const parse=(txt,sep,ncol)=>{const ls=txt.replace(/\r\n?/g,'\n').replace(/\u00a0/g,' ').split('\n').map(l=>l.replace(/\s+$/,'')).filter(l=>l.trim());if(sep==='auto')sep=detect(ls);
+  let rows;if(sep==='cell'){const n=Math.max(1,ncol|0||2);rows=[];for(let i=0;i<ls.length;i+=n)rows.push(ls.slice(i,i+n).map(x=>x.trim()))}
+  else if(sep==='pipe')rows=ls.filter(l=>!/^\s*\|?\s*:?-{2,}/.test(l)).map(l=>l.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(x=>x.trim()));
+  else rows=ls.map(l=>l.trim().split(RE[sep]).map(x=>x.trim().replace(/^"(.*)"$/,'$1')));return{rows,sep}};
+ window.tabsToTables=t=>{const L=t.split('\n'),out=[];let i=0,made=0;while(i<L.length){const k=cnt(L[i],/\t/);if(k>=1){let j=i;while(j<L.length&&cnt(L[j],/\t/)===k)j++;if(j-i>=2){out.push((out.length&&out[out.length-1].trim()?'\n':'')+tiMd(L.slice(i,j).map(l=>l.split('\t').map(x=>x.trim())),true)+'\n');made++;i=j;continue}}out.push(L[i]);i++}return{text:out.join('\n'),made}};
+ const insMd=md=>{if(!md)return;if(innerWidth<=760)$('#sb').classList.remove('open');let n=cur();if(!n){newNote();n=cur()}const v=window.cmView&&cmView();if(v&&document.body.dataset.m!=='read'){const ln=v.state.doc.lineAt(v.state.selection.main.head),pre=ln.text.trim()?'\n\n':(ln.from>0&&v.state.doc.lineAt(Math.max(0,ln.from-1)).text.trim()?'\n':''),ins=pre+md+'\n';v.dispatch({changes:{from:ln.to,insert:ins},selection:{anchor:ln.to+ins.length},scrollIntoView:true});v.focus()}
+  else{n.body=(n.body.replace(/\s+$/,'')+'\n\n'+md+'\n').replace(/^\n+/,'');n.updated=now();persistNew(n);save();show()}};
+ window.tiInsertMd=insMd;
+ const prev=()=>{const m=$('#tim');if(!m)return;const{rows,sep}=parse($('#tit').value,$('#tis').value,+$('#tin').value),h=$('#tih').checked;$('#tinw').hidden=$('#tis').value!=='cell'&&!(($('#tis').value==='auto')&&sep==='cell');
+  const n=rows.length?Math.max(...rows.map(r=>r.length)):0;$('#tiinfo').textContent=rows.length?rows.length+' linha(s) × '+n+' coluna(s)'+($('#tis').value==='auto'?' · separador: '+({tab:'tab',semi:'ponto e vírgula',comma:'vírgula',sp:'espaços',pipe:'barras |',cell:'uma célula por linha'}[sep]):''):'Nada para mostrar ainda';
+  $('#tip').innerHTML=rows.length?'<table>'+rows.slice(0,30).map((r,i)=>'<tr>'+Array.from({length:n},(_,j)=>(i===0&&h?'<th>':'<td>')+esc(r[j]||'')+(i===0&&h?'</th>':'</td>')).join('')+'</tr>').join('')+'</table>'+(rows.length>30?'<p class="mu">… e mais '+(rows.length-30)+' linha(s)</p>':''):''};
+ window.tiOpen=(txt)=>{const m=modal('tim','<div class="teh"><b>📊 Importar tabela</b><button data-tix aria-label="Fechar">×</button></div>'+
+  '<p class="mu" style="margin:4px 0 8px">Cole a tabela copiada (Honor Notas, Excel, site…) ou leia de uma foto/print. Cada linha do texto vira uma linha da tabela.</p>'+
+  '<textarea id="tit" rows="7" placeholder="Nome	Idade	Cidade\nAna	30	Lisboa" style="width:100%;font:13px ui-monospace,monospace;padding:8px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--ink)"></textarea>'+
+  '<div class="tiopt"><label>Separar colunas por <select id="tis"><option value="auto">automático</option><option value="tab">tab</option><option value="semi">ponto e vírgula (;)</option><option value="comma">vírgula (,)</option><option value="sp">2 ou mais espaços</option><option value="pipe">barras |</option><option value="cell">uma célula por linha</option></select></label>'+
+  '<label id="tinw" hidden>Colunas <input id="tin" type="number" min="1" max="30" value="2" style="width:60px"></label><label><input id="tih" type="checkbox" checked> 1.ª linha é o cabeçalho</label></div>'+
+  '<div class="tiopt"><button data-tiocr>📷 Ler de foto ou print</button><button data-ticlip>📋 Colar</button><span id="tiinfo" class="mu"></span></div><div id="tip" class="tip"></div>'+
+  '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><button data-tix>Cancelar</button><button data-tiok class="pri">Inserir na nota</button></div>');
+  m.classList.add('timm');$('#tit').value=txt||'';prev();setTimeout(()=>$('#tit').focus(),50)};
+ document.addEventListener('input',e=>{if(e.target.closest&&e.target.closest('#tim'))prev()});document.addEventListener('change',e=>{if(e.target.closest&&e.target.closest('#tim'))prev()});
+ const ocr=async f=>{const info=$('#tiinfo');info.textContent='Lendo a imagem… (a 1.ª vez baixa o leitor, precisa de internet)';
+  try{const T=await tess(),w=await T.createWorker(['por','eng']);const{data}=await w.recognize(f);await w.terminate();
+   const lines=(data.lines||[]).map(l=>(l.words||[]).filter(x=>x.text.trim()).sort((a,b)=>a.bbox.x0-b.bbox.x0)).filter(l=>l.length);
+   if(!lines.length){info.textContent='Não achei texto na imagem';return}
+   const hs=lines.flat().map(x=>x.bbox.y1-x.bbox.y0).sort((a,b)=>a-b),hm=hs[hs.length>>1]||12,W=Math.max(...lines.flat().map(x=>x.bbox.x1));
+   const segs=lines.map(ws=>{const sg=[];ws.forEach(x=>{const l=sg[sg.length-1];if(l&&x.bbox.x0-l.x1<Math.max(hm*1.1,10)){l.t+=' '+x.text;l.x1=x.bbox.x1}else sg.push({x:x.bbox.x0,x1:x.bbox.x1,t:x.text})});return sg});
+   const xs=segs.flat().map(s=>s.x).sort((a,b)=>a-b),tol=Math.max(hm*1.6,W*.03),an=[];xs.forEach(x=>{if(!an.length||x-an[an.length-1].m>tol)an.push({a:x,m:x});else an[an.length-1].m=x});
+   const col=x=>{let k=0;an.forEach((c,i)=>{if(x>=c.a-tol*.5)k=i});return k};
+   const rows=segs.map(sg=>{const r=Array(an.length).fill('');sg.forEach(s=>{const k=col(s.x);r[k]=(r[k]?r[k]+' ':'')+s.t});return r});
+   $('#tit').value=rows.map(r=>r.join('\t')).join('\n');$('#tis').value='tab';prev();toast('Confira a tabela antes de inserir')}catch(err){info.textContent='Não deu para ler a imagem: '+(err&&err.message||err)+' (o leitor precisa de internet na 1.ª vez)'}};
+ document.addEventListener('click',async e=>{const t=e.target;if(!t.closest)return;
+  if(t.closest('[data-tix]')||t.id==='tim'){$('#tim').hidden=true;return}
+  if(t.closest('[data-tiok]')){const{rows}=parse($('#tit').value,$('#tis').value,+$('#tin').value);const md=tiMd(rows,$('#tih').checked);if(!md){toast('Cole a tabela primeiro');return}$('#tim').hidden=true;insMd(md);toast('Tabela inserida');return}
+  if(t.closest('[data-tiocr]')){const i=document.createElement('input');i.type='file';i.accept='image/*';i.onchange=()=>{if(i.files[0])ocr(i.files[0])};i.click();return}
+  if(t.closest('[data-ticlip]')){try{const x=await navigator.clipboard.readText();if(x){$('#tit').value=x;prev()}else toast('A área de transferência está vazia')}catch(err){toast('Toque e segure na caixa de texto e escolha Colar');$('#tit').focus()}return}
+  if(t.closest('[data-cr="tabela"]')||t.id==='tgimp'){e.stopPropagation();const p=t.closest('.pop');if(p)p.hidden=true;const g=$('#tgp');if(g)g.hidden=true;tiOpen('');return}},true);
+ // entradas: menu Criar, janela de inserir tabela e Ctrl+K
+ const addEntries=()=>{const crm=$('#crm');if(crm&&!crm.querySelector('[data-cr="tabela"]')){const k=crm.querySelector('[data-cr="db"]')||crm.querySelector('[data-cr="kanban"]');if(k)k.insertAdjacentHTML('beforebegin','<button data-cr="tabela"><span class="cri">📊</span>Tabela de texto ou foto</button>')}
+  const g=$('#tgp');if(g&&!g.hidden&&!g.querySelector('#tgimp')){const m=g.querySelector('#tgmore');(m||g.lastElementChild).insertAdjacentHTML('afterend','<button id="tgimp">📋 Importar de texto copiado ou foto…</button>')}};
+ new MutationObserver(()=>{if(!addEntries.q)addEntries.q=requestAnimationFrame(()=>{addEntries.q=0;addEntries()})}).observe(document.body,{subtree:true,attributes:true,attributeFilter:['hidden'],childList:true});addEntries();
+ {const c0=CMDS;CMDS=()=>c0().concat([['Importar tabela (texto copiado ou foto)…',()=>tiOpen('')]])}
 })();
 
 boot();

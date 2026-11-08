@@ -266,7 +266,7 @@ async fn update_install(url: String, token: Option<String>) -> Result<(), String
     #[cfg(any(target_os = "windows", target_os = "linux"))]
     {
         #[cfg(target_os = "linux")]
-        let target = match std::env::var_os("APPIMAGE") { Some(a) => PathBuf::from(a), None => return Err("Instalado pelo .deb: baixe o pacote novo na página de versões".into()) };
+        let target = match std::env::var_os("APPIMAGE") { Some(a) => PathBuf::from(a), None => return Err("Para atualizar esta instalação, rode no terminal: marginalia-atualizar".into()) };
         let client = reqwest::Client::builder().timeout(std::time::Duration::from_secs(300)).build().map_err(|e| e.to_string())?;
         let mut rq = client.get(&url).header("User-Agent", "MarginaliaNotes").header("Accept", "application/octet-stream");
         if let Some(t) = token.filter(|t| !t.trim().is_empty()) { rq = rq.header("Authorization", format!("Bearer {}", t.trim())); }

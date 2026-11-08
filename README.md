@@ -231,3 +231,25 @@ O arquivo `.github/workflows/compilar.yml` compila na nuvem o instalador do Wind
 - Corrigido: alterações feitas menos de 0,3 s antes de fechar o app podiam se perder — agora tudo é gravado ao fechar/minimizar.
 - Observadores de página agrupados por quadro (menos trabalho ao digitar em notas longas); buscas e listas com mapas (O(n)).
 - Sem IDs duplicados no DOM; varredura de ~70 controles por modo (computador e celular) sem erros.
+
+## Atualizar pelo terminal (Windows e Linux)
+Precisa do token do GitHub (o mesmo do Obtainium, só leitura). Ele fica salvo no computador — criptografado no Windows, com permissão só sua no Linux.
+
+**Windows (PowerShell), só na 1.ª vez:**
+```powershell
+$t=Read-Host 'Token'; $f="$env:TEMP\m.ps1"; irm https://api.github.com/repos/rafaelpalvador/notas-locais2/contents/scripts/atualizar-windows.ps1 -Headers @{Authorization="Bearer $t";Accept='application/vnd.github.raw'} -OutFile $f; $env:MARGINALIA_TOKEN=$t; powershell -NoProfile -ExecutionPolicy Bypass -File $f
+```
+
+**Linux (openSUSE, Pop!_OS, CachyOS, qualquer um; funciona também no fish), só na 1.ª vez:**
+```bash
+bash -c 'read -rsp "Token: " T; echo; curl -fsSL -H "Authorization: Bearer $T" -H "Accept: application/vnd.github.raw" https://api.github.com/repos/rafaelpalvador/notas-locais2/contents/scripts/atualizar-linux.sh | MARGINALIA_TOKEN="$T" bash'
+```
+No Linux o app vai para `~/.local/share/marginalia-notes`, com atalho no menu de aplicativos e o comando `marginalia-notes`. Não precisa de FUSE nem de sudo.
+
+**Depois disso, sempre que quiser atualizar:** `marginalia-atualizar`
+(opções: `--forcar` / `-Forcar` reinstala; `--token` / `-Token` troca o token; no Linux `--remover` desinstala sem apagar as notas).
+
+## Tabelas de outros apps
+- Colar texto com colunas separadas por tab (Honor Notas, Excel, Planilhas Google, sites) vira tabela automaticamente.
+- Criar → **Tabela de texto ou foto** (ou "Importar de texto copiado ou foto…" na janela de tabela, ou Ctrl+K): cole o texto e escolha como separar as colunas — tab, `;`, `,`, 2+ espaços, `|` ou **uma célula por linha** (diga quantas colunas). Mostra a prévia antes de inserir.
+- **Ler de foto ou print:** reconhece o texto (OCR) e monta as colunas pela posição das palavras. Confira antes de inserir. A 1.ª vez baixa o leitor (precisa de internet).
