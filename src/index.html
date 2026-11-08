@@ -2814,7 +2814,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 /* gaveta no celular: camada escura de verdade, bloqueia toques na nota */
 (function(){const ov=document.createElement('div');ov.id='sbov';const sb=$('#sb'),mn=$('#mn');sb.parentNode.insertBefore(ov,sb);
  const sync=()=>{const o=sb.classList.contains('open')&&innerWidth<=760;document.body.classList.toggle('sbo',o);if(mn){if(o)mn.setAttribute('inert','');else mn.removeAttribute('inert')}
-  if(o){const ae=document.activeElement;if(ae&&ae.closest&&ae.closest('#mn'))ae.blur();const s=getSelection&&getSelection();if(s)s.removeAllRanges()}};
+  if(o&&!sync.was){const ae=document.activeElement;if(ae&&ae.closest&&ae.closest('#mn')){ae.blur();const s=getSelection&&getSelection();if(s)s.removeAllRanges()}}sync.was=o};
  new MutationObserver(sync).observe(sb,{attributes:true,attributeFilter:['class']});addEventListener('resize',sync);
  const close=e=>{e.preventDefault();e.stopPropagation();sb.classList.remove('open')};ov.addEventListener('pointerdown',close);ov.addEventListener('click',close);
  let x0=null;sb.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});sb.addEventListener('touchend',e=>{if(x0!==null&&x0-e.changedTouches[0].clientX>70)sb.classList.remove('open');x0=null},{passive:true});
