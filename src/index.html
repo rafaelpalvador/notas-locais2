@@ -685,6 +685,16 @@ body.dbmode #dbr{display:block;flex:1;min-height:0;overflow:auto;padding:18px 26
 .dbmo{display:flex;flex-direction:column;gap:6px;margin:8px 0}.dbmo label{display:flex;align-items:center;gap:8px}
 #dbsl .sbe{font-size:12.5px;padding:4px 12px}
 @media(max-width:760px){body.dbmode #dbr{padding:12px 10px 90px}.dbtop h1,.dbtitle{font-size:22px}.dbq{width:110px}.dbcount{display:none}.dbfr{grid-template-columns:1fr 1fr;}.dbfr>.dbfo,.dbfr>span:not(.dbfb){grid-column:1/-1}.dbcol{flex-basis:78vw}}
+#fl .it.flash{background:color-mix(in srgb,var(--ac) 22%,transparent);transition:background .3s}
+@media(max-width:760px){
+ body.popo .pop:not([hidden]):not(#ex){background:var(--sf)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+ #xm .swr{display:flex!important;flex-wrap:wrap;gap:10px;padding:8px 2px}
+ #xm .fsw{flex:none!important;width:34px!important;height:34px!important;min-width:0!important;min-height:0!important;padding:0!important;margin:0!important;border-radius:50%!important}
+ #xm .fsn{background:rgba(120,120,128,.14)!important}
+ #xm .fcx{width:100%}#xm .fcx #fct{flex:1 1 auto!important;width:auto!important;min-width:0}#xm .fcx #fcok{flex:none!important;width:auto!important;padding:10px 16px!important}#xm .fcx #fcc{width:44px!important;height:40px!important}
+ #xm .fxa{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}#xm .fxa button{padding:12px 8px!important;font-weight:600}#xm .fxa #xmd{grid-column:1/-1}
+}
+#xm .fxa{display:flex;flex-direction:column;gap:4px;margin:6px 0}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -852,7 +862,7 @@ function rel(n){const k='[['+n.title.toLowerCase(),by=S.notes.filter(x=>x.id!==n
 function renderPV(){const n=cur();if(!n)return;
  $('#pv').innerHTML=(UI.meta?'<details class="fm"><summary>Metadados (YAML)</summary><pre>'+esc(toMd({...n,body:''}).trim())+'</pre></details>':'')+md(n.body)+(UI.rel?rel(n):'');hydrate();document.querySelectorAll(':is(#pv,.cmw-c) .pdfb').forEach(loadPdf);hydMath();isR()?richPrep():$('#pv').removeAttribute('contenteditable');roApply()}
 function fsel(n){$('#fs').innerHTML='<option value="">Raiz</option>'+S.folders.map(f=>'<option'+(f===n.folder?' selected':'')+' value="'+esc(f)+'">'+esc(f)+'</option>').join('')}
-function show(){const n=cur();$('#ti').value=n.title;fsel(n);$('#ed').value=n.body;renderPV();renderPr();pkHide();pgApply();cvApply()}
+function show(){const n=cur();const ti=$('#ti');if(document.activeElement!==ti||!isUntitled(n.title))ti.value=isUntitled(n.title)?'':n.title;ti.placeholder=UI.lang==='en'?'Untitled':'Sem título';fsel(n);$('#ed').value=n.body;renderPV();renderPr();pkHide();pgApply();cvApply()}
 const SM=[['s7','Últimos 7 dias',n=>new Date(n.created)>Date.now()-7*864e5],['su','#urgente',n=>tagsOf(n).includes('urgente')],['st','Tarefas pendentes',n=>/^\s*[-*]\s\[ \]/m.test(n.body)]];
 function listFor(){const v=view;
  if(v.t==='d')return['Notas de '+fmtDay(v.d),S.notes.filter(n=>noteDates(n).includes(v.d))];
@@ -871,7 +881,8 @@ function go(v){view=v;$('#sb').classList.remove('open');
   $('#lv').innerHTML='<div class="lh"><h2>'+esc(t)+'</h2><span class="lx">'+(view.t==='q'?'<input id="sn" placeholder="Nome para salvar a busca"><button id="ss">Salvar como pasta inteligente</button>':'')+(view.t==='s'&&SMC.some(c=>c.id===view.id)?'<button id="sd">Excluir pasta inteligente</button>':'')+'<button id="ln">Nova nota aqui</button></span></div><div class="gr">'+(ns.length?ns.map(n=>card(n,view.q)).join(''):'<p class="mu">Nenhuma nota aqui. Use “Nova nota aqui” para criar a primeira.</p>')+'</div>'}
  renderSB()}
 function openId(id){curId=id;go({t:'n'})}
-function newNote(f){const u=UI.lang==='en'?'Untitled':'Sem título',n=mk(u,f||'','# '+u+'\n\n');if(view.t==='d')n.props={date:view.d};S.notes.unshift(n);save();openId(n.id);$('#ed').focus()}
+function newNote(f){const u=UI.lang==='en'?'Untitled':'Sem título',n=mk(u,f||'','');if(view.t==='d')n.props={date:view.d};S.notes.unshift(n);save();openId(n.id);setTimeout(()=>{const t=$('#ti');if(t&&!t.readOnly)t.focus();else $('#ed').focus()},60)}
+const isUntitled=t=>/^(Sem título|Untitled)( \d+)?$/.test(t||'');
 function openTitle(t){const n=S.notes.find(x=>x.title.toLowerCase()===t.toLowerCase());if(n)return openId(n.id);
  const m=mk(t,cur()?cur().folder:'','# '+t+'\n\n');S.notes.unshift(m);save();openId(m.id)}
 async function copy(t,b){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(x){}a.remove()}
@@ -904,7 +915,7 @@ document.addEventListener('click',e=>{const t=e.target;let a;
  else if(a=t.closest('.wl[data-n]'))openTitle(a.dataset.n);
  else if((a=t.closest('[data-ts]'))&&!t.closest('input,.tg')){if(a._au){a._au.currentTime=+a.dataset.ts;a._au.play()}}
  else if(a=t.closest('[data-id]'))openId(a.dataset.id);
- else if((a=t.closest('[data-f]'))&&!t.closest('.fx,.fco,.fmv,.fmvs'))go({t:'f',f:a.dataset.f});
+ else if((a=t.closest('[data-f]'))&&!t.closest('.fx,.fco,.fmv,.fmvs,#xm,.pop,.mdl'))go({t:'f',f:a.dataset.f});
  else if(a=t.closest('[data-s]'))go({t:'s',id:a.dataset.s});
  else if(t.closest('[data-all]'))go({t:'all'});
  else if(a=t.closest('.tg')){$('#q').value='#'+a.dataset.t;go({t:'q',q:'#'+a.dataset.t})}});
@@ -912,7 +923,7 @@ document.addEventListener('toggle',e=>{const d=e.target;if(d.tagName==='DETAILS'
 $('#ed').addEventListener('input',e=>{const ed=e.target,n=cur();
  if(e.data==='='){const p=ed.selectionStart,ls=ed.value.lastIndexOf('\n',p-1)+1,r=calc(ed.value.slice(ls,p-1).replace(/^\s*[-*]\s+/,''));if(r!==null)ed.setRangeText(' '+fmt(r),p,p,'end')}
  n.body=ed.value;n.updated=now();save();renderPV()});
-$('#ti').addEventListener('input',e=>{const n=cur();n.title=e.target.value||'Sem título';n.updated=now();save();renderSB()});
+$('#ti').addEventListener('input',e=>{const n=cur();n.title=e.target.value.trim()?e.target.value:(UI.lang==='en'?'Untitled':'Sem título');n.updated=now();save();renderSB()});
 $('#fs').addEventListener('change',e=>{const n=cur();n.folder=e.target.value;n.updated=now();save();renderSB();renderPV()});
 $('#q').addEventListener('input',e=>{const v=e.target.value.trim();v?go({t:'q',q:v}):go({t:'all'})});
 $('#nf').addEventListener('keydown',e=>{if(e.key!=='Enter')return;const f=e.target.value.trim().replace(/^\/|\/$/g,'');if(!f)return;
@@ -1346,7 +1357,7 @@ async function importFiles(list,dirMode){const items=[],imp=UI.lang==='en'?'Impo
 $('#imi').addEventListener('change',e=>{const l=[...e.target.files];e.target.value='';if(l.length)importFiles(l)});
 $('#imd').addEventListener('change',e=>{const l=[...e.target.files];e.target.value='';if(l.length)importFiles(l,1)});
 /* modelos */
-const TPL0=[{n:'Nota em branco',b:'# {{title}}\n\n',e:'# {{title}}\n\n'},
+const TPL0=[{n:'Nota em branco',b:'',e:''},
  {n:'Reunião',b:'# {{title}}\n\n## Participantes\n- \n\n## Pauta\n- \n\n## Decisões\n- \n\n## Próximos passos\n- [ ] \n',e:'# {{title}}\n\n## Attendees\n- \n\n## Agenda\n- \n\n## Decisions\n- \n\n## Next steps\n- [ ] \n',p:{date:'{{date}}'}},
  {n:'Diário',b:'# {{date}}\n\n## Como foi o dia\n\n## Gratidão\n- \n\n## Tarefas\n- [ ] \n',e:'# {{date}}\n\n## How the day went\n\n## Gratitude\n- \n\n## Tasks\n- [ ] \n',p:{date:'{{date}}'}},
  {n:'Projeto',b:'# {{title}}\n\n> [!note] Objetivo\n\n## Marcos\n- [ ] \n\n## Notas\n',e:'# {{title}}\n\n> [!note] Goal\n\n## Milestones\n- [ ] \n\n## Notes\n',p:{status:'planning'}},
@@ -1422,7 +1433,7 @@ document.addEventListener('click',e=>{const t=e.target;if(!t.closest)return;
  if(t.id==='fed'){FEDIT=!FEDIT;renderSB()}
  else if(t.dataset.fc){const f=t.dataset.fc;FCOL=FCOL.includes(f)?FCOL.filter(x=>x!==f):[...FCOL,f];fsv();renderSB()}
  else if(t.dataset.mv){const[a,f]=t.dataset.mv.split('|');mvFolder(a,f)}
- else if(t.id==='xms'){const m=$('#xm'),f=m.dataset.f;m.hidden=true;let nm=f+'/Nova pasta',k=2;while(FL().includes(nm))nm=f+'/Nova pasta '+k++;S.folders.push(nm);FCOL=FCOL.filter(x=>x!==f);fsv();if(AT)AT.invoke('create_folder',{path:nm}).catch(()=>{});save();renderSB();toast('Subpasta criada')}});
+ else if(t.id==='xms'){const m=$('#xm'),f=m.dataset.f;m.hidden=true;askText('Nova subpasta em “'+f+'”','Nova pasta').then(v=>{v=(v||'').trim().replace(/[\\/]+/g,'-');if(!v)return;let nm=f+'/'+v,k=2;while(FL().includes(nm))nm=f+'/'+v+' '+k++;S.folders.push(nm);FCOL=FCOL.filter(x=>x!==f);let p='';f.split('/').forEach(x=>{p=p?p+'/'+x:x;if(typeof FEXP!=='undefined')FEXP.add(p)});if(typeof fexpSave==='function')fexpSave();fsv();if(AT)AT.invoke('create_folder',{path:nm}).catch(()=>{});save();renderSB();setTimeout(()=>{const r=document.querySelector('#fl .it[data-f="'+CSS.escape(nm)+'"]');if(r){r.scrollIntoView({block:'nearest'});r.classList.add('flash');setTimeout(()=>r.classList.remove('flash'),1200)}},50);toast('Subpasta “'+v+'” criada')})}});
 /* tabelas */
 function splitRow(l){l=l.trim();if(l[0]==='|')l=l.slice(1);if(l.endsWith('|')&&l[l.length-2]!=='\\')l=l.slice(0,-1);const o=[];let c='';for(let i=0;i<l.length;i++){if(l[i]==='\\'&&l[i+1]==='|'){c+='|';i++}else if(l[i]==='|'){o.push(c.trim());c=''}else c+=l[i]}o.push(c.trim());return o}
 const TC=['gray','yellow','green','blue','pink','orange'];
@@ -1870,6 +1881,8 @@ const _show=show;show=function(){_show.apply(this,arguments);const n=cur();if(n&
 const _save6=save;save=function(){_save6.apply(this,arguments);const n=cur();if(n){if(Date.now()-(HLAST[n.id]||0)>5*60e3)snap(n,'Automática');syncMark(n);if(SIDE&&SIDE===n.id)sideSoon()}};
 function ldiff(A,B){const n=A.length,m=B.length;if(n*m>2.5e6)return null;const D=Array.from({length:n+1},()=>new Uint16Array(m+1));for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)D[i][j]=A[i]===B[j]?D[i+1][j+1]+1:Math.max(D[i+1][j],D[i][j+1]);
  const o=[];let i=0,j=0;while(i<n&&j<m){if(A[i]===B[j]){o.push([0,A[i]]);i++;j++}else if(D[i+1][j]>=D[i][j+1])o.push([-1,A[i++]]);else o.push([1,B[j++]])}while(i<n)o.push([-1,A[i++]]);while(j<m)o.push([1,B[j++]]);return o}
+function askText(title,def){return new Promise(res=>{const m=modal('askm','<div class="teh"><b>'+esc(title)+'</b><button data-ax aria-label="Fechar">×</button></div><input class="u askin" value="'+esc(def||'')+'" style="width:100%;margin:10px 0;font-size:16px;padding:10px"><div style="display:flex;gap:8px;justify-content:flex-end"><button data-ax>Cancelar</button><button data-aok class="pri">OK</button></div>');const i=m.querySelector('.askin');let done=0;const fin=v=>{if(done)return;done=1;m.hidden=true;res(v)};
+ m.onclick=e=>{if(e.target===m||e.target.closest('[data-ax]'))fin(null);else if(e.target.closest('[data-aok]'))fin(i.value)};i.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();fin(i.value)}else if(e.key==='Escape')fin(null)};setTimeout(()=>{i.focus();i.select()},40)})}
 function modal(id,html){let m=$('#'+id);if(!m){m=document.createElement('div');m.id=id;m.className='mdl';document.body.appendChild(m)}m.innerHTML='<div class="mdb" role="dialog">'+html+'</div>';m.hidden=false;return m}
 const fmtT=s=>new Date(s).toLocaleString(UI.lang==='en'?'en-US':'pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
 let HV=[],HSEL=-1;
@@ -3546,7 +3559,7 @@ const _stPage17=stPage;stPage=function(p){return _stPage17(p).replace('<h2>Lume<
 document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#stbtn2')){e.stopPropagation();stOpen()}});
 /* ---------- cor de pasta personalizada (hex, rgb, hsl) ---------- */
 if(!Array.isArray(ST.fcCustom))ST.fcCustom=[];
-const _openFx17=openFx;openFx=function(btn,f){_openFx17.apply(this,arguments);const m=$('#xm'),sw=m.querySelector('.swr');if(!sw)return;const cur0=FCLR[f]||'';
+const _openFx17=openFx;openFx=function(btn,f){_openFx17.apply(this,arguments);{const m0=$('#xm'),inp=m0.querySelector('#xmn');if(inp&&!m0.querySelector('.fxa')){const w=document.createElement('div');w.className='fxa';['#xms','#xmr','#xmd'].forEach(q=>{const b0=m0.querySelector(q);if(b0)w.appendChild(b0)});inp.after(w)}}const m=$('#xm'),sw=m.querySelector('.swr');if(!sw)return;const cur0=FCLR[f]||'';
  ST.fcCustom.forEach(c=>{if(!FCP.includes(c))sw.querySelector('.fsn').insertAdjacentHTML('beforebegin','<button class="fsw" data-fcl="'+esc(c)+'" style="background:'+esc(c)+'" title="'+esc(c)+'" aria-label="'+esc(c)+'"></button>')});
  sw.insertAdjacentHTML('afterend','<div class="fcx"><input type="color" id="fcc" value="'+(/^#[0-9a-f]{6}$/i.test(cur0)?cur0:'#6d4aff')+'" aria-label="Escolher cor"><input id="fct" placeholder="#6d4aff, rgb(109,74,255) ou hsl(255 100% 65%)" value="'+esc(cur0)+'" aria-label="Código da cor"><button id="fcok">Aplicar</button></div>');
  m.style.top=Math.max(6,Math.min(innerHeight-m.offsetHeight-6,parseFloat(m.style.top)||0))+'px'};
