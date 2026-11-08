@@ -2357,7 +2357,7 @@ document.addEventListener('click',e=>{const t=e.target;if(!t.closest)return;
 document.addEventListener('keydown',e=>{const m=e.ctrlKey||e.metaKey;if(m&&e.shiftKey&&(e.code==='Space'||e.key===' ')){e.preventDefault();capOpen()}else if(e.target.id==='capt'&&m&&e.key==='Enter'){e.preventDefault();capSave()}});
 /* colar páginas no modo Markdown vira Markdown */
 $('#ed').addEventListener('paste',e=>{const h=e.clipboardData&&e.clipboardData.getData('text/html');if(!h||!/<(h[1-6]|ul|ol|table|p|li|strong|b|a)\b/i.test(h)||[...(e.clipboardData.files||[])].length)return;e.preventDefault();e.stopImmediatePropagation();
- const d=new DOMParser().parseFromString(h,'text/html'),ctx={imgs:[]},md2=htmlToMd(d.body,ctx);saveImgs(ctx.imgs);const ed=$('#ed');ed.setRangeText(md2,ed.selectionStart,ed.selectionEnd,'end');ed.dispatchEvent(new Event('input'))},true);
+ const d=new DOMParser().parseFromString(h,'text/html'),ctx={imgs:[]};let md2=htmlToMd(d.body,ctx);{const pl=(e.clipboardData.getData('text/plain')||'').replace(/\r\n?/g,'\n'),nz=x=>x.replace(/[\s*_#>`~=\-\[\]|()!\\.]/g,'').length;if(pl&&nz(pl)>nz(md2)*1.02+10&&!ctx.imgs.length)md2=pl}saveImgs(ctx.imgs);const ed=$('#ed');ed.setRangeText(md2,ed.selectionStart,ed.selectionEnd,'end');ed.dispatchEvent(new Event('input'))},true);
 (function(){const nn=$('#qn');if(nn)nn.insertAdjacentHTML('afterend','<button id="capb" class="qn2" title="Ctrl+Shift+Espaço">⚡ Captura rápida</button>')})();
 
 /* ===== 4. Ícones / emojis nas notas ===== */
