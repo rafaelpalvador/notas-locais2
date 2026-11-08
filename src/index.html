@@ -3170,7 +3170,7 @@ function nmDo(a,n){const touch=()=>{n.updated=now();persistNew(n);save();renderS
  case'ren':{const v=prompt('Novo nome da nota',n.title);if(v&&v.trim()&&v.trim()!==n.title){n.title=v.trim();touch()}break}
  case'del':{if(ST.confirmDel!==false&&!confirm('Mover "'+n.title+'" para a lixeira?'))break;const id=n.id;trash(n);if(FH)fsDel(id);if(AT)AT.invoke('delete_note',{id}).catch(()=>{});S.notes=S.notes.filter(x=>x.id!==id);save();if(id===curId){curId=S.notes[0]&&S.notes[0].id;go({t:'all'})}else renderSB();toast('Nota na lixeira','Desfazer',()=>{restoreNote(id);save();renderSB()});break}}}
 const NSEL='#sb .it[data-id],#lv .cd[data-id],#tabs [data-id],#bl [data-id]';
-window.addEventListener('contextmenu',e=>{const el=e.target.closest&&e.target.closest(NSEL);if(!el)return;if(typeof SELN!=='undefined'&&SELN.size>1&&SELN.has(el.dataset.id))return;
+window.addEventListener('contextmenu',e=>{const el=e.target.closest&&e.target.closest(NSEL);if(!el)return;if(Date.now()-(window.__lastTouch||0)<1500||(e.pointerType==='touch')||(e.sourceCapabilities&&e.sourceCapabilities.firesTouchEvents)){e.preventDefault();return}if(typeof SELN!=='undefined'&&SELN.size>1&&SELN.has(el.dataset.id))return;
  if(!S.notes.some(n=>n.id===el.dataset.id))return;e.preventDefault();e.stopImmediatePropagation();nmOpen(el.dataset.id,e.clientX,e.clientY)},true);
 window.addEventListener('click',e=>{const t=e.target;if(!t.closest)return;const b=t.closest('[data-nmo]');
  if(b){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();const el=b.closest('[data-id]'),r=b.getBoundingClientRect();nmOpen(el.dataset.id,r.right-4,r.bottom+2);return}
