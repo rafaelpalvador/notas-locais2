@@ -698,6 +698,9 @@ body.dbmode #dbr{display:block;flex:1;min-height:0;overflow:auto;padding:18px 26
 #tim .mdb{max-width:760px;width:min(760px,96vw)}.tiopt{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0;font-size:13px}.tiopt select,.tiopt input[type=number]{padding:5px 6px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--ink)}
 .tip{max-height:38vh;overflow:auto;border:1px solid var(--bd);border-radius:10px}.tip:empty{display:none}.tip table{border-collapse:collapse;width:100%;font-size:13px}.tip td,.tip th{border:1px solid var(--ln);padding:5px 8px;text-align:left;white-space:nowrap}.tip th{background:var(--cd)}
 #tgp #tgimp{display:block;width:100%;margin-top:6px;text-align:left}
+.abh{display:flex;gap:14px;align-items:center;margin-bottom:6px}.abh .mrg-logo{width:56px;height:56px;flex:none}.abh h2{margin:0 0 2px}
+.abg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:6px 0 12px}.abk{background:rgba(120,120,128,.08);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;min-width:0}.abk b{font:600 11.5px var(--ui);color:var(--mu);text-transform:none}.abk span{font:600 14px var(--ui);overflow-wrap:anywhere}.abk kbd,.abk b kbd{font:600 11px ui-monospace,monospace;background:var(--bg);border:1px solid var(--bd);border-bottom-width:2px;border-radius:5px;padding:1px 5px;color:var(--ink)}
+.abl{margin:6px 0 12px;padding-left:2px;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:13.5px;line-height:1.45}.abln{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}.abln a{padding:7px 12px;border-radius:9px;border:1px solid var(--bd);color:var(--ac);text-decoration:none;font:600 13px var(--ui)}.abln a:hover{background:rgba(120,120,128,.1)}.abft{margin-top:14px;font-size:12px;text-align:center}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -3941,6 +3944,33 @@ const _noteRow22=noteRow;noteRow=function(n,dp){let h=_noteRow22(n,dp);if(isDbNo
   const g=$('#tgp');if(g&&!g.hidden&&!g.querySelector('#tgimp')){const m=g.querySelector('#tgmore');(m||g.lastElementChild).insertAdjacentHTML('afterend','<button id="tgimp">📋 Importar de texto copiado ou foto…</button>')}};
  new MutationObserver(()=>{if(!addEntries.q)addEntries.q=requestAnimationFrame(()=>{addEntries.q=0;addEntries()})}).observe(document.body,{subtree:true,attributes:true,attributeFilter:['hidden'],childList:true});addEntries();
  {const c0=CMDS;CMDS=()=>c0().concat([['Importar tabela (texto copiado ou foto)…',()=>tiOpen('')]])}
+})();
+
+/* NEW25: Sobre — versão, data da compilação, plataforma, estatísticas, privacidade e créditos */
+window.BUILD=/*BUILD*/{v:'dev',d:'',c:''};
+(function(){
+ const REPO='https://github.com/rafaelpalvador/notas-locais2';
+ const plat=()=>{const u=navigator.userAgent;if(!AT)return'Navegador (versão web)';if(/Android/i.test(u))return'Android';if(/Windows/i.test(u))return'Windows';if(/Mac/i.test(u))return'macOS';if(/Linux|X11/i.test(u))return'Linux';return'Computador'};
+ const fdt=d=>{try{const x=new Date(d);if(isNaN(x))return'';return x.toLocaleDateString(loc(),{day:'numeric',month:'long',year:'numeric'})+' às '+x.toLocaleTimeString(loc(),{hour:'2-digit',minute:'2-digit'})}catch(e){return''}};
+ const ago=d=>{const ms=Date.now()-new Date(d);if(!(ms>=0))return'';const dd=Math.floor(ms/864e5);return dd<1?'hoje':dd===1?'ontem':'há '+dd+' dias'};
+ const kb=n=>n<1024?n+' B':n<1048576?(n/1024).toFixed(1).replace('.',',')+' KB':(n/1048576).toFixed(1).replace('.',',')+' MB';
+ const stats=()=>{let w=0,ch=0,tasks=0,done=0,old=null;const tags=new Set();S.notes.forEach(n=>{const b=n.body||'';ch+=b.length;w+=(b.match(/[\p{L}\p{N}]+/gu)||[]).length;const t=b.match(/^\s*[-*] \[( |x|X)\]/gm)||[];tasks+=t.length;done+=t.filter(x=>/x/i.test(x)).length;(b.match(/(^|\s)#[\p{L}\p{N}_\-/]+/gu)||[]).forEach(x=>tags.add(x.trim().toLowerCase()));if(n.created&&(!old||n.created<old))old=n.created});
+  const dbs=typeof dbList==='function'?dbList().length:0,lk=S.notes.filter(n=>typeof isLk==='function'&&isLk(n)).length,pdf=S.notes.filter(n=>typeof isPdfNote==='function'&&isPdfNote(n)).length;return{w,ch,tasks,done,tags:tags.size,old,dbs,lk,pdf}};
+ const sobre=()=>{const B=window.BUILD||{},v=(B.v&&B.v!=='dev'?B.v:(UPD&&UPD.cur))||'em desenvolvimento',st=stats(),L=UPD&&UPD.latest,nv=L&&UPD.cur&&vNewer(L.v,UPD.cur);
+  const k=(a,b)=>'<div class="abk"><b>'+a+'</b><span>'+b+'</span></div>';
+  return'<div class="abh">'+(typeof MRG_SVG!=='undefined'?MRG_SVG:'')+'<div><h2>Marginália Notes</h2><p class="mu">Suas notas em Markdown, guardadas no seu aparelho. Sem conta, sem anúncios, sem nuvem obrigatória.</p></div></div>'+
+  '<h3>Versão</h3><div class="abg">'+k('Versão',esc(String(v).replace(/^v/,'')))+k('Atualizado em',B.d?esc(fdt(B.d))+' <small class="mu">('+ago(B.d)+')</small>':'—')+k('Plataforma',plat())+(B.c?k('Compilação','<code>'+esc(B.c)+'</code>'):'')+'</div>'+
+  stRow('Atualizações',L?(nv?'<b>Versão '+esc(L.v.replace(/^v/,''))+' disponível</b> (publicada '+esc(fdt(L.date))+')':'Você está na versão mais nova.'):'Veja se saiu uma versão nova.','<button class="stb" data-stp="atual">Verificar atualizações</button>')+
+  '<h3>Suas notas</h3><div class="abg">'+k('Notas',S.notes.length)+k('Pastas',S.folders.length)+k('Palavras',st.w.toLocaleString(loc()))+k('Tamanho do texto',kb(st.ch))+k('Tarefas',st.done+' de '+st.tasks+' feitas')+k('Tags',st.tags)+(st.dbs?k('Bancos de dados',st.dbs):'')+(st.pdf?k('PDFs',st.pdf):'')+(st.lk?k('Notas com senha',st.lk):'')+(st.old?k('Desde',esc(new Date(st.old).toLocaleDateString(loc(),{day:'numeric',month:'short',year:'numeric'}))):'')+'</div>'+
+  stRow('Onde ficam os dados',AT?'Cada nota é um arquivo <b>.md</b> numa pasta do seu aparelho. Você pode abrir com qualquer editor de texto.':'No armazenamento deste navegador. Para não perder nada, use o app ou faça backups.','<button class="stb" data-sta="fp">Pasta de notas…</button>')+
+  '<h3>Privacidade</h3><ul class="abl"><li>🔒 Funciona sem internet e sem criar conta. O app não tem servidor próprio: suas notas não saem do aparelho.</li><li>🌐 Ele só usa a internet para procurar versões novas (no GitHub), sincronizar, se você ativar, e baixar o leitor de texto de imagens na 1.ª vez que for usado.</li><li>🚫 Sem anúncios, sem rastreamento, sem estatísticas de uso.</li><li>🔑 Notas com senha usam criptografia AES-256; a senha nunca é guardada.</li><li>☁️ A sincronização (WebDAV) é opcional, vai para o servidor que você escolher e pode ser criptografada de ponta a ponta.</li><li>📄 Formato aberto: Markdown com propriedades YAML, o mesmo do Obsidian e de outros apps. Suas notas não ficam presas aqui.</li></ul>'+
+  (innerWidth<=760||/Android/i.test(navigator.userAgent)?'':'<h3>Atalhos úteis</h3><div class="abg">'+k('<kbd>Ctrl</kbd> + <kbd>K</kbd>','Paleta de comandos')+k('<kbd>Ctrl</kbd> + <kbd>,</kbd>','Configurações')+k('<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Espaço</kbd>','Captura rápida')+k('<kbd>[[</kbd>','Link para outra nota')+k('<kbd>/</kbd>','Inserir bloco (no início da linha)')+'</div>')+
+  '<h3>Feito com</h3><p class="mu">Tauri 2 (Rust) · CodeMirror 6 · PDF.js · KaTeX · Tesseract.js (leitura de texto em imagens). Agradecimento a esses projetos de código aberto.</p>'+
+  '<h3>Links</h3><div class="abln"><a href="'+REPO+'" target="_blank" rel="noopener">Código-fonte</a><a href="'+REPO+'/releases" target="_blank" rel="noopener">Novidades e downloads</a><a href="'+REPO+'/issues/new" target="_blank" rel="noopener">Relatar um problema</a></div>'+
+  '<p class="mu abft">Marginália Notes · projeto de rafaelpalvador · '+new Date().getFullYear()+'</p>'};
+ const _stPage25=stPage;stPage=function(p){return p==='sobre'?sobre():_stPage25(p)};
+ // botão "Verificar atualizações" leva à página de atualizações e já verifica
+ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.stpg [data-stp="atual"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();STPG='atual';stOpen('atual');if(typeof updCheck==='function')updCheck(true).then(()=>{if(STPG==='atual')stRefresh()}).catch(()=>{})},true);
 })();
 
 boot();

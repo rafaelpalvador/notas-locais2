@@ -27,6 +27,8 @@ jobs:
         run: |
           node -e "const f='src-tauri/tauri.conf.json',j=JSON.parse(require('fs').readFileSync(f,'utf8'));j.version='0.1.${{ github.run_number }}';require('fs').writeFileSync(f,JSON.stringify(j,null,1))"
           grep '"version"' src-tauri/tauri.conf.json
+          sed -i "s|/\*BUILD\*/{v:'dev',d:'',c:''}|{v:'0.1.${{ github.run_number }}',d:'$(date -u +%Y-%m-%dT%H:%M:%SZ)',c:'${GITHUB_SHA::7}'}|" src/index.html
+          grep -o "window.BUILD={[^}]*}" src/index.html
       - name: Instalar dependências
         run: npm install
       - name: Ícones do app
@@ -63,6 +65,8 @@ jobs:
         run: |
           node -e "const f='src-tauri/tauri.conf.json',j=JSON.parse(require('fs').readFileSync(f,'utf8'));j.version='0.1.${{ github.run_number }}';require('fs').writeFileSync(f,JSON.stringify(j,null,1))"
           grep '"version"' src-tauri/tauri.conf.json
+          sed -i "s|/\*BUILD\*/{v:'dev',d:'',c:''}|{v:'0.1.${{ github.run_number }}',d:'$(date -u +%Y-%m-%dT%H:%M:%SZ)',c:'${GITHUB_SHA::7}'}|" src/index.html
+          grep -o "window.BUILD={[^}]*}" src/index.html
       - name: Instalar dependências
         run: npm install
       - name: Ícones do app
@@ -122,6 +126,8 @@ jobs:
         run: |
           node -e "const f='src-tauri/tauri.conf.json',j=JSON.parse(require('fs').readFileSync(f,'utf8'));j.version='0.1.${{ github.run_number }}';require('fs').writeFileSync(f,JSON.stringify(j,null,1))"
           grep '"version"' src-tauri/tauri.conf.json
+          sed -i "s|/\*BUILD\*/{v:'dev',d:'',c:''}|{v:'0.1.${{ github.run_number }}',d:'$(date -u +%Y-%m-%dT%H:%M:%SZ)',c:'${GITHUB_SHA::7}'}|" src/index.html
+          grep -o "window.BUILD={[^}]*}" src/index.html
       - name: Instalar dependências
         run: npm install
       - name: Gerar projeto Android
