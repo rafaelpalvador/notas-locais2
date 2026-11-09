@@ -703,6 +703,21 @@ body.dbmode #dbr{display:block;flex:1;min-height:0;overflow:auto;padding:18px 26
 .abl{margin:6px 0 12px;padding-left:2px;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:13.5px;line-height:1.45}.abln{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}.abln a{padding:7px 12px;border-radius:9px;border:1px solid var(--bd);color:var(--ac);text-decoration:none;font:600 13px var(--ui)}.abln a:hover{background:rgba(120,120,128,.1)}.abft{margin-top:14px;font-size:12px;text-align:center}
 .lanbox{border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin:8px 0;display:flex;flex-direction:column;gap:6px}.lanrow{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.lanrow span{color:var(--mu);font-size:13px}.lanbox code{font:600 14px ui-monospace,monospace}.lancode{letter-spacing:.08em;font-size:17px!important;color:var(--ac)}.lanbtns{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}.lanbox label{display:flex;flex-direction:column;gap:4px;font-size:13px}.lanbox input{padding:9px 10px;border-radius:9px;border:1px solid var(--bd);background:var(--bg);color:var(--ink);font-size:16px}.lanerr{color:#c0392b!important}.lanbox[hidden]{display:none!important}
 .gdbtn{display:inline-flex;align-items:center;background:#fff!important;color:#1f1f1f!important;border:1px solid #dadce0!important;font-weight:600}.gdbtn[disabled]{opacity:.5}.gdcfg{margin:8px 0;font-size:13px}.gdcfg summary{cursor:pointer;color:var(--mu)}.gdcfg label{display:flex;flex-direction:column;gap:4px;margin:6px 0}.gdcfg input{padding:8px 10px;border-radius:9px;border:1px solid var(--bd);background:var(--bg);color:var(--ink);font-size:14px}
+.stback,.stnx{display:none}#stm .stpg [hidden]{display:none!important}
+@media(max-width:760px){
+ .stmod{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)!important}
+ .stback{display:inline-flex;align-items:center;gap:4px;border:0;background:none;color:var(--ac);font:600 15px var(--ui);padding:4px 0 10px;cursor:pointer}
+ .stnx{float:right;border:0;background:none;color:var(--ink);font-size:18px;padding:0 6px;cursor:pointer}
+ #stm:not(.stl) .stbox{grid-template-rows:1fr}#stm:not(.stl) .stbox nav{display:none}
+ #stm.stl .stbox{grid-template-rows:1fr}#stm.stl .stbox section{display:none}
+ #stm.stl .stbox nav{display:flex;flex-direction:column;gap:2px;overflow-y:auto;overflow-x:hidden;padding:12px 10px;border:0}
+ #stm.stl .stbox nav .sts{display:flex!important;margin-bottom:8px}#stm.stl .stbox nav .stcap{display:block!important;font:700 22px var(--ui);padding:6px 8px 12px;color:var(--ink)}
+ #stm.stl .stbox nav button[data-stp]{width:100%;padding:14px 12px;font-size:16px;border-radius:10px;white-space:normal}
+ #stm.stl .stbox nav button[data-stp]::after{content:'›';margin-left:auto;opacity:.45;font-size:20px}
+ #stm.stl .stbox nav button.on{background:none;font-weight:400}
+ #stm.stl.stsq .stbox{grid-template-rows:auto 1fr}#stm.stl.stsq .stbox nav button[data-stp],#stm.stl.stsq .stbox nav .stcap{display:none!important}#stm.stl.stsq .stbox section{display:block}#stm.stl.stsq .stback{display:none}
+ #stm .stbox section>.stx{display:none}
+}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -4154,6 +4169,25 @@ window.syncWithTarget=(id,T,cfg,persist)=>{const run=async()=>{for(let i=0;i<240
   else if(k==='pw'){const v=await askText('Senha para criptografar as notas no Drive (use a mesma em todos os aparelhos). Deixe vazio para não criptografar.',GD.pw||'');if(v===null)return;GD.pw=v.trim();GD.key=null;GD.keyFor='';GD.B={};GD.AS=new Set();GD.last=0;GD.ids={};GD.files={};persist();redraw();toast(GD.pw?'As notas vão para a pasta “Marginália Notes (criptografado)” — use a mesma senha nos outros aparelhos':'Criptografia desligada');gdSync(true)}
   else if(k==='savecfg'){LS('client',{id:$('#gdcid').value.trim(),secret:$('#gdcsec').value.trim()});redraw();toast('Acesso do Google salvo')}},true);
  {const c0=CMDS;CMDS=()=>c0().concat([['Sincronizar com o Google Drive agora',()=>gdSync(true)]])}
+})();
+
+/* NEW28: Configurações no celular como lista (estilo Android): toca numa seção → abre; ‹ volta */
+(function(){
+ const mob=()=>innerWidth<=760;
+ const _stOpen28=stOpen;stOpen=function(p){_stOpen28.apply(this,arguments);const m=$('#stm');if(!m)return;
+  const sec=m.querySelector('.stbox section'),nav=m.querySelector('.stbox nav');
+  if(sec&&!sec.querySelector('.stback'))sec.insertAdjacentHTML('afterbegin','<button class="stback" data-stback>‹ Configurações</button>');
+  if(nav&&!nav.querySelector('.stnx'))nav.querySelector('.stcap').insertAdjacentHTML('beforeend','<button class="stnx" data-stx aria-label="Fechar">✕</button>');
+  m.classList.toggle('stl',mob()&&!p);m.classList.remove('stsq')};
+ document.addEventListener('click',e=>{const m=$('#stm');if(!m||m.hidden||!e.target.closest)return;
+  if(e.target.closest('[data-stback]')){m.classList.add('stl');const q=$('#stq');if(q&&q.value){q.value='';q.dispatchEvent(new Event('input',{bubbles:true}))}m.classList.remove('stsq');return}
+  const b=e.target.closest('#stm nav [data-stp]');if(b&&mob()){m.classList.remove('stl','stsq');const sc=m.querySelector('.stbox section');if(sc)sc.scrollTop=0}},false);
+ document.addEventListener('input',e=>{if(e.target.id!=='stq')return;const m=$('#stm');if(!m)return;if(mob())m.classList.toggle('stsq',!!e.target.value.trim());
+  const pg=m.querySelector('.stpg');if(!pg||!e.target.value.trim())return;
+  /* esconde também os blocos especiais (Sobre, Wi-Fi, Google…) que não têm o termo buscado */
+  const hide=el=>{[...el.children].forEach(c=>{if(c.matches('.str')||c.matches('.stback'))return;if(c.querySelector('.str:not([hidden])')){hide(c);return}c.hidden=true})};hide(pg);
+  const q=nz(e.target.value);pg.querySelectorAll('h3').forEach(h=>{if(!nz(h.textContent).includes(q))return;let x=h;h.hidden=false;for(let p=h.parentElement;p&&p!==pg;p=p.parentElement)p.hidden=false;while((x=x.nextElementSibling)&&!/^H[23]$/.test(x.tagName)){x.hidden=false;x.querySelectorAll('[hidden]').forEach(y=>{if(!y.matches('.str')||y.closest('.str')===y)y.hidden=false})}});
+  let nr=pg.querySelector('.stnone');if(!pg.querySelector('.str:not([hidden]),h3:not([hidden])')){if(!nr)pg.insertAdjacentHTML('beforeend','<p class="mu stnone" style="padding:20px 4px">Nenhuma configuração encontrada.</p>')}else if(nr)nr.remove()});
 })();
 
 boot();
