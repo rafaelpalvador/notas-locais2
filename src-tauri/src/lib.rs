@@ -16,7 +16,14 @@ fn default_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
     #[cfg(mobile)]
     { Ok(app.path().app_data_dir().map_err(|e| e.to_string())?.join("NotasLocais")) }
     #[cfg(not(mobile))]
-    { Ok(app.path().document_dir().map_err(|e| e.to_string())?.join("NotasLocais")) }
+    {
+        // sem pasta Documentos configurada (ex.: Linux mínimo): usa ~/Documents, senão a pasta de dados do app
+        let base = app.path().document_dir().ok()
+            .or_else(|| app.path().home_dir().ok().map(|h| h.join("Documents")))
+            .or_else(|| app.path().app_data_dir().ok())
+            .ok_or_else(|| "Não achei uma pasta para guardar as notas".to_string())?;
+        Ok(base.join("NotasLocais"))
+    }
 }
 fn cfg(app: &tauri::AppHandle) -> Result<PathBuf, String> {
     let d = app.path().app_config_dir().map_err(|e| e.to_string())?;
