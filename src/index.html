@@ -701,6 +701,7 @@ body.dbmode #dbr{display:block;flex:1;min-height:0;overflow:auto;padding:18px 26
 .abh{display:flex;gap:14px;align-items:center;margin-bottom:6px}.abh .mrg-logo{width:56px;height:56px;flex:none}.abh h2{margin:0 0 2px}
 .abg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:6px 0 12px}.abk{background:rgba(120,120,128,.08);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;min-width:0}.abk b{font:600 11.5px var(--ui);color:var(--mu);text-transform:none}.abk span{font:600 14px var(--ui);overflow-wrap:anywhere}.abk kbd,.abk b kbd{font:600 11px ui-monospace,monospace;background:var(--bg);border:1px solid var(--bd);border-bottom-width:2px;border-radius:5px;padding:1px 5px;color:var(--ink)}
 .abl{margin:6px 0 12px;padding-left:2px;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:13.5px;line-height:1.45}.abln{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}.abln a{padding:7px 12px;border-radius:9px;border:1px solid var(--bd);color:var(--ac);text-decoration:none;font:600 13px var(--ui)}.abln a:hover{background:rgba(120,120,128,.1)}.abft{margin-top:14px;font-size:12px;text-align:center}
+.lanbox{border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin:8px 0;display:flex;flex-direction:column;gap:6px}.lanrow{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.lanrow span{color:var(--mu);font-size:13px}.lanbox code{font:600 14px ui-monospace,monospace}.lancode{letter-spacing:.08em;font-size:17px!important;color:var(--ac)}.lanbtns{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}.lanbox label{display:flex;flex-direction:column;gap:4px;font-size:13px}.lanbox input{padding:9px 10px;border-radius:9px;border:1px solid var(--bd);background:var(--bg);color:var(--ink);font-size:16px}.lanerr{color:#c0392b!important}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -2909,7 +2910,7 @@ try{WD.last=+localStorage.getItem('ln:wdlast')||0}catch(e){}
 const wdSaveCfg=()=>{try{localStorage.setItem('ln:wd',JSON.stringify(WD.cfg))}catch(e){}};
 let WDB={};try{WDB=JSON.parse(localStorage.getItem('ln:wdbase')||'{}')}catch(e){}
 let WDAS=new Set();try{WDAS=new Set(JSON.parse(localStorage.getItem('ln:wdas')||'[]'))}catch(e){}
-const wdPersist=()=>{try{localStorage.setItem('ln:wdbase',JSON.stringify(WDB));localStorage.setItem('ln:wdas',JSON.stringify([...WDAS]));localStorage.setItem('ln:wdlast',String(WD.last))}catch(e){}};
+const wdPersist=()=>{if(window.SYNCT&&SYNCT.cur!=='cloud')return;try{localStorage.setItem('ln:wdbase',JSON.stringify(WDB));localStorage.setItem('ln:wdas',JSON.stringify([...WDAS]));localStorage.setItem('ln:wdlast',String(WD.last))}catch(e){}};
 const b64e=u8=>{let s='';for(let i=0;i<u8.length;i+=32768)s+=String.fromCharCode.apply(null,u8.subarray(i,i+32768));return btoa(s)};
 const b64d=s=>{const b=atob(s||''),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u};
 const u8=x=>x instanceof Uint8Array?x:typeof x==='string'?new TextEncoder().encode(x):new Uint8Array(x);
@@ -2944,7 +2945,7 @@ const wdAssetsOf=n=>{const o=new Set();for(const m of String(n.body||'').matchAl
  Object.values(n.props||{}).forEach(v=>{v=String(v);if(/^[\w.-]+\.(png|jpe?g|gif|webp|svg|pdf|webm|m4a|mp3|wav|ogg)$/i.test(v))o.add(v)});return o};
 const wdNoteObj=n=>({id:n.id,title:n.title,folder:n.folder||'',created:n.created,updated:n.updated,body:n.body,props:n.props||{}});
 function wdStatus(t){WD.err=t||'';const el=$('#wdst');if(el){el.textContent=WD.busy?'☁ Sincronizando…':WD.err?'☁ Erro na sincronização':WD.last?'☁ Sincronizado '+new Date(WD.last).toLocaleTimeString(loc(),{hour:'2-digit',minute:'2-digit'}):'☁ Sincronizar';el.classList.toggle('err',!!WD.err);el.title=WD.err||'Clique para sincronizar agora'}const m=$('#wdmsg');if(m)m.textContent=WD.err||(WD.last?'Última sincronização: '+new Date(WD.last).toLocaleString(loc()):'')}
-async function wdSync(manual){if(!WD.cfg.url){if(manual)wdOpen();return}if(WD.busy)return;WD.busy=true;wdStatus();let up=0,dn=0,cf=0,dl=0;
+async function wdSync(manual){if(!WD.cfg.url){if(manual)wdOpen();return}if(WD.busy)return;WD.busy=true;wdStatus();let up=0,dn=0,cf=0,dl=0,jn=0,cfx=0;
  try{for(let attempt=0;attempt<3;attempt++){
   const{key}=await wdMeta();let r=await wdReq('GET','index.json',null),idx={notes:{},folders:[],assets:[]},etag='';
   if(r.status===200){idx=JSON.parse(td(await wdDec(key,r.body)));etag=r.etag}else if(r.status!==404)throw new Error('Erro ao ler o índice ('+r.status+').');
@@ -2954,11 +2955,12 @@ async function wdSync(manual){if(!WD.cfg.url){if(manual)wdOpen();return}if(WD.bu
    if(rr&&!l){if(b!==undefined){R[id]={d:now0};delR.push(id);delete WDB[id];changed=true}else pull.push(rr.h?[id,rr.h]:[id,''])}
    else if(l&&!rr)push.push(l);
    else if(l&&rr){if(rr.h===lh)WDB[id]=lh;else if(lh===b)pull.push([id,rr.h]);else if(rr.h===b)push.push(l);else{pull.push([id,rr.h,'conf']);cf++}}}
-  for(const[id,h,conf]of pull){const g=await wdReq('GET','notes/'+id+'.json',null);if(g.status!==200)continue;const o=JSON.parse(td(await wdDec(key,g.body)));let l=S.notes.find(n=>n.id===id);
-   if(conf&&l){const c=mk(l.title+' (conflito '+new Date().toLocaleString(loc())+')',l.folder,l.body);c.props={...(l.props||{})};S.notes.push(c);persistNew(c);push.push(c)}
+  for(const[id,h,conf]of pull){const g=await wdReq('GET','notes/'+id+'.json',null);if(g.status!==200)continue;const o=JSON.parse(td(await wdDec(key,g.body)));let l=S.notes.find(n=>n.id===id);let mrg=null;
+   if(conf&&l){mrg=window.wdMergeNote?wdMergeNote(WDB[id],l,o):null;if(mrg){Object.assign(o,mrg.o);cf--;if(mrg.conflicts)cfx++;else jn++}
+    else{const c=mk(l.title+' (conflito '+new Date().toLocaleString(loc())+')',l.folder,l.body);c.props={...(l.props||{})};S.notes.push(c);persistNew(c);push.push(c)}}
    if(l){Object.assign(l,{title:o.title,folder:o.folder||'',created:o.created||l.created,updated:o.updated||now(),body:o.body,props:o.props||{}})}else{l={id,title:o.title,folder:o.folder||'',created:o.created||now(),updated:o.updated||now(),body:o.body,props:o.props||{}};S.notes.push(l)}
    (l.folder||'').split('/').filter(Boolean).reduce((p,s)=>{const x=p?p+'/'+s:s;if(!S.folders.includes(x))S.folders.push(x);return x},'');
-   persistNew(l);WDB[id]=nh(l);dn++}
+   persistNew(l);if(mrg){l.updated=now();push.push(l)}else WDB[id]=nh(l);dn++}
   for(const l of delL){try{trash(l);if(FH)fsDel(l.id);if(AT)AT.invoke('delete_note',{id:l.id}).catch(()=>{})}catch(e){}S.notes=S.notes.filter(n=>n.id!==l.id);if(curId===l.id)curId=S.notes[0]&&S.notes[0].id;dl++}
   for(const l of push){const w=await wdReq('PUT','notes/'+l.id+'.json',await wdEnc(key,JSON.stringify(wdNoteObj(l))),{'Content-Type':'application/octet-stream'});if(w.status>=300)throw new Error('Falha ao enviar nota ('+w.status+').');const h=nh(l);R[l.id]={u:l.updated,h};WDB[l.id]=h;up++;changed=true}
   for(const id of delR){try{await wdReq('DELETE','notes/'+id+'.json',null)}catch(e){}}
@@ -2971,7 +2973,7 @@ async function wdSync(manual){if(!WD.cfg.url){if(manual)wdOpen();return}if(WD.bu
   if(changed||r.status===404){const w=await wdReq('PUT','index.json',await wdEnc(key,JSON.stringify(idx)),etag?{'If-Match':etag}:{});if(w.status===412){continue}if(w.status>=300)throw new Error('Falha ao gravar o índice ('+w.status+').')}
   break}
   WD.last=Date.now();wdPersist();if(dn||dl){save();if(!TA)try{localStorage.setItem('ln:v1',JSON.stringify(S))}catch(e){}if(view.t==='n'&&cur())show();else go(view)}renderSB();wdStatus();
-  if(manual||dn||cf)toast('Sincronizado: '+up+' enviadas, '+dn+' recebidas'+(dl?', '+dl+' excluídas':'')+(cf?', '+cf+' conflito(s) — cópia criada':''))}
+  window.__wdLastRes={up,dn,dl,jn,cfx};if(manual||dn||cf||jn||cfx)toast((window.SYNCT&&SYNCT.cur==='lan'?'Wi-Fi: ':'Sincronizado: ')+up+' enviadas, '+dn+' recebidas'+(dl?', '+dl+' excluídas':'')+(cf?', '+cf+' conflito(s) — cópia criada':'')+(jn?', '+jn+' nota(s) editada(s) nos dois aparelhos foram juntadas':'')+(cfx?', '+cfx+' nota(s) com trechos para conferir (⟪ conflito ⟫)':''))}
  catch(e){wdStatus(e.message||String(e));if(manual)toast(e.message||'Falha na sincronização')}
  finally{WD.busy=false;wdStatus(WD.err)}}
 function wdOpen(){let m=$('#wdm');if(!m){m=document.createElement('div');m.id='wdm';m.className='wdmod';document.body.appendChild(m)}const c=WD.cfg;
@@ -3971,6 +3973,93 @@ window.BUILD=/*BUILD*/{v:'dev',d:'',c:''};
  const _stPage25=stPage;stPage=function(p){return p==='sobre'?sobre():_stPage25(p)};
  // botão "Verificar atualizações" leva à página de atualizações e já verifica
  document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.stpg [data-stp="atual"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();STPG='atual';stOpen('atual');if(typeof updCheck==='function')updCheck(true).then(()=>{if(STPG==='atual')stRefresh()}).catch(()=>{})},true);
+})();
+
+/* NEW26: juntar edições feitas em dois aparelhos + sincronização pelo Wi-Fi (computador como ponto de encontro) */
+/* junção de 3 vias por linhas (base comum, este aparelho, outro aparelho) */
+function lcsMap(a,b){/* devolve m: índice em a -> índice em b (ou -1), monotônico */
+ const n=a.length,m=b.length,map=new Int32Array(n).fill(-1);let s=0;while(s<n&&s<m&&a[s]===b[s]){map[s]=s;s++}
+ let ea=n,eb=m;while(ea>s&&eb>s&&a[ea-1]===b[eb-1]){ea--;eb--;map[ea]=eb}
+ const N=ea-s,M=eb-s;if(!N||!M)return map;if(N*M>25e6)return null;
+ const W=M+1,dp=new Int32Array((N+1)*W);
+ for(let i=N-1;i>=0;i--)for(let j=M-1;j>=0;j--)dp[i*W+j]=a[s+i]===b[s+j]?dp[(i+1)*W+j+1]+1:Math.max(dp[(i+1)*W+j],dp[i*W+j+1]);
+ let i=0,j=0;while(i<N&&j<M){if(a[s+i]===b[s+j]){map[s+i]=s+j;i++;j++}else if(dp[(i+1)*W+j]>=dp[i*W+j+1])i++;else j++}
+ return map}
+function merge3(base,mine,theirs,lab){
+ if(mine===theirs)return{text:mine,conflicts:0};if(base===mine)return{text:theirs,conflicts:0};if(base===theirs)return{text:mine,conflicts:0};
+ const O=base.split('\n'),A=mine.split('\n'),B=theirs.split('\n'),ma=lcsMap(O,A),mb=lcsMap(O,B);if(!ma||!mb)return null;
+ const out=[];let conflicts=0,io=0,ia=0,ib=0;const eq=(x,y)=>x.length===y.length&&x.every((v,k)=>v===y[k]);
+ const chunk=(o1,a1,b1)=>{const o=O.slice(io,o1),a=A.slice(ia,a1),b=B.slice(ib,b1);
+  if(eq(a,o))out.push(...b);else if(eq(b,o))out.push(...a);else if(eq(a,b))out.push(...a);else if(!o.length)out.push(...a,...b);
+  else{conflicts++;out.push((lab&&lab.a)||'⟪ conflito · este aparelho ⟫',...a,(lab&&lab.b)||'⟪ outro aparelho ⟫',...b,(lab&&lab.e)||'⟪ fim do conflito ⟫')}};
+ for(let k=0;k<O.length;k++){if(ma[k]<0||mb[k]<0)continue;if(ma[k]<ia||mb[k]<ib)continue;chunk(k,ma[k],mb[k]);out.push(O[k]);io=k+1;ia=ma[k]+1;ib=mb[k]+1}
+ chunk(O.length,A.length,B.length);return{text:out.join('\n'),conflicts}}
+
+
+window.merge3=merge3;
+/* base = como a nota estava na última sincronização (WDB guarda título␁pasta␁texto␁propriedades) */
+window.wdMergeNote=(baseStr,l,o)=>{if(typeof baseStr!=='string')return null;const p=baseStr.split('\u0001');if(p.length<4)return null;
+ const bT=p[0],bF=p[1],bB=p[2],bP={};(p.slice(3).join('\u0001')||'').split('\u0002').filter(Boolean).forEach(kv=>{const i=kv.indexOf('=');if(i>0)bP[kv.slice(0,i)]=kv.slice(i+1)});
+ const norm=x=>String(x||'').replace(/^\n+/,'').replace(/\s+$/,'');const dv=/Android/i.test(navigator.userAgent)?'celular':AT?'computador':'navegador';const r=merge3(bB,norm(l.body),norm(o.body),{a:'⟪ conflito · versão do '+dv+' ⟫',b:'⟪ versão do outro aparelho ⟫',e:'⟪ fim do conflito ⟫'});if(!r)return null;
+ const pick=(b,x,y)=>x===b?y:x;const lp=l.props||{},op=o.props||{},keys=new Set([...Object.keys(bP),...Object.keys(lp),...Object.keys(op)]),props={};
+ keys.forEach(k=>{const b=bP[k],x=lp[k]!==undefined?String(lp[k]):undefined,y=op[k]!==undefined?String(op[k]):undefined;const v=x===b?y:x;if(v!==undefined)props[k]=v});
+ return{o:{title:pick(bT,l.title,o.title),folder:pick(bF,l.folder||'',o.folder||''),body:r.text+'\n',props,updated:now()},conflicts:r.conflicts}};
+
+window.SYNCT={cur:'cloud'};
+(function(){
+ const isAnd=/Android/i.test(navigator.userAgent),PORT=47730,USER='marginalia';
+ const LS=(k,v)=>{try{if(v===undefined)return localStorage.getItem('ln:lan:'+k);if(v===null)localStorage.removeItem('ln:lan:'+k);else localStorage.setItem('ln:lan:'+k,typeof v==='string'?v:JSON.stringify(v))}catch(e){}};
+ const J=(k,d)=>{try{return JSON.parse(LS(k)||'')}catch(e){return d}};
+ const LAN={mode:LS('mode')||'',addr:LS('addr')||'',code:LS('code')||'',B:J('base',{}),AS:new Set(J('as',[])),last:+(LS('last')||0),err:'',busy:false,key:null,keyFor:'',info:null};
+ window.LAN=LAN;
+ const save=()=>{LS('mode',LAN.mode||null);LS('addr',LAN.addr||null);LS('code',LAN.code||null);LS('base',LAN.B);LS('as',[...LAN.AS]);LS('last',String(LAN.last))};
+ const newCode=()=>{const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',r=crypto.getRandomValues(new Uint8Array(8));let c='';r.forEach((x,i)=>{c+=A[x%A.length];if(i===3)c+='-'});return c};
+ const url=()=>LAN.mode==='host'?'http://127.0.0.1:'+PORT+'/':(()=>{let a=(LAN.addr||'').trim().replace(/^https?:\/\//,'').replace(/\/+$/,'');if(a&&!/:\d+$/.test(a))a+=':'+PORT;return a?'http://'+a+'/':''})();
+ const cfg=()=>({url:url(),user:USER,pass:LAN.code,dir:'Marginalia',e2ee:LAN.code,auto:true});
+ let q=Promise.resolve();
+ async function lanSync(manual){if(!LAN.mode||!LAN.code||!(AT||window.__lanTest))return;if(LAN.busy)return;LAN.busy=true;lanStatus();
+  q=q.then(async()=>{for(let i=0;i<120&&WD.busy;i++)await new Promise(r=>setTimeout(r,250));
+   const keep={cfg:WD.cfg,B:WDB,AS:WDAS,last:WD.last,key:WD.key,keyFor:WD.keyFor,err:WD.err};
+   WD.cfg=cfg();WDB=LAN.B;WDAS=LAN.AS;WD.last=LAN.last;WD.key=LAN.key;WD.keyFor=LAN.keyFor;WD.err='';SYNCT.cur='lan';
+   try{try{await wdEnsure()}catch(e){}window.__wdLastRes=null;await wdSync(false);LAN.err=WD.err||''}catch(e){LAN.err=e.message||String(e)}
+   finally{LAN.B=WDB;LAN.AS=WDAS;LAN.key=WD.key;LAN.keyFor=WD.keyFor;if(!LAN.err)LAN.last=WD.last;
+    WD.cfg=keep.cfg;WDB=keep.B;WDAS=keep.AS;WD.last=keep.last;WD.key=keep.key;WD.keyFor=keep.keyFor;WD.err=keep.err;SYNCT.cur='cloud';save();wdStatus()}
+  }).finally(()=>{LAN.busy=false;lanStatus();if(manual){const r=window.__wdLastRes;if(LAN.err)toast(friendly(LAN.err));else toast(r&&(r.up||r.dn||r.dl)?'Wi-Fi: '+r.up+' enviadas, '+r.dn+' recebidas'+(r.jn?', '+r.jn+' juntadas':'')+(r.cfx?', '+r.cfx+' para conferir (⟪ conflito ⟫)':''):'Wi-Fi: tudo em dia')}});return q}
+ window.lanSync=lanSync;
+ const friendly=e=>/Usuário ou senha|criptografia incorreta/i.test(e)?'Código de pareamento errado — confira o código mostrado no computador':/Sem conex|error sending|connect|timed out|tcp|dns|refused|unreachable/i.test(e)?(LAN.mode==='host'?'O servidor deste computador não respondeu':'O computador não está ao alcance (fora da mesma rede, desligado ou com o app fechado)'):e;
+ function lanStatus(){const el=$('#lanst');if(!el)return;el.textContent=LAN.busy?'Sincronizando pelo Wi-Fi…':LAN.err?friendly(LAN.err):LAN.last?'Última vez: '+new Date(LAN.last).toLocaleString(loc()):'Ainda não sincronizou';el.className='mu'+(LAN.err?' lanerr':'')}
+ async function hostStart(){if(!LAN.code)LAN.code=newCode();try{LAN.info=await AT.invoke('lan_start',{port:PORT,user:USER,pass:LAN.code});LAN.mode='host';save();return true}catch(e){toast('Não deu para ligar: '+e);return false}}
+ async function hostStop(){try{await AT.invoke('lan_stop')}catch(e){}}
+ // ao abrir o app: religa o servidor e sincroniza; depois a cada 45 s e ao voltar para o app
+ setTimeout(async()=>{if(LAN.mode==='host'&&AT&&!isAnd)await hostStart();if(LAN.mode)lanSync(false)},2500);
+ setInterval(()=>{if(LAN.mode&&document.visibilityState==='visible')lanSync(false)},45000);
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&LAN.mode)setTimeout(()=>lanSync(false),800)});
+ // sincroniza logo depois de editar (agrupa várias edições)
+ let ed=null;document.addEventListener('input',()=>{if(!LAN.mode)return;clearTimeout(ed);ed=setTimeout(()=>lanSync(false),8000)},true);
+
+ const card=()=>{if(!(AT||window.__lanTest))return'<h3>Sincronizar pelo Wi-Fi</h3><p class="mu">Disponível no app de computador e no Android.</p>';
+  const ips=(LAN.info&&LAN.info.ips)||[],ts=ips.filter(x=>x.startsWith('100.')),lan=ips.filter(x=>!x.startsWith('100.'));
+  let h='<h3>Sincronizar pelo Wi-Fi (sem nuvem)</h3><p class="mu">O computador vira o ponto de encontro: celular e outros computadores sincronizam direto com ele quando estão na mesma rede. Tudo vai criptografado com o código de pareamento.</p>';
+  if(LAN.mode==='host'){h+='<div class="lanbox"><div><b>Este computador está recebendo conexões</b></div><div class="lanrow"><span>Endereço</span><code>'+(lan[0]?esc(lan[0])+':'+PORT:'(sem rede)')+'</code></div>'+(ts.length?'<div class="lanrow"><span>Fora de casa (Tailscale)</span><code>'+esc(ts[0])+':'+PORT+'</code></div>':'')+'<div class="lanrow"><span>Código</span><code class="lancode">'+esc(LAN.code)+'</code></div><p class="mu" id="lanst"></p></div>'+
+   '<div class="lanbtns"><button class="stb" data-lan="now">Sincronizar agora</button><button class="stb" data-lan="copy">Copiar endereço e código</button><button class="stb" data-lan="newcode">Trocar código</button><button class="stb" data-lan="off">Desligar</button></div>'+
+   '<p class="mu">No celular: Configurações → Sincronização → <b>Conectar a um computador</b>, e digite o endereço e o código acima. Se o Windows perguntar sobre o firewall, permita em <b>redes privadas</b>.</p>'}
+  else if(LAN.mode==='client'){h+='<div class="lanbox"><div><b>Conectado ao computador</b> <code>'+esc(LAN.addr)+'</code></div><p class="mu" id="lanst"></p></div><div class="lanbtns"><button class="stb" data-lan="now">Sincronizar agora</button><button class="stb" data-lan="off">Desconectar</button></div>'}
+  else{h+='<div class="lanbtns">'+(isAnd?'':'<button class="stb pri" data-lan="host">Usar este computador como ponto de encontro</button>')+'<button class="stb" data-lan="join">Conectar a um computador…</button></div>'+
+   '<div id="lanjoin" hidden class="lanbox"><label>Endereço do computador<input id="lanaddr" placeholder="192.168.1.20:47730" inputmode="url" autocapitalize="off"></label><label>Código<input id="lancode" placeholder="ABCD-EFGH" autocapitalize="characters"></label><div class="lanbtns"><button class="stb pri" data-lan="connect">Conectar</button></div></div>'}
+  h+='<p class="mu" style="margin-top:8px">📶 <b>Pelos dados móveis (fora de casa):</b> o celular só alcança o computador se os dois estiverem no <b>Tailscale</b> (grátis) — aí use o endereço que começa com 100. Ou use a sincronização WebDAV acima, que funciona em qualquer rede.</p>';return h};
+ window.lanCard=card;
+ const _stPage26=stPage;stPage=function(p){const h=_stPage26(p);if(p!=='sync')return h;setTimeout(lanStatus,0);return h+'<div id="lancard">'+card()+'</div>'};
+ const redraw=()=>{const c=$('#lancard');if(c){c.innerHTML=card();lanStatus()}};
+ document.addEventListener('click',async e=>{const b=e.target.closest&&e.target.closest('[data-lan]');if(!b)return;e.preventDefault();const k=b.dataset.lan;
+  if(k==='host'){if(await hostStart()){redraw();lanSync(true)}}
+  else if(k==='join'){const j=$('#lanjoin');if(j){j.hidden=false;$('#lanaddr').focus()}}
+  else if(k==='connect'){const a=$('#lanaddr').value.trim(),c=$('#lancode').value.trim().toUpperCase().replace(/\s+/g,'');if(!a||!c){toast('Preencha o endereço e o código');return}
+   LAN.mode='client';LAN.addr=a;LAN.code=c.length===8&&!c.includes('-')?c.slice(0,4)+'-'+c.slice(4):c;LAN.B={};LAN.AS=new Set();LAN.last=0;LAN.key=null;LAN.keyFor='';save();redraw();await lanSync(true)}
+  else if(k==='now'){if(LAN.mode==='host')await hostStart();await lanSync(true);redraw()}
+  else if(k==='copy'){const ips=(LAN.info&&LAN.info.ips)||[];const t='Endereço: '+(ips[0]||'?')+':'+PORT+'\nCódigo: '+LAN.code;try{await navigator.clipboard.writeText(t);toast('Copiado')}catch(x){toast(t)}}
+  else if(k==='newcode'){if(!confirm('Trocar o código? Os aparelhos conectados vão precisar do código novo.'))return;LAN.code=newCode();LAN.B={};LAN.AS=new Set();LAN.last=0;LAN.key=null;LAN.keyFor='';save();await hostStart();redraw()}
+  else if(k==='off'){if(!confirm(LAN.mode==='host'?'Desligar a sincronização pelo Wi-Fi neste computador?':'Desconectar deste computador?'))return;if(LAN.mode==='host')await hostStop();LAN.mode='';LAN.B={};LAN.AS=new Set();LAN.last=0;save();redraw()}},true);
+ {const c0=CMDS;CMDS=()=>c0().concat([['Sincronizar pelo Wi-Fi agora',()=>lanSync(true)]])}
 })();
 
 boot();

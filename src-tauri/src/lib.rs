@@ -321,11 +321,103 @@ fn ext_poll(app: tauri::AppHandle, id: String) -> Result<ExtOut, String> {
     Ok(ExtOut { path: p.to_string_lossy().into(), mtime: mtime_ms(&p), body: n.body })
 }
 
+
+// ---------- Sincronização pelo Wi-Fi: servidor WebDAV mínimo no computador ----------
+mod lan {
+    use std::{fs, io::Read, path::{Path, PathBuf}, sync::{Arc, Mutex, atomic::{AtomicBool, Ordering}}, time::Duration};
+    pub struct Lan { pub stop: Arc<AtomicBool>, pub port: u16 }
+    pub static STATE: Mutex<Option<Lan>> = Mutex::new(None);
+
+    fn etag(b: &[u8]) -> String { let mut h: u64 = 0xcbf29ce484222325; for x in b { h ^= *x as u64; h = h.wrapping_mul(0x100000001b3); } format!("\"{:016x}-{}\"", h, b.len()) }
+    fn decode(p: &str) -> String {
+        let b = p.as_bytes(); let mut o = Vec::with_capacity(b.len()); let mut i = 0;
+        while i < b.len() { if b[i] == b'%' && i + 2 < b.len() { if let Ok(v) = u8::from_str_radix(&p[i + 1..i + 3], 16) { o.push(v); i += 3; continue; } } o.push(b[i]); i += 1; }
+        String::from_utf8_lossy(&o).into_owned()
+    }
+    fn safe(root: &Path, url: &str) -> Option<PathBuf> {
+        let path = url.split('?').next().unwrap_or("");
+        let mut out = root.to_path_buf();
+        for part in decode(path).split('/') { if part.is_empty() || part == "." { continue; } if part == ".." || part.contains('\\') || part.contains(':') { return None; } out.push(part); }
+        Some(out)
+    }
+    pub fn local_ips() -> Vec<String> {
+        let mut v = Vec::new();
+        if let Ok(s) = std::net::UdpSocket::bind("0.0.0.0:0") { if s.connect("192.168.1.1:80").is_ok() || s.connect("8.8.8.8:80").is_ok() { if let Ok(a) = s.local_addr() { let ip = a.ip().to_string(); if ip != "0.0.0.0" { v.push(ip); } } } }
+        if let Ok(s) = std::net::UdpSocket::bind("0.0.0.0:0") { if s.connect("100.100.100.100:80").is_ok() { if let Ok(a) = s.local_addr() { let ip = a.ip().to_string(); if ip.starts_with("100.") && !v.contains(&ip) { v.push(ip); } } } }
+        v
+    }
+    pub fn start(root: PathBuf, port: u16, auth: String) -> Result<(), String> {
+        let mut st = STATE.lock().map_err(|e| e.to_string())?;
+        if let Some(l) = st.take() { l.stop.store(true, Ordering::SeqCst); std::thread::sleep(Duration::from_millis(700)); }
+        fs::create_dir_all(&root).map_err(|e| e.to_string())?;
+        let server = tiny_http::Server::http(("0.0.0.0", port)).map_err(|e| format!("Não consegui abrir a porta {port}: {e}"))?;
+        let stop = Arc::new(AtomicBool::new(false)); let stop2 = stop.clone();
+        let want = format!("Basic {}", auth);
+        std::thread::spawn(move || {
+            while !stop2.load(Ordering::SeqCst) {
+                let mut rq = match server.recv_timeout(Duration::from_millis(500)) { Ok(Some(r)) => r, Ok(None) => continue, Err(_) => break };
+                let hdr = |rq: &tiny_http::Request, n: &str| rq.headers().iter().find(|h| h.field.as_str().as_str().eq_ignore_ascii_case(n)).map(|h| h.value.as_str().to_string());
+                let mk = |code: u16, body: Vec<u8>, tag: Option<String>| { let mut r = tiny_http::Response::from_data(body).with_status_code(code); if let Some(t) = tag { if let Ok(h) = tiny_http::Header::from_bytes(&b"ETag"[..], t.as_bytes()) { r.add_header(h); } } r };
+                if hdr(&rq, "Authorization").as_deref() != Some(want.as_str()) {
+                    let mut r = mk(401, b"auth".to_vec(), None);
+                    if let Ok(h) = tiny_http::Header::from_bytes(&b"WWW-Authenticate"[..], &b"Basic realm=\"Marginalia\""[..]) { r.add_header(h); }
+                    let _ = rq.respond(r); continue;
+                }
+                let p = match safe(&root, rq.url()) { Some(p) => p, None => { let _ = rq.respond(mk(400, vec![], None)); continue; } };
+                let method = rq.method().as_str().to_uppercase();
+                let resp = match method.as_str() {
+                    "GET" => match fs::read(&p) { Ok(b) if p.is_file() => { let t = etag(&b); mk(200, b, Some(t)) } _ => mk(404, vec![], None) },
+                    "PUT" => {
+                        let mut body = Vec::new();
+                        if rq.as_reader().read_to_end(&mut body).is_err() { mk(400, vec![], None) } else {
+                            let cur = fs::read(&p).ok().map(|b| etag(&b));
+                            match hdr(&rq, "If-Match") {
+                                Some(m) if Some(m.trim().to_string()) != cur => mk(412, vec![], cur),
+                                _ => {
+                                    if let Some(d) = p.parent() { let _ = fs::create_dir_all(d); }
+                                    let tmp = p.with_extension("tmp-up");
+                                    match fs::write(&tmp, &body).and_then(|_| fs::rename(&tmp, &p)) { Ok(_) => { let t = etag(&body); mk(if cur.is_some() { 204 } else { 201 }, vec![], Some(t)) } Err(_) => mk(500, vec![], None) }
+                                }
+                            }
+                        }
+                    }
+                    "DELETE" => { if p.is_file() { let _ = fs::remove_file(&p); mk(204, vec![], None) } else { mk(404, vec![], None) } }
+                    "MKCOL" => { if p.is_dir() { mk(405, vec![], None) } else if fs::create_dir_all(&p).is_ok() { mk(201, vec![], None) } else { mk(500, vec![], None) } }
+                    _ => mk(200, vec![], None),
+                };
+                let _ = rq.respond(resp);
+            }
+        });
+        *st = Some(Lan { stop, port });
+        Ok(())
+    }
+    pub fn stop() { if let Ok(mut st) = STATE.lock() { if let Some(l) = st.take() { l.stop.store(true, Ordering::SeqCst); } } }
+}
+
+#[derive(Serialize)]
+struct LanInfo { running: bool, port: u16, ips: Vec<String> }
+
+#[tauri::command]
+fn lan_start(app: tauri::AppHandle, port: u16, user: String, pass: String) -> Result<LanInfo, String> {
+    use base64::Engine;
+    let root = app.path().app_data_dir().map_err(|e| e.to_string())?.join("sync-wifi");
+    let auth = base64::engine::general_purpose::STANDARD.encode(format!("{user}:{pass}"));
+    lan::start(root, port, auth)?;
+    Ok(LanInfo { running: true, port, ips: lan::local_ips() })
+}
+#[tauri::command]
+fn lan_stop() -> Result<(), String> { lan::stop(); Ok(()) }
+#[tauri::command]
+fn lan_info() -> LanInfo {
+    let port = lan::STATE.lock().ok().and_then(|s| s.as_ref().map(|l| l.port));
+    LanInfo { running: port.is_some(), port: port.unwrap_or(0), ips: lan::local_ips() }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_notification::init())
-        .invoke_handler(tauri::generate_handler![load_vault, save_note, delete_note, create_folder, save_asset, read_asset, set_vault, rename_folder, delete_folder, http_req, ext_open, ext_poll, ext_reveal, update_install])
+        .invoke_handler(tauri::generate_handler![load_vault, save_note, delete_note, create_folder, save_asset, read_asset, set_vault, rename_folder, delete_folder, http_req, ext_open, ext_poll, ext_reveal, update_install, lan_start, lan_stop, lan_info])
         .run(tauri::generate_context!())
         .expect("erro ao iniciar o app");
 }

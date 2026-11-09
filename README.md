@@ -253,3 +253,8 @@ No Linux o app vai para `~/.local/share/marginalia-notes`, com atalho no menu de
 - Colar texto com colunas separadas por tab (Honor Notas, Excel, Planilhas Google, sites) vira tabela automaticamente.
 - Criar → **Tabela de texto ou foto** (ou "Importar de texto copiado ou foto…" na janela de tabela, ou Ctrl+K): cole o texto e escolha como separar as colunas — tab, `;`, `,`, 2+ espaços, `|` ou **uma célula por linha** (diga quantas colunas). Mostra a prévia antes de inserir.
 - **Ler de foto ou print:** reconhece o texto (OCR) e monta as colunas pela posição das palavras. Confira antes de inserir. A 1.ª vez baixa o leitor (precisa de internet).
+
+## Sincronização: juntar edições e Wi-Fi
+- **Juntar edições:** se a mesma nota for editada em dois aparelhos antes de sincronizar, o app junta as linhas alteradas (vale para WebDAV e Wi-Fi). Só quando a **mesma linha** muda nos dois lados ele mantém as duas versões entre marcas `⟪ conflito … ⟫` para você escolher. Antes criava uma cópia "(conflito)".
+- **Wi-Fi (sem nuvem):** Configurações → Sincronização → *Usar este computador como ponto de encontro*. Ele mostra endereço e código. No celular: *Conectar a um computador* e digite os dois. Sincroniza ao abrir o app, 8 s depois de editar e a cada 45 s, quando o computador está ao alcance. Os dados vão criptografados (AES-GCM) com o código.
+- **Pelos dados móveis:** instale o Tailscale (grátis) no computador e no celular e use o endereço `100.x.x.x` que aparece. Ou use WebDAV (ex.: Koofr, Nextcloud), que funciona em qualquer rede.
