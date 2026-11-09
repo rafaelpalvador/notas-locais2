@@ -701,7 +701,8 @@ body.dbmode #dbr{display:block;flex:1;min-height:0;overflow:auto;padding:18px 26
 .abh{display:flex;gap:14px;align-items:center;margin-bottom:6px}.abh .mrg-logo{width:56px;height:56px;flex:none}.abh h2{margin:0 0 2px}
 .abg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:6px 0 12px}.abk{background:rgba(120,120,128,.08);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;min-width:0}.abk b{font:600 11.5px var(--ui);color:var(--mu);text-transform:none}.abk span{font:600 14px var(--ui);overflow-wrap:anywhere}.abk kbd,.abk b kbd{font:600 11px ui-monospace,monospace;background:var(--bg);border:1px solid var(--bd);border-bottom-width:2px;border-radius:5px;padding:1px 5px;color:var(--ink)}
 .abl{margin:6px 0 12px;padding-left:2px;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:13.5px;line-height:1.45}.abln{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}.abln a{padding:7px 12px;border-radius:9px;border:1px solid var(--bd);color:var(--ac);text-decoration:none;font:600 13px var(--ui)}.abln a:hover{background:rgba(120,120,128,.1)}.abft{margin-top:14px;font-size:12px;text-align:center}
-.lanbox{border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin:8px 0;display:flex;flex-direction:column;gap:6px}.lanrow{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.lanrow span{color:var(--mu);font-size:13px}.lanbox code{font:600 14px ui-monospace,monospace}.lancode{letter-spacing:.08em;font-size:17px!important;color:var(--ac)}.lanbtns{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}.lanbox label{display:flex;flex-direction:column;gap:4px;font-size:13px}.lanbox input{padding:9px 10px;border-radius:9px;border:1px solid var(--bd);background:var(--bg);color:var(--ink);font-size:16px}.lanerr{color:#c0392b!important}
+.lanbox{border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin:8px 0;display:flex;flex-direction:column;gap:6px}.lanrow{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.lanrow span{color:var(--mu);font-size:13px}.lanbox code{font:600 14px ui-monospace,monospace}.lancode{letter-spacing:.08em;font-size:17px!important;color:var(--ac)}.lanbtns{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}.lanbox label{display:flex;flex-direction:column;gap:4px;font-size:13px}.lanbox input{padding:9px 10px;border-radius:9px;border:1px solid var(--bd);background:var(--bg);color:var(--ink);font-size:16px}.lanerr{color:#c0392b!important}.lanbox[hidden]{display:none!important}
+.gdbtn{display:inline-flex;align-items:center;background:#fff!important;color:#1f1f1f!important;border:1px solid #dadce0!important;font-weight:600}.gdbtn[disabled]{opacity:.5}.gdcfg{margin:8px 0;font-size:13px}.gdcfg summary{cursor:pointer;color:var(--mu)}.gdcfg label{display:flex;flex-direction:column;gap:4px;margin:6px 0}.gdcfg input{padding:8px 10px;border-radius:9px;border:1px solid var(--bd);background:var(--bg);color:var(--ink);font-size:14px}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -4006,6 +4007,18 @@ window.wdMergeNote=(baseStr,l,o)=>{if(typeof baseStr!=='string')return null;cons
  return{o:{title:pick(bT,l.title,o.title),folder:pick(bF,l.folder||'',o.folder||''),body:r.text+'\n',props,updated:now()},conflicts:r.conflicts}};
 
 window.SYNCT={cur:'cloud'};
+/* troca temporária do alvo de sincronização (nuvem WebDAV, Wi-Fi, Google Drive) — uma por vez */
+window.SYNCQ=Promise.resolve();
+window.syncWithTarget=(id,T,cfg,persist)=>{const run=async()=>{for(let i=0;i<240&&WD.busy;i++)await new Promise(r=>setTimeout(r,250));
+  const keep={cfg:WD.cfg,B:WDB,AS:WDAS,last:WD.last,key:WD.key,keyFor:WD.keyFor,err:WD.err};
+  WD.cfg=cfg;WDB=T.B;WDAS=T.AS;WD.last=T.last;WD.key=T.key;WD.keyFor=T.keyFor;WD.err='';SYNCT.cur=id;window.__swapIn=true;
+  try{try{await wdEnsure()}catch(e){if(/401|403|senha|token|Google/i.test(e.message||''))throw e}window.__wdLastRes=null;await wdSync(false);T.err=WD.err||''}catch(e){T.err=e.message||String(e)}
+  finally{window.__swapIn=false;T.B=WDB;T.AS=WDAS;T.key=WD.key;T.keyFor=WD.keyFor;if(!T.err)T.last=WD.last;
+   WD.cfg=keep.cfg;WDB=keep.B;WDAS=keep.AS;WD.last=keep.last;WD.key=keep.key;WD.keyFor=keep.keyFor;WD.err=keep.err;SYNCT.cur='cloud';try{persist()}catch(e){}wdStatus()}};
+ const p=SYNCQ.then(run,run);SYNCQ=p.catch(()=>{});return p};
+/* enquanto outro alvo está ativo, a sincronização automática da nuvem espera a vez */
+{const _ws=wdSync;wdSync=function(m){if(SYNCT.cur!=='cloud'&&!window.__swapIn)return Promise.resolve();return _ws.apply(this,arguments)}}
+
 (function(){
  const isAnd=/Android/i.test(navigator.userAgent),PORT=47730,USER='marginalia';
  const LS=(k,v)=>{try{if(v===undefined)return localStorage.getItem('ln:lan:'+k);if(v===null)localStorage.removeItem('ln:lan:'+k);else localStorage.setItem('ln:lan:'+k,typeof v==='string'?v:JSON.stringify(v))}catch(e){}};
@@ -4018,13 +4031,7 @@ window.SYNCT={cur:'cloud'};
  const cfg=()=>({url:url(),user:USER,pass:LAN.code,dir:'Marginalia',e2ee:LAN.code,auto:true});
  let q=Promise.resolve();
  async function lanSync(manual){if(!LAN.mode||!LAN.code||!(AT||window.__lanTest))return;if(LAN.busy)return;LAN.busy=true;lanStatus();
-  q=q.then(async()=>{for(let i=0;i<120&&WD.busy;i++)await new Promise(r=>setTimeout(r,250));
-   const keep={cfg:WD.cfg,B:WDB,AS:WDAS,last:WD.last,key:WD.key,keyFor:WD.keyFor,err:WD.err};
-   WD.cfg=cfg();WDB=LAN.B;WDAS=LAN.AS;WD.last=LAN.last;WD.key=LAN.key;WD.keyFor=LAN.keyFor;WD.err='';SYNCT.cur='lan';
-   try{try{await wdEnsure()}catch(e){}window.__wdLastRes=null;await wdSync(false);LAN.err=WD.err||''}catch(e){LAN.err=e.message||String(e)}
-   finally{LAN.B=WDB;LAN.AS=WDAS;LAN.key=WD.key;LAN.keyFor=WD.keyFor;if(!LAN.err)LAN.last=WD.last;
-    WD.cfg=keep.cfg;WDB=keep.B;WDAS=keep.AS;WD.last=keep.last;WD.key=keep.key;WD.keyFor=keep.keyFor;WD.err=keep.err;SYNCT.cur='cloud';save();wdStatus()}
-  }).finally(()=>{LAN.busy=false;lanStatus();if(manual){const r=window.__wdLastRes;if(LAN.err)toast(friendly(LAN.err));else toast(r&&(r.up||r.dn||r.dl)?'Wi-Fi: '+r.up+' enviadas, '+r.dn+' recebidas'+(r.jn?', '+r.jn+' juntadas':'')+(r.cfx?', '+r.cfx+' para conferir (⟪ conflito ⟫)':''):'Wi-Fi: tudo em dia')}});return q}
+  q=syncWithTarget('lan',LAN,cfg(),save).finally(()=>{LAN.busy=false;lanStatus();if(manual){const r=window.__wdLastRes;if(LAN.err)toast(friendly(LAN.err));else toast(r&&(r.up||r.dn||r.dl)?'Wi-Fi: '+r.up+' enviadas, '+r.dn+' recebidas'+(r.jn?', '+r.jn+' juntadas':'')+(r.cfx?', '+r.cfx+' para conferir (⟪ conflito ⟫)':''):'Wi-Fi: tudo em dia')}});return q}
  window.lanSync=lanSync;
  const friendly=e=>/Usuário ou senha|criptografia incorreta/i.test(e)?'Código de pareamento errado — confira o código mostrado no computador':/Sem conex|error sending|connect|timed out|tcp|dns|refused|unreachable/i.test(e)?(LAN.mode==='host'?'O servidor deste computador não respondeu':'O computador não está ao alcance (fora da mesma rede, desligado ou com o app fechado)'):e;
  function lanStatus(){const el=$('#lanst');if(!el)return;el.textContent=LAN.busy?'Sincronizando pelo Wi-Fi…':LAN.err?friendly(LAN.err):LAN.last?'Última vez: '+new Date(LAN.last).toLocaleString(loc()):'Ainda não sincronizou';el.className='mu'+(LAN.err?' lanerr':'')}
@@ -4060,6 +4067,93 @@ window.SYNCT={cur:'cloud'};
   else if(k==='newcode'){if(!confirm('Trocar o código? Os aparelhos conectados vão precisar do código novo.'))return;LAN.code=newCode();LAN.B={};LAN.AS=new Set();LAN.last=0;LAN.key=null;LAN.keyFor='';save();await hostStart();redraw()}
   else if(k==='off'){if(!confirm(LAN.mode==='host'?'Desligar a sincronização pelo Wi-Fi neste computador?':'Desconectar deste computador?'))return;if(LAN.mode==='host')await hostStop();LAN.mode='';LAN.B={};LAN.AS=new Set();LAN.last=0;save();redraw()}},true);
  {const c0=CMDS;CMDS=()=>c0().concat([['Sincronizar pelo Wi-Fi agora',()=>lanSync(true)]])}
+})();
+
+/* NEW27: Entrar com o Google — sincroniza pelo Google Drive (pasta "Marginália Notes") */
+(function(){
+ const isAnd=/Android/i.test(navigator.userAgent);
+ const LS=(k,v)=>{try{if(v===undefined)return localStorage.getItem('ln:gd:'+k);if(v===null)localStorage.removeItem('ln:gd:'+k);else localStorage.setItem('ln:gd:'+k,typeof v==='string'?v:JSON.stringify(v))}catch(e){}};
+ const J=(k,d)=>{try{return JSON.parse(LS(k)||'')}catch(e){return d}};
+ const BUILT=/*GOOGLE*/{id:'',secret:''};
+ const GD={tok:J('tok',null),email:LS('email')||'',pw:LS('pw')||'',B:J('base',{}),AS:new Set(J('as',[])),last:+(LS('last')||0),err:'',busy:false,key:null,keyFor:'',ids:{},files:{}};
+ window.GD=GD;
+ const client=()=>{const c=J('client',null);return c&&c.id?c:BUILT};
+ const persist=()=>{LS('tok',GD.tok);LS('email',GD.email||null);LS('pw',GD.pw||null);LS('base',GD.B);LS('as',[...GD.AS]);LS('last',String(GD.last))};
+ const inv=(c,a)=>AT.invoke(c,a);
+ const form=o=>Object.entries(o).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
+ async function http(method,url,headers,body){const r=await inv('http_req',{method,url,headers:headers||{},body:body==null?null:b64e(u8(body))});return{status:r.status,body:b64d(r.body),headers:r.headers||{}}}
+ const b64u=a=>btoa(String.fromCharCode(...a)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+ /* ---- login ---- */
+ async function login(){const c=client();if(!c.id){toast('Falta configurar o acesso do Google (veja abaixo)');return}
+  const ver=b64u(crypto.getRandomValues(new Uint8Array(48))),chal=b64u(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(ver)))),state=b64u(crypto.getRandomValues(new Uint8Array(12)));
+  const port=await inv('oauth_listen'),redir='http://127.0.0.1:'+port;
+  const url='https://accounts.google.com/o/oauth2/v2/auth?'+form({client_id:c.id,redirect_uri:redir,response_type:'code',scope:'openid email https://www.googleapis.com/auth/drive.file',code_challenge:chal,code_challenge_method:'S256',access_type:'offline',prompt:'consent',state});
+  try{await inv('plugin:opener|open_url',{url})}catch(e){toast('Não consegui abrir o navegador: '+e);return}
+  toast('Entre na sua conta Google no navegador e volte para cá');
+  let got=null;for(let i=0;i<600&&!got;i++){await new Promise(r=>setTimeout(r,1000));try{got=await inv('oauth_poll')}catch(e){}}
+  if(!got){toast('O login não terminou (tempo esgotado)');return}
+  const q=new URLSearchParams(got.split('?')[1]||'');if(q.get('error')){toast('Login cancelado');return}if(q.get('state')!==state){toast('Resposta de login inválida');return}
+  const r=await http('POST','https://oauth2.googleapis.com/token',{'Content-Type':'application/x-www-form-urlencoded'},form({code:q.get('code'),client_id:c.id,client_secret:c.secret||'',redirect_uri:redir,grant_type:'authorization_code',code_verifier:ver}));
+  const j=JSON.parse(td(r.body)||'{}');if(!j.refresh_token){toast('O Google não autorizou: '+(j.error_description||j.error||r.status));return}
+  GD.tok={rt:j.refresh_token,at:j.access_token,exp:Date.now()+(j.expires_in-60)*1000};
+  try{const pl=JSON.parse(atob(j.id_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));GD.email=pl.email||''}catch(e){}
+  GD.B={};GD.AS=new Set();GD.last=0;GD.ids={};persist();redraw();toast('Conectado como '+(GD.email||'sua conta Google'));gdSync(true)}
+ async function token(force){if(!GD.tok)throw new Error('Google: entre na sua conta de novo');if(!force&&GD.tok.at&&Date.now()<GD.tok.exp)return GD.tok.at;const c=client();
+  const r=await http('POST','https://oauth2.googleapis.com/token',{'Content-Type':'application/x-www-form-urlencoded'},form({refresh_token:GD.tok.rt,client_id:c.id,client_secret:c.secret||'',grant_type:'refresh_token'}));
+  const j=JSON.parse(td(r.body)||'{}');if(!j.access_token){if(j.error==='invalid_grant'){GD.tok=null;persist();redraw();throw new Error('Google: o acesso expirou ou foi removido — entre de novo')}throw new Error('Google: sem conexão ('+(j.error||r.status)+')')}
+  GD.tok.at=j.access_token;GD.tok.exp=Date.now()+(j.expires_in-60)*1000;persist();return GD.tok.at}
+ async function api(method,url,headers,body){let t=await token();let r=await http(method,url,Object.assign({Authorization:'Bearer '+t},headers||{}),body);if(r.status===401){t=await token(true);r=await http(method,url,Object.assign({Authorization:'Bearer '+t},headers||{}),body)}return r}
+ const DA='https://www.googleapis.com/drive/v3/files',UP='https://www.googleapis.com/upload/drive/v3/files',FOLD='application/vnd.google-apps.folder',ROOTN=()=>GD.pw?'Marginália Notes (criptografado)':'Marginália Notes';
+ const qs=x=>x.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+ async function list(q){const out=[];let pt='';do{const r=await api('GET',DA+'?'+form({q,fields:'nextPageToken,files(id,name,version,mimeType)',pageSize:1000,spaces:'drive'})+(pt?'&pageToken='+encodeURIComponent(pt):''));if(r.status!==200)throw new Error('Google Drive: erro '+r.status+' ao listar');const j=JSON.parse(td(r.body));out.push(...(j.files||[]));pt=j.nextPageToken||''}while(pt);return out}
+ async function folder(path){if(GD.ids[path])return GD.ids[path];
+  if(path===''){let f=(await list("name='"+qs(ROOTN())+"' and mimeType='"+FOLD+"' and 'root' in parents and trashed=false"))[0];
+   if(!f){const r=await api('POST',DA+'?fields=id',{'Content-Type':'application/json'},JSON.stringify({name:ROOTN(),mimeType:FOLD,parents:['root']}));if(r.status>=300)throw new Error('Google Drive: não consegui criar a pasta ('+r.status+')');f=JSON.parse(td(r.body))}return GD.ids['']=f.id}
+  const par=await folder(''),name=path;let f=(await list("name='"+qs(name)+"' and mimeType='"+FOLD+"' and '"+par+"' in parents and trashed=false"))[0];
+  if(!f){const r=await api('POST',DA+'?fields=id',{'Content-Type':'application/json'},JSON.stringify({name,mimeType:FOLD,parents:[par]}));if(r.status>=300)throw new Error('Google Drive: não consegui criar a pasta '+name);f=JSON.parse(td(r.body))}return GD.ids[path]=f.id}
+ async function filesIn(dir){if(GD.files[dir])return GD.files[dir];const id=await folder(dir),m={};(await list("'"+id+"' in parents and trashed=false and mimeType!='"+FOLD+"'")).forEach(f=>m[f.name]=f);return GD.files[dir]=m}
+ const split=p=>{p=(p||'').replace(/^\/+|\/+$/g,'');const i=p.lastIndexOf('/');return i<0?['',p]:[p.slice(0,i),p.slice(i+1)]};
+ /* tradutor: o motor de sincronização fala "WebDAV"; aqui vira Google Drive */
+ async function gdReq(method,path,body,hdr){hdr=hdr||{};const[dir,name]=split(path);
+  if(method==='MKCOL'){await folder(name?name:dir);return{status:201,body:new Uint8Array(),etag:''}}
+  if(path==='sync.json'&&method==='GET'){GD.files={}}
+  const fm=await filesIn(dir),f=fm[name];
+  if(method==='GET'){if(!f)return{status:404,body:new Uint8Array(),etag:''};const r=await api('GET',DA+'/'+f.id+'?alt=media');let v=f.version;
+   if(name==='index.json'){const m=await api('GET',DA+'/'+f.id+'?fields=version');if(m.status===200)v=JSON.parse(td(m.body)).version}return{status:r.status,body:r.body,etag:String(v||'')}}
+  if(method==='DELETE'){if(!f)return{status:404,body:new Uint8Array(),etag:''};const r=await api('DELETE',DA+'/'+f.id);delete fm[name];return{status:r.status===204?204:r.status,body:new Uint8Array(),etag:''}}
+  if(method==='PUT'){const im=hdr['If-Match'];if(im!==undefined&&f){const m=await api('GET',DA+'/'+f.id+'?fields=version');const cv=m.status===200?String(JSON.parse(td(m.body)).version):'';if(cv!==String(im))return{status:412,body:new Uint8Array(),etag:cv}}
+   let r;if(f){r=await api('PATCH',UP+'/'+f.id+'?uploadType=media&fields=id,version',{'Content-Type':'application/octet-stream'},body)}
+   else{const bd='mrg'+Math.random().toString(36).slice(2),pid=await folder(dir),head='--'+bd+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify({name,parents:[pid]})+'\r\n--'+bd+'\r\nContent-Type: application/octet-stream\r\n\r\n',tail='\r\n--'+bd+'--';
+    const a=u8(head),b=u8(body||''),c=u8(tail),all=new Uint8Array(a.length+b.length+c.length);all.set(a,0);all.set(b,a.length);all.set(c,a.length+b.length);
+    r=await api('POST',UP+'?uploadType=multipart&fields=id,version',{'Content-Type':'multipart/related; boundary='+bd},all)}
+   if(r.status>=300)return{status:r.status,body:r.body,etag:''};const j=JSON.parse(td(r.body));fm[name]={id:j.id,name,version:j.version};return{status:201,body:new Uint8Array(),etag:String(j.version)}}
+  return{status:200,body:new Uint8Array(),etag:''}}
+ {const _wr=wdReq;wdReq=function(method,path,body,hdr){if(String(WD.cfg.url||'').startsWith('gdrive:'))return gdReq(method,path,body,hdr);return _wr.apply(this,arguments)}}
+ const cfg=()=>({url:'gdrive:',user:'',pass:'',dir:'',e2ee:GD.pw||'',auto:true});
+ async function gdSync(manual){if(!GD.tok||!AT)return;if(GD.busy)return;GD.busy=true;st();
+  try{await syncWithTarget('gd',GD,cfg(),persist)}finally{GD.busy=false;st();redraw();
+   if(manual){const r=window.__wdLastRes;if(GD.err)toast(GD.err);else toast(r&&(r.up||r.dn||r.dl)?'Google Drive: '+r.up+' enviadas, '+r.dn+' recebidas'+(r.jn?', '+r.jn+' juntadas':''):'Google Drive: tudo em dia')}}}
+ window.gdSync=gdSync;
+ function st(){const el=$('#gdst');if(el){el.textContent=GD.busy?'Sincronizando com o Google Drive…':GD.err?GD.err:GD.last?'Última vez: '+new Date(GD.last).toLocaleString(loc()):'Ainda não sincronizou';el.className='mu'+(GD.err?' lanerr':'')}}
+ setTimeout(()=>{if(GD.tok)gdSync(false)},4000);setInterval(()=>{if(GD.tok&&document.visibilityState==='visible')gdSync(false)},120000);
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&GD.tok)setTimeout(()=>gdSync(false),1500)});
+ let ed=null;document.addEventListener('input',()=>{if(!GD.tok)return;clearTimeout(ed);ed=setTimeout(()=>gdSync(false),10000)},true);
+ const G='<svg width="18" height="18" viewBox="0 0 48 48" style="vertical-align:-4px;margin-right:6px"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';
+ const card=()=>{if(!(AT||window.__lanTest))return'<h3>Google Drive</h3><p class="mu">Disponível no app de computador e no Android.</p>';const c=client();
+  let h='<h3>Google Drive (entrar com o Google)</h3><p class="mu">Entre com a sua conta Google no celular e no computador: as notas sincronizam pela pasta <b>Marginália Notes</b> do seu Drive. O app só enxerga os arquivos que ele mesmo criou.</p>';
+  if(GD.tok){h+='<div class="lanbox"><div><b>Conectado</b> '+(GD.email?'<code>'+esc(GD.email)+'</code>':'')+'</div><p class="mu" id="gdst"></p></div><div class="lanbtns"><button class="stb" data-gd="now">Sincronizar agora</button><button class="stb" data-gd="pw">'+(GD.pw?'Trocar senha de criptografia':'Criptografar no Drive…')+'</button><button class="stb" data-gd="out">Sair da conta</button></div>'}
+  else{h+='<div class="lanbtns"><button class="stb pri gdbtn" data-gd="in"'+(c.id?'':' disabled')+'>'+G+'Entrar com o Google</button></div>'+(c.id?'':'<p class="mu lanerr">Falta configurar o acesso do Google uma vez (Client ID). Toque em “Configurar acesso”.</p>')}
+  h+='<details class="gdcfg"'+(c.id?'':' open')+'><summary>Configurar acesso do Google (uma vez)</summary><p class="mu">Crie um “ID do cliente OAuth” do tipo <b>App para computador</b> no Google Cloud, com a API do Google Drive ativada, e cole aqui. O passo a passo está no README.</p><label>Client ID<input id="gdcid" value="'+esc(J('client',{}).id||'')+'" placeholder="123…apps.googleusercontent.com" autocapitalize="off"></label><label>Client secret<input id="gdcsec" value="'+esc(J('client',{}).secret||'')+'" placeholder="GOCSPX-…" autocapitalize="off"></label><div class="lanbtns"><button class="stb" data-gd="savecfg">Salvar</button></div>'+(BUILT.id?'<p class="mu">Este app já vem com um acesso configurado; só preencha se quiser usar o seu.</p>':'')+'</details>';
+  return h};
+ const redraw=()=>{const c=$('#gdcard');if(c){c.innerHTML=card();st()}};
+ const _stPage27=stPage;stPage=function(p){const h=_stPage27(p);if(p!=='sync')return h;setTimeout(st,0);return h.replace('<div id="lancard">','<div id="gdcard">'+card()+'</div><div id="lancard">')};
+ document.addEventListener('click',async e=>{const b=e.target.closest&&e.target.closest('[data-gd]');if(!b)return;e.preventDefault();const k=b.dataset.gd;
+  if(k==='in')login().catch(x=>toast('Erro no login: '+(x.message||x)));
+  else if(k==='now')gdSync(true);
+  else if(k==='out'){if(!confirm('Sair da conta Google neste aparelho? As notas continuam aqui e no Drive.'))return;GD.tok=null;GD.email='';GD.B={};GD.AS=new Set();GD.last=0;GD.ids={};persist();redraw()}
+  else if(k==='pw'){const v=await askText('Senha para criptografar as notas no Drive (use a mesma em todos os aparelhos). Deixe vazio para não criptografar.',GD.pw||'');if(v===null)return;GD.pw=v.trim();GD.key=null;GD.keyFor='';GD.B={};GD.AS=new Set();GD.last=0;GD.ids={};GD.files={};persist();redraw();toast(GD.pw?'As notas vão para a pasta “Marginália Notes (criptografado)” — use a mesma senha nos outros aparelhos':'Criptografia desligada');gdSync(true)}
+  else if(k==='savecfg'){LS('client',{id:$('#gdcid').value.trim(),secret:$('#gdcsec').value.trim()});redraw();toast('Acesso do Google salvo')}},true);
+ {const c0=CMDS;CMDS=()=>c0().concat([['Sincronizar com o Google Drive agora',()=>gdSync(true)]])}
 })();
 
 boot();

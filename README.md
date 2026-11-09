@@ -258,3 +258,20 @@ No Linux o app vai para `~/.local/share/marginalia-notes`, com atalho no menu de
 - **Juntar edições:** se a mesma nota for editada em dois aparelhos antes de sincronizar, o app junta as linhas alteradas (vale para WebDAV e Wi-Fi). Só quando a **mesma linha** muda nos dois lados ele mantém as duas versões entre marcas `⟪ conflito … ⟫` para você escolher. Antes criava uma cópia "(conflito)".
 - **Wi-Fi (sem nuvem):** Configurações → Sincronização → *Usar este computador como ponto de encontro*. Ele mostra endereço e código. No celular: *Conectar a um computador* e digite os dois. Sincroniza ao abrir o app, 8 s depois de editar e a cada 45 s, quando o computador está ao alcance. Os dados vão criptografados (AES-GCM) com o código.
 - **Pelos dados móveis:** instale o Tailscale (grátis) no computador e no celular e use o endereço `100.x.x.x` que aparece. Ou use WebDAV (ex.: Koofr, Nextcloud), que funciona em qualquer rede.
+
+## Google Drive (entrar com o Google)
+Configurações → Sincronização → **Entrar com o Google**. As notas sincronizam pela pasta **Marginália Notes** do seu Drive (ou **Marginália Notes (criptografado)**, se você definir uma senha). O app pede só a permissão `drive.file`: ele enxerga apenas os arquivos que ele mesmo criou.
+
+### Configurar o acesso do Google (uma vez, ~10 min)
+1. Entre em **console.cloud.google.com** com a sua conta → crie um projeto (ex.: `Marginalia`).
+2. **APIs e serviços → Biblioteca** → procure **Google Drive API** → **Ativar**.
+3. **Google Auth Platform** (Tela de permissão OAuth): tipo **Externo**, nome `Marginália Notes`, seu e-mail. Em **Acesso a dados/Escopos** adicione `.../auth/drive.file`. Em **Público**, clique em **Publicar app** (fica "Em produção"; senão o login expira a cada 7 dias).
+4. **Clientes → Criar cliente** → tipo **App para computador** → copie o **Client ID** e o **Client secret**.
+5. Coloque no app de um destes jeitos:
+   - **Embutido em todas as versões (recomendado):** no GitHub, *Settings → Secrets and variables → Actions → New repository secret*: `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET`. A próxima versão já vem pronta.
+   - **Ou à mão:** Configurações → Sincronização → *Configurar acesso do Google*, em cada aparelho.
+
+No login vai aparecer “O Google não verificou este app”: é o seu próprio app. Toque em **Avançado → Acessar Marginália Notes (não seguro)**.
+
+## Proton Drive no computador
+Configurações → **Pasta de dados** → escolha uma pasta dentro do Proton Drive (ex.: `Proton Drive/Marginalia`). As notas ficam lá como arquivos `.md` e o Proton Drive guarda a cópia dele. Isso funciona junto com o Google Drive e o Wi-Fi.

@@ -329,6 +329,37 @@ fn ext_poll(app: tauri::AppHandle, id: String) -> Result<ExtOut, String> {
 }
 
 
+
+// ---------- Login do Google (OAuth com retorno para 127.0.0.1) ----------
+mod oauth {
+    use std::{sync::Mutex, time::Duration};
+    pub static RESULT: Mutex<Option<String>> = Mutex::new(None);
+    pub fn listen() -> Result<u16, String> {
+        let server = tiny_http::Server::http("127.0.0.1:0").map_err(|e| e.to_string())?;
+        let port = server.server_addr().to_ip().map(|a| a.port()).ok_or("sem porta")?;
+        if let Ok(mut r) = RESULT.lock() { *r = None; }
+        std::thread::spawn(move || {
+            let deadline = std::time::Instant::now() + Duration::from_secs(600);
+            while std::time::Instant::now() < deadline {
+                let rq = match server.recv_timeout(Duration::from_millis(500)) { Ok(Some(r)) => r, Ok(None) => continue, Err(_) => break };
+                let url = rq.url().to_string();
+                if !url.contains("code=") && !url.contains("error=") { let _ = rq.respond(tiny_http::Response::from_string("").with_status_code(404)); continue; }
+                let html = "<!doctype html><meta charset=utf-8><meta name=viewport content='width=device-width'><body style='font-family:system-ui;text-align:center;padding:48px 20px;background:#faf7f0;color:#2b2622'><h2>Pronto! ✔</h2><p>Você entrou com o Google. Pode fechar esta aba e voltar ao <b>Marginália Notes</b>.</p></body>";
+                let mut resp = tiny_http::Response::from_string(html);
+                if let Ok(h) = tiny_http::Header::from_bytes(&b"Content-Type"[..], &b"text/html; charset=utf-8"[..]) { resp.add_header(h); }
+                let _ = rq.respond(resp);
+                if let Ok(mut r) = RESULT.lock() { *r = Some(url); }
+                break;
+            }
+        });
+        Ok(port)
+    }
+}
+#[tauri::command]
+fn oauth_listen() -> Result<u16, String> { oauth::listen() }
+#[tauri::command]
+fn oauth_poll() -> Option<String> { oauth::RESULT.lock().ok().and_then(|mut r| r.take()) }
+
 // ---------- Sincronização pelo Wi-Fi: servidor WebDAV mínimo no computador ----------
 mod lan {
     use std::{fs, io::Read, path::{Path, PathBuf}, sync::{Arc, Mutex, atomic::{AtomicBool, Ordering}}, time::Duration};
@@ -424,7 +455,8 @@ fn lan_info() -> LanInfo {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_notification::init())
-        .invoke_handler(tauri::generate_handler![load_vault, save_note, delete_note, create_folder, save_asset, read_asset, set_vault, rename_folder, delete_folder, http_req, ext_open, ext_poll, ext_reveal, update_install, lan_start, lan_stop, lan_info])
+        .plugin(tauri_plugin_opener::init())
+        .invoke_handler(tauri::generate_handler![load_vault, save_note, delete_note, create_folder, save_asset, read_asset, set_vault, rename_folder, delete_folder, http_req, ext_open, ext_poll, ext_reveal, update_install, lan_start, lan_stop, lan_info, oauth_listen, oauth_poll])
         .run(tauri::generate_context!())
         .expect("erro ao iniciar o app");
 }

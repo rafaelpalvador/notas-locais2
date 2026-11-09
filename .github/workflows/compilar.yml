@@ -24,11 +24,15 @@ jobs:
           workspaces: src-tauri
       - name: Número da versão (0.1.N, sobe a cada compilação)
         shell: bash
+        env:
+          GID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GSEC: ${{ secrets.GOOGLE_CLIENT_SECRET }}
         run: |
           node -e "const f='src-tauri/tauri.conf.json',j=JSON.parse(require('fs').readFileSync(f,'utf8'));j.version='0.1.${{ github.run_number }}';require('fs').writeFileSync(f,JSON.stringify(j,null,1))"
           grep '"version"' src-tauri/tauri.conf.json
           sed -i "s|/\*BUILD\*/{v:'dev',d:'',c:''}|{v:'0.1.${{ github.run_number }}',d:'$(date -u +%Y-%m-%dT%H:%M:%SZ)',c:'${GITHUB_SHA::7}'}|" src/index.html
           grep -o "window.BUILD={[^}]*}" src/index.html
+          if [ -n "$GID" ]; then sed -i "s|/\*GOOGLE\*/{id:'',secret:''}|{id:'$GID',secret:'$GSEC'}|" src/index.html && echo "acesso do Google embutido"; fi
       - name: Instalar dependências
         run: npm install
       - name: Ícones do app
@@ -62,11 +66,15 @@ jobs:
           workspaces: src-tauri
       - name: Número da versão (0.1.N, sobe a cada compilação)
         shell: bash
+        env:
+          GID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GSEC: ${{ secrets.GOOGLE_CLIENT_SECRET }}
         run: |
           node -e "const f='src-tauri/tauri.conf.json',j=JSON.parse(require('fs').readFileSync(f,'utf8'));j.version='0.1.${{ github.run_number }}';require('fs').writeFileSync(f,JSON.stringify(j,null,1))"
           grep '"version"' src-tauri/tauri.conf.json
           sed -i "s|/\*BUILD\*/{v:'dev',d:'',c:''}|{v:'0.1.${{ github.run_number }}',d:'$(date -u +%Y-%m-%dT%H:%M:%SZ)',c:'${GITHUB_SHA::7}'}|" src/index.html
           grep -o "window.BUILD={[^}]*}" src/index.html
+          if [ -n "$GID" ]; then sed -i "s|/\*GOOGLE\*/{id:'',secret:''}|{id:'$GID',secret:'$GSEC'}|" src/index.html && echo "acesso do Google embutido"; fi
       - name: Instalar dependências
         run: npm install
       - name: Ícones do app
@@ -123,11 +131,15 @@ jobs:
           workspaces: src-tauri
       - name: Número da versão (0.1.N, sobe a cada compilação)
         shell: bash
+        env:
+          GID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GSEC: ${{ secrets.GOOGLE_CLIENT_SECRET }}
         run: |
           node -e "const f='src-tauri/tauri.conf.json',j=JSON.parse(require('fs').readFileSync(f,'utf8'));j.version='0.1.${{ github.run_number }}';require('fs').writeFileSync(f,JSON.stringify(j,null,1))"
           grep '"version"' src-tauri/tauri.conf.json
           sed -i "s|/\*BUILD\*/{v:'dev',d:'',c:''}|{v:'0.1.${{ github.run_number }}',d:'$(date -u +%Y-%m-%dT%H:%M:%SZ)',c:'${GITHUB_SHA::7}'}|" src/index.html
           grep -o "window.BUILD={[^}]*}" src/index.html
+          if [ -n "$GID" ]; then sed -i "s|/\*GOOGLE\*/{id:'',secret:''}|{id:'$GID',secret:'$GSEC'}|" src/index.html && echo "acesso do Google embutido"; fi
       - name: Instalar dependências
         run: npm install
       - name: Gerar projeto Android
