@@ -1,12 +1,13 @@
 use serde::{Deserialize, Serialize};
 use std::{fs, path::{Path, PathBuf}};
 use tauri::Manager;
+mod mcp;
 
 #[derive(Serialize, Deserialize, Clone, Default)]
-struct Note {
-    id: String, title: String, folder: String, created: String, updated: String, body: String,
-    #[serde(default)] tags: Vec<String>,
-    #[serde(default)] props: std::collections::BTreeMap<String, String>,
+pub(crate) struct Note {
+    pub id: String, pub title: String, pub folder: String, pub created: String, pub updated: String, pub body: String,
+    #[serde(default)] pub tags: Vec<String>,
+    #[serde(default)] pub props: std::collections::BTreeMap<String, String>,
 }
 #[derive(Serialize)]
 struct Vault { notes: Vec<Note>, folders: Vec<String>, root: String }
@@ -51,12 +52,12 @@ fn set_vault(app: tauri::AppHandle, path: String) -> Result<String, String> {
     }
     Ok(root(&app)?.to_string_lossy().into())
 }
-fn safe(s: &str) -> String {
+pub(crate) fn safe(s: &str) -> String {
     let t: String = s.chars().map(|c| if "\\/:*?\"<>|".contains(c) { '-' } else { c }).collect();
     let t = t.trim().trim_matches('.').to_string();
     if t.is_empty() { "Sem título".into() } else { t }
 }
-fn parse(text: &str, folder: &str, stem: &str) -> Note {
+pub(crate) fn parse(text: &str, folder: &str, stem: &str) -> Note {
     let mut n = Note { title: stem.into(), folder: folder.into(), body: text.into(), ..Default::default() };
     if let Some(rest) = text.strip_prefix("---\n") {
         if let Some((fm, body)) = rest.split_once("\n---") {
@@ -73,7 +74,7 @@ fn parse(text: &str, folder: &str, stem: &str) -> Note {
     }
     n
 }
-fn render(note: &Note) -> String {
+pub(crate) fn render(note: &Note) -> String {
     let extra: String = note.props.iter().filter(|(k, _)| !k.is_empty() && !k.contains(':') && !k.contains('\n'))
         .map(|(k, v)| format!("\n{}: \"{}\"", k, v.replace('"', "\\\""))).collect();
     format!(
@@ -81,7 +82,7 @@ fn render(note: &Note) -> String {
         note.id, note.title.replace('"', "\\\""), note.created, note.updated, note.tags.join(", "), extra, note.body
     )
 }
-fn walk(dir: &Path, base: &Path, notes: &mut Vec<Note>, folders: &mut Vec<String>) {
+pub(crate) fn walk(dir: &Path, base: &Path, notes: &mut Vec<Note>, folders: &mut Vec<String>) {
     let Ok(rd) = fs::read_dir(dir) else { return };
     for e in rd.flatten() {
         let p = e.path();
@@ -99,7 +100,7 @@ fn walk(dir: &Path, base: &Path, notes: &mut Vec<Note>, folders: &mut Vec<String
         }
     }
 }
-fn find(dir: &Path, id: &str) -> Option<PathBuf> {
+pub(crate) fn find(dir: &Path, id: &str) -> Option<PathBuf> {
     for e in fs::read_dir(dir).ok()?.flatten() {
         let p = e.path();
         if p.is_dir() {
@@ -451,12 +452,34 @@ fn lan_info() -> LanInfo {
     LanInfo { running: port.is_some(), port: port.unwrap_or(0), ips: lan::local_ips() }
 }
 
+
+/// caminho que o Claude deve chamar para abrir o conector (Linux: o atalho que prepara o ambiente)
+fn mcp_command() -> String {
+    #[cfg(target_os = "linux")]
+    {
+        if let Some(h) = std::env::var_os("HOME") { let l = PathBuf::from(h).join(".local/bin/marginalia-notes"); if l.exists() { return l.to_string_lossy().into(); } }
+        if let Some(a) = std::env::var_os("APPIMAGE") { return PathBuf::from(a).to_string_lossy().into(); }
+    }
+    std::env::current_exe().map(|p| p.to_string_lossy().into()).unwrap_or_default()
+}
+#[derive(Serialize)]
+struct McpInfo { command: String, vault: String, claude_code: String }
+#[tauri::command]
+fn mcp_info() -> McpInfo {
+    let c = mcp_command();
+    McpInfo { claude_code: format!("claude mcp add marginalia-notes -- \"{}\" --mcp", c), vault: mcp::vault_root().map(|p| p.to_string_lossy().into()).unwrap_or_default(), command: c }
+}
+#[tauri::command]
+fn mcp_install() -> Result<String, String> { mcp::install_claude_desktop(&mcp_command()) }
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    #[cfg(not(mobile))]
+    if std::env::args().any(|a| a == "--mcp") { mcp::serve(); return; }
     tauri::Builder::default()
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![load_vault, save_note, delete_note, create_folder, save_asset, read_asset, set_vault, rename_folder, delete_folder, http_req, ext_open, ext_poll, ext_reveal, update_install, lan_start, lan_stop, lan_info, oauth_listen, oauth_poll])
+        .invoke_handler(tauri::generate_handler![load_vault, save_note, delete_note, create_folder, save_asset, read_asset, set_vault, rename_folder, delete_folder, http_req, ext_open, ext_poll, ext_reveal, update_install, lan_start, lan_stop, lan_info, oauth_listen, oauth_poll, mcp_info, mcp_install])
         .run(tauri::generate_context!())
         .expect("erro ao iniciar o app");
 }

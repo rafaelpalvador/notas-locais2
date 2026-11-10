@@ -731,6 +731,7 @@ body.dbmode #dbr{display:block;flex:1;min-height:0;overflow:auto;padding:18px 26
 .delghost{background:color-mix(in srgb,#d64545 14%,var(--sf))!important;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.08)}
 @keyframes cfin{from{opacity:0;transform:translateY(8px) scale(.95)}to{opacity:1;transform:none}}@keyframes cfo{to{opacity:0;transform:scale(.96)}}@keyframes cfbg{from{opacity:0}}@keyframes cfbgo{to{opacity:0}}
 @media(prefers-reduced-motion:reduce){#cfm .mdb,#cfm.cfmm,#cfm.cfout,#cfm.cfout .mdb{animation:none}}
+.clcode{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0 12px}.clcode code{flex:1;min-width:0;overflow-wrap:anywhere;font:12.5px ui-monospace,monospace;background:rgba(120,120,128,.1);border:1px solid var(--bd);border-radius:8px;padding:8px 10px}.clpre{font:12px ui-monospace,monospace;background:rgba(120,120,128,.1);border:1px solid var(--bd);border-radius:8px;padding:10px;overflow:auto;white-space:pre}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -4214,6 +4215,27 @@ window.syncWithTarget=(id,T,cfg,persist)=>{const run=async()=>{for(let i=0;i<240
   const hide=el=>{[...el.children].forEach(c=>{if(c.matches('.str')||c.matches('.stback'))return;if(c.querySelector('.str:not([hidden])')){hide(c);return}c.hidden=true})};hide(pg);
   const q=nz(e.target.value);pg.querySelectorAll('h3').forEach(h=>{if(!nz(h.textContent).includes(q))return;let x=h;h.hidden=false;for(let p=h.parentElement;p&&p!==pg;p=p.parentElement)p.hidden=false;while((x=x.nextElementSibling)&&!/^H[23]$/.test(x.tagName)){x.hidden=false;x.querySelectorAll('[hidden]').forEach(y=>{if(!y.matches('.str')||y.closest('.str')===y)y.hidden=false})}});
   let nr=pg.querySelector('.stnone');if(!pg.querySelector('.str:not([hidden]),h3:not([hidden])')){if(!nr)pg.insertAdjacentHTML('beforeend','<p class="mu stnone" style="padding:20px 4px">Nenhuma configuração encontrada.</p>')}else if(nr)nr.remove()});
+})();
+
+/* NEW29: Claude (conector MCP) — o Claude lê e escreve nas suas notas pelo app Claude no computador */
+(function(){
+ const isAnd=/Android/i.test(navigator.userAgent);
+ const i=STP.findIndex(p=>p[0]==='sync');STP.splice(i+1,0,['claude','Claude (IA)','<path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4z"/><path d="M18.5 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>']);
+ let INFO=null;
+ const page=()=>{let h='<h2>Claude (IA)</h2><p class="mu">Conecte o Marginália ao app <b>Claude</b> do computador. Aí você pode pedir ao Claude, em português, coisas como “resuma minhas notas da pasta Estudo”, “quais tarefas estão pendentes?”, “crie uma nota com o resumo desta conversa” ou “acrescente isto na nota Compras”.</p>';
+  if(!AT||isAnd)return h+'<p class="mu">Essa conexão é feita no <b>computador</b> (Windows ou Linux): abra o Marginália lá, em Configurações → Claude (IA).</p>';
+  const c=INFO&&INFO.command||'…';
+  h+=stRow('Conectar ao app Claude','Grava o Marginália nas configurações do app Claude para computador. Depois, feche e abra o Claude de novo.','<button class="stb pri" data-cl="install">Conectar</button>');
+  h+='<h3>No Claude Code (terminal)</h3><p class="mu">Rode uma vez:</p><div class="clcode"><code id="clcc">'+esc(INFO?INFO.claude_code:'…')+'</code><button class="stb" data-cl="copycc">Copiar</button></div>';
+  h+='<details class="gdcfg"><summary>Configurar à mão (outros apps compatíveis com MCP)</summary><p class="mu">Comando:</p><div class="clcode"><code>'+esc(c)+' --mcp</code></div><p class="mu">JSON:</p><pre class="clpre" id="cljson">'+esc(JSON.stringify({mcpServers:{'marginalia-notes':{command:c,args:['--mcp']}}},null,2))+'</pre><div class="lanbtns"><button class="stb" data-cl="copyjson">Copiar JSON</button></div></details>';
+  h+='<h3>O que o Claude consegue fazer</h3><ul class="abl"><li>🔎 Buscar e ler notas, listar pastas e tarefas pendentes</li><li>✍️ Criar notas, acrescentar texto, trocar trechos, renomear e mover</li><li>🔒 Notas com senha ficam de fora: ele não consegue ler nem alterar</li><li>🗑️ Ele não apaga notas</li></ul>';
+  h+='<p class="mu">Pasta usada: <code>'+esc(INFO&&INFO.vault||'…')+'</code>. As mudanças feitas pelo Claude aparecem aqui em alguns segundos. O conteúdo de uma nota só sai do computador quando o Claude a lê para responder a você.</p>';return h};
+ const _stPage29=stPage;stPage=function(p){if(p!=='claude')return _stPage29(p);if(!INFO&&AT&&!isAnd)AT.invoke('mcp_info').then(x=>{INFO=x;if(STPG==='claude')stRefresh()}).catch(()=>{});return page()};
+ const copy=async t=>{try{await navigator.clipboard.writeText(t);toast('Copiado')}catch(e){toast('Não deu para copiar')}};
+ document.addEventListener('click',async e=>{const b=e.target.closest&&e.target.closest('[data-cl]');if(!b)return;e.preventDefault();const k=b.dataset.cl;
+  if(k==='install'){try{const f=await AT.invoke('mcp_install');toast('Pronto! Feche e abra o app Claude para ele enxergar suas notas');b.textContent='Conectado ✔'}catch(x){toast('Não deu: '+x)}}
+  else if(k==='copycc')copy(INFO&&INFO.claude_code||'');else if(k==='copyjson')copy(($('#cljson')||{}).textContent||'')},true);
+ {const c0=CMDS;CMDS=()=>c0().concat([['Conectar ao Claude (IA)…',()=>stOpen('claude')]])}
 })();
 
 boot();
