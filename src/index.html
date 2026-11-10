@@ -732,6 +732,9 @@ body.dbmode #dbr{display:block;flex:1;min-height:0;overflow:auto;padding:18px 26
 @keyframes cfin{from{opacity:0;transform:translateY(8px) scale(.95)}to{opacity:1;transform:none}}@keyframes cfo{to{opacity:0;transform:scale(.96)}}@keyframes cfbg{from{opacity:0}}@keyframes cfbgo{to{opacity:0}}
 @media(prefers-reduced-motion:reduce){#cfm .mdb,#cfm.cfmm,#cfm.cfout,#cfm.cfout .mdb{animation:none}}
 .clcode{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0 12px}.clcode code{flex:1;min-width:0;overflow-wrap:anywhere;font:12.5px ui-monospace,monospace;background:rgba(120,120,128,.1);border:1px solid var(--bd);border-radius:8px;padding:8px 10px}.clpre{font:12px ui-monospace,monospace;background:rgba(120,120,128,.1);border:1px solid var(--bd);border-radius:8px;padding:10px;overflow:auto;white-space:pre}
+.jsw [data-jm="md"],#jly{display:none!important}
+#tqb{z-index:96}
+.cm-blk:has(.te-b) .cm-srcb{right:96px!important;top:-4px!important}#tqb button[disabled]{opacity:.4}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -3565,10 +3568,10 @@ function x17tblLoc(td){const n=cur();if(!n)return null;const L=n.body.split('\n'
  if(l0<0)return null;while(l0<L.length&&!/^\s*\|/.test(L[l0]))l0++;let l1=l0;while(l1+1<L.length&&/^\s*\|/.test(L[l1+1]))l1++;return{n,L,l0,l1}}
 function x17cellPos(td){const tr=td.parentElement,tb=td.closest('table');const rows=[...tb.querySelectorAll('tr')].filter(r=>!r.closest('table table'));const ri=rows.indexOf(tr),ci=[...tr.children].filter(c=>/^T[DH]$/.test(c.tagName)&&!c.classList.contains('trx')).indexOf(td);return{ri,ci}}
 let x17CEL=null;
-function x17cellEdit(td){if(x17CEL&&x17CEL.td===td)return;x17cellDone();const loc=x17tblLoc(td);if(!loc)return;const{ri,ci}=x17cellPos(td),li=ri===0?loc.l0:loc.l0+1+ri;if(li>loc.l1||ci<0)return;
+function x17cellEdit(td,selAll){if(x17CEL&&x17CEL.td===td)return;x17cellDone();const loc=x17tblLoc(td);if(!loc)return;const{ri,ci}=x17cellPos(td),li=ri===0?loc.l0:loc.l0+1+ri;if(li>loc.l1||ci<0)return;
  const cells=splitRow17(loc.L[li]);if(ci>=cells.length)return;const raw=cells[ci].trim().replace(/\\\|/g,'|');
  const blk=td.closest('.cm-blk');if(blk){blk.contentEditable='false';blk._own=Date.now()}
- x17CEL={td,li,ci,ri,raw,l0:loc.l0,id:loc.n.id,html:td.innerHTML};td.textContent=raw;td.contentEditable='true';td.classList.add('cel');td.focus();const s=getSelection(),rg=document.createRange();rg.selectNodeContents(td);rg.collapse(false);s.removeAllRanges();s.addRange(rg)}
+ x17CEL={td,li,ci,ri,raw,l0:loc.l0,id:loc.n.id,html:td.innerHTML};td.textContent=raw;td.contentEditable='true';td.classList.add('cel');td.focus();const s=getSelection(),rg=document.createRange();rg.selectNodeContents(td);if(!selAll)rg.collapse(false);s.removeAllRanges();s.addRange(rg)}
 function x17cellDone(cancel,move){if(!x17CEL)return;const c=x17CEL;x17CEL=null;const td=c.td;td.contentEditable='false';td.classList.remove('cel');const n=S.notes.find(x=>x.id===c.id);
  const val=td.innerText.replace(/\n+/g,' ').trim();if(cancel||!n||val===c.raw){td.innerHTML=c.html;if(move)x17cellMove(td,move);return}
  const L=n.body.split('\n'),cells=splitRow17(L[c.li]);cells[c.ci]=' '+val.replace(/(?<!\\)\|/g,'\\|')+' ';L[c.li]='|'+cells.join('|')+'|';
@@ -3578,11 +3581,17 @@ function x17cellMove(td,move,c){/* depois de salvar, a tabela pode ter sido rede
  let tb=td&&td.isConnected?td.closest('table'):null;if(!tb&&c){const v=window.cmView&&cmView();if(v&&document.body.dataset.m!=='read'){try{const pos=v.state.doc.line(c.l0+1).from,dom=v.domAtPos(pos).node;const el=(dom.nodeType===1?dom:dom.parentElement);tb=(el.closest('.cm-blk')||el).querySelector('table')||[...document.querySelectorAll('#cmw .cm-blk-tb table')].find(t=>{try{return v.state.doc.lineAt(v.posAtDOM(t.closest('.cm-blk'))).number-1===c.l0}catch(e){return false}})}catch(e){}}if(!tb)tb=document.querySelectorAll('#pv table')[0]}
  if(!tb)return;const rows=[...tb.querySelectorAll('tr')],ri=c?c.ri:x17cellPos(td).ri,ci=c?c.ci:x17cellPos(td).ci;const cellsOf=r=>[...r.children].filter(x=>/^T[DH]$/.test(x.tagName)&&!x.classList.contains('trx'));
  let R=ri,Ci=ci;if(move==='tab'){Ci++;if(Ci>=cellsOf(rows[R]).length){Ci=0;R++}}else if(move==='stab'){Ci--;if(Ci<0){R--;Ci=R>=0?cellsOf(rows[R]).length-1:0}}else if(move==='down')R++;
- if(R<0||R>=rows.length)return;const t2=cellsOf(rows[R])[Ci];if(t2)x17cellEdit(t2)}
+ if(R<0||R>=rows.length)return;const t2=cellsOf(rows[R])[Ci];if(t2)x17cellEdit(t2,true)}
 document.addEventListener('click',e=>{const td=e.target.closest&&e.target.closest('#cmw .cm-blk-tb td,#cmw .cm-blk-tb th,#pv .tb td,#pv .tb th');if(!td||td.classList.contains('trx')||e.target.closest('button,a,input'))return;e.preventDefault();e.stopPropagation();x17cellEdit(td)},true);
 document.addEventListener('mousedown',e=>{if(x17CEL&&!(e.target.closest&&e.target.closest('.cel')))x17cellDone()},true);
 ['keydown','keypress','beforeinput','input','paste','cut'].forEach(t=>document.addEventListener(t,e=>{if(!x17CEL||!e.target.closest||!e.target.closest('.cel'))return;e.stopPropagation();
- if(t==='keydown'){if(e.key==='Enter'){e.preventDefault();x17cellDone(false,'down')}else if(e.key==='Tab'){e.preventDefault();x17cellDone(false,e.shiftKey?'stab':'tab')}else if(e.key==='Escape'){e.preventDefault();x17cellDone(true)}}
+ if(t==='keydown'){if(e.key==='Enter'){e.preventDefault();x17cellDone(false,'down')}else if(e.key==='Tab'){e.preventDefault();x17cellDone(false,e.shiftKey?'stab':'tab')}else if(e.key==='Escape'){e.preventDefault();x17cellDone(true)}
+  else if((e.ctrlKey||e.metaKey)&&!e.altKey){const k=e.key.toLowerCase(),td=e.target.closest('.cel');
+   /* atalhos dentro da célula: nunca deixar chegar ao editor da nota (Ctrl+A selecionava a nota toda) */
+   if(k==='a'){e.preventDefault();const r=document.createRange();r.selectNodeContents(td);const sl=getSelection();sl.removeAllRanges();sl.addRange(r)}
+   else if(k==='z'||k==='y'){e.preventDefault();if(x17CEL){td.textContent=x17CEL.raw;const r=document.createRange();r.selectNodeContents(td);r.collapse(false);const sl=getSelection();sl.removeAllRanges();sl.addRange(r)}}
+   else if(k==='b'||k==='i'){e.preventDefault();const m=k==='b'?'**':'*',sl=getSelection(),t0=sl.toString();document.execCommand('insertText',false,m+(t0||'')+m)}
+   else if(!['c','x','v'].includes(k))e.preventDefault()}}
  if(t==='paste'){e.preventDefault();document.execCommand('insertText',false,(e.clipboardData.getData('text/plain')||'').replace(/\n+/g,' '))}},true));
 /* Backspace/Delete não juntam texto com um bloco renderizado (tabela, desenho, Kanban…) */
 document.addEventListener('keydown',e=>{if((e.key!=='Backspace'&&e.key!=='Delete')||e.ctrlKey||e.metaKey||e.altKey)return;const v=window.cmView&&cmView();if(!v||!e.target.closest||!e.target.closest('#cmw .cm-content')||e.target.closest('.cm-blk'))return;
@@ -4236,6 +4245,31 @@ window.syncWithTarget=(id,T,cfg,persist)=>{const run=async()=>{for(let i=0;i<240
   if(k==='install'){try{const f=await AT.invoke('mcp_install');toast('Pronto! Feche e abra o app Claude para ele enxergar suas notas');b.textContent='Conectado ✔'}catch(x){toast('Não deu: '+x)}}
   else if(k==='copycc')copy(INFO&&INFO.claude_code||'');else if(k==='copyjson')copy(($('#cljson')||{}).textContent||'')},true);
  {const c0=CMDS;CMDS=()=>c0().concat([['Conectar ao Claude (IA)…',()=>stOpen('claude')]])}
+})();
+
+/* NEW30: só Texto rico + Leitura (sem editor Markdown) e tabelas mais fáceis de editar */
+(function(){const B=document.body;
+ /* 1) modo Markdown/dividido some: vira Texto rico */
+ const fix=()=>{if(B.dataset.m==='split'||B.dataset.m==='edit'){B.dataset.m='view';try{localStorage.setItem('ln:mode','view');localStorage.setItem('ln:jlast','view')}catch(e){}}
+  try{if(localStorage.getItem('ln:jlv')==='1')localStorage.setItem('ln:jlv','0')}catch(e){}};
+ fix();const mc=modeChanged;modeChanged=function(){fix();return mc.apply(this,arguments)};setTimeout(()=>{fix();try{modeChanged()}catch(e){}},50);
+ /* 2) barra rápida da tabela (+ Linha, + Coluna…) aparece ao editar uma célula */
+ const showQ=td=>{const loc=x17tblLoc(td);if(!loc)return;const{ri,ci}=x17cellPos(td),tbl=td.closest('table'),q=$('#tqb');if(!q||!tbl)return;
+  document.querySelectorAll('.tb.tqon').forEach(x=>x.classList.remove('tqon'));const tbw=td.closest('.tb');if(tbw)tbw.classList.add('tqon');
+  TQ={l0:loc.l0,id:loc.n.id,ri,ci,head:!!td.closest('thead')||(ri===0&&!tbl.classList.contains('tbl-nh')),tb:tbw};q.hidden=false;const r=tbl.getBoundingClientRect(),hh=q.offsetHeight||34;
+  q.style.left=Math.max(8,Math.min(r.left,innerWidth-q.offsetWidth-8))+'px';q.style.top=(r.top-hh-6<56?Math.min(innerHeight-hh-8,r.bottom+6):r.top-hh-6)+'px';
+  const rd=q.querySelector('[data-tq="rd"]');if(rd)rd.disabled=TQ.head};
+ const _ce=x17cellEdit;x17cellEdit=function(td){const r=_ce.apply(this,arguments);if(x17CEL&&x17CEL.td===td)try{showQ(td)}catch(e){}return r};
+ /* a barra não deve sumir quando se toca nela (o toque encerra a célula antes) */
+ document.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('#tqb'))e.stopPropagation()},true);
+ /* aplicar pela posição da tabela no texto atual (não por uma cópia antiga) */
+ const _tqA=tqApply;tqApply=function(f){if(!TQ||TQ.l0===undefined)return _tqA.apply(this,arguments);if(x17CEL)x17cellDone();
+  const n=S.notes.find(x=>x.id===TQ.id);if(!n)return;const L=n.body.split('\n');let l0=TQ.l0;while(l0<L.length&&!/^\s*\|/.test(L[l0]))l0++;if(l0>=L.length){toast('Não foi possível alterar esta tabela');return}
+  let l1=l0;while(l1+1<L.length&&/^\s*\|/.test(L[l1+1]))l1++;if(/^<!--tbl /.test(L[l1+1]||''))l1++;
+  const m=tblParse(L.slice(l0,l1+1).join('\n'));f(m,TQ.ri,TQ.ci);const nw=tblMd(m),id=n.id;
+  const v=window.cmView&&cmView();if(v&&id===curId&&B.dataset.m!=='read'&&v.state.doc.lines>l1){const a=v.state.doc.line(l0+1).from,b=v.state.doc.line(l1+1).to;v.dispatch({changes:{from:a,to:b,insert:nw}})}
+  else{L.splice(l0,l1-l0+1,...nw.split('\n'));n.body=L.join('\n');n.updated=now();persistNew(n);save();if(id===curId)show()}
+  const keep={l0,ri:TQ.ri,ci:TQ.ci};tqHide();setTimeout(()=>{if(typeof renderPV==='function'&&B.dataset.m==='read')renderPV()},0);toast('Tabela atualizada')};
 })();
 
 boot();
