@@ -735,6 +735,14 @@ body.dbmode #dbr{display:block;flex:1;min-height:0;overflow:auto;padding:18px 26
 .jsw [data-jm="md"],#jly{display:none!important}
 #tqb{z-index:96}
 .cm-blk:has(.te-b) .cm-srcb{right:96px!important;top:-4px!important}#tqb button[disabled]{opacity:.4}
+/* v0.1.39: cantos retos, painéis encostados nas bordas */
+*,*::before,*::after{border-radius:0!important}
+.swc,.tsw,.fsw,.fdot,.kbdot,.kbcs,.imh[data-h=se],.cvsw button,.cvl,.psc,.cd2.has::after,li.tk input,.wdmod .mx2,.sw i,.sw i::before,#xm .fsw,.popxb{border-radius:50%!important}
+.sw i{border-radius:999px!important}
+@media(min-width:761px){#app{padding:0;gap:0}#sb,#mn{border-top:0;border-bottom:0;box-shadow:none}#sb{border-left:0}#mn{border-right:0}}
+.cel{outline:2px solid var(--ac);outline-offset:-2px;background:var(--acs)}
+@keyframes celok{from{background:color-mix(in srgb,var(--ac) 35%,transparent)}to{background:transparent}}
+.celok{animation:celok .7s ease-out}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -4270,6 +4278,17 @@ window.syncWithTarget=(id,T,cfg,persist)=>{const run=async()=>{for(let i=0;i<240
   const v=window.cmView&&cmView();if(v&&id===curId&&B.dataset.m!=='read'&&v.state.doc.lines>l1){const a=v.state.doc.line(l0+1).from,b=v.state.doc.line(l1+1).to;v.dispatch({changes:{from:a,to:b,insert:nw}})}
   else{L.splice(l0,l1-l0+1,...nw.split('\n'));n.body=L.join('\n');n.updated=now();persistNew(n);save();if(id===curId)show()}
   const keep={l0,ri:TQ.ri,ci:TQ.ci};tqHide();setTimeout(()=>{if(typeof renderPV==='function'&&B.dataset.m==='read')renderPV()},0);toast('Tabela atualizada')};
+})();
+
+/* NEW31: tocar/afastar fora da célula salva e fecha a edição; a barra some e acompanha a rolagem */
+(function(){
+ const inCell=t=>t&&t.closest&&t.closest('.cel'),inBar=t=>t&&t.closest&&t.closest('#tqb'),inTbl=t=>t&&t.closest&&t.closest('.tb,.cm-blk-tb,#pv table');
+ const flash=td=>{try{td.classList.add('celok');setTimeout(()=>td.classList.remove('celok'),750)}catch(e){}};
+ const _d=x17cellDone;x17cellDone=function(cancel,move){const td=x17CEL&&x17CEL.td;const had=!!x17CEL,old=x17CEL&&x17CEL.raw;const r=_d.apply(this,arguments);if(had&&!cancel&&td&&td.isConnected&&td.innerText.trim()!==(old||'').trim())flash(td);return r};
+ document.addEventListener('pointerdown',e=>{const t=e.target;if(inBar(t))return;if(x17CEL&&!inCell(t))x17cellDone();if(!inTbl(t)){try{tqHide()}catch(_){}}},true);
+ document.addEventListener('focusout',e=>{const t=e.target;if(!inCell(t))return;setTimeout(()=>{if(!x17CEL)return;const a=document.activeElement;if(a&&(inCell(a)||inBar(a)))return;x17cellDone()},60)},true);
+ const place=()=>{const q=document.getElementById('tqb');if(!q||q.hidden||!TQ)return;const tb=TQ.tb&&TQ.tb.isConnected?TQ.tb:null;if(!tb)return;const r=tb.getBoundingClientRect();if(r.bottom<60||r.top>innerHeight){q.hidden=true;return}const hh=q.offsetHeight||34;q.style.left=Math.max(8,Math.min(r.left,innerWidth-q.offsetWidth-8))+'px';q.style.top=(r.top-hh-6<56?Math.min(innerHeight-hh-8,r.bottom+6):r.top-hh-6)+'px'};
+ document.addEventListener('scroll',place,true);addEventListener('resize',place);
 })();
 
 boot();
