@@ -4286,7 +4286,7 @@ window.syncWithTarget=(id,T,cfg,persist)=>{const run=async()=>{for(let i=0;i<240
  const _tqA=tqApply;tqApply=function(f){if(!TQ||TQ.l0===undefined)return _tqA.apply(this,arguments);if(x17CEL)x17cellDone();
   const n=S.notes.find(x=>x.id===TQ.id);if(!n)return;const L=n.body.split('\n');let l0=TQ.l0;while(l0<L.length&&!/^\s*\|/.test(L[l0]))l0++;if(l0>=L.length){toast('Não foi possível alterar esta tabela');return}
   let l1=l0;while(l1+1<L.length&&/^\s*\|/.test(L[l1+1]))l1++;if(/^<!--tbl /.test(L[l1+1]||''))l1++;
-  const m=tblParse(L.slice(l0,l1+1).join('\n'));f(m,TQ.ri,TQ.ci);const nw=tblMd(m),id=n.id;
+  const m=tblParse(L.slice(l0,l1+1).join('\n'));f(m,m.h?TQ.ri:Math.max(0,TQ.ri-1),TQ.ci);const nw=tblMd(m),id=n.id;
   const v=window.cmView&&cmView();document.querySelectorAll('.cm-blk').forEach(b=>{b._own=0});if(v&&id===curId&&B.dataset.m!=='read'&&v.state.doc.lines>l1){const a=v.state.doc.line(l0+1).from,b=v.state.doc.line(l1+1).to;v.dispatch({changes:{from:a,to:b,insert:nw}})}
   else{L.splice(l0,l1-l0+1,...nw.split('\n'));n.body=L.join('\n');n.updated=now();persistNew(n);save();if(id===curId)show()}
   const keep={l0,ri:TQ.ri,ci:TQ.ci};tqHide();setTimeout(()=>{if(typeof renderPV==='function'&&B.dataset.m==='read')renderPV()},0);toast('Tabela atualizada')};
@@ -4309,7 +4309,7 @@ window.syncWithTarget=(id,T,cfg,persist)=>{const run=async()=>{for(let i=0;i<240
  let G=null,D=null;
  const lay=document.createElement('div');lay.id='tgg';document.body.appendChild(lay);
  const mn=document.createElement('div');mn.id='tgm';mn.hidden=true;document.body.appendChild(mn);
- const nhOf=t=>t.classList.contains('tbl-nh'),off=t=>nhOf(t)?1:0;
+ const nhOf=t=>t.classList.contains('tbl-nh'),off=t=>0;/* o cabeçalho oculto já fica fora de rowsOf: índice do pegador = índice em m.rows */
  const rowsOf=t=>[...t.querySelectorAll('tr')].filter(r=>!r.closest('table table')&&r.offsetHeight>0);
  const cellsOf=r=>[...r.children].filter(x=>/^T[DH]$/.test(x.tagName)&&!x.classList.contains('trx'));
  const allT=()=>[...document.querySelectorAll('#cmw .cm-blk-tb table,#pv .tb table')];
