@@ -205,7 +205,12 @@ async fn http_req(method: String, url: String, headers: std::collections::BTreeM
     let mut rq = client.request(m, &url);
     for (k, v) in headers.iter() { rq = rq.header(k.as_str(), v.as_str()); }
     if let Some(b) = body { rq = rq.body(b64.decode(b).map_err(|e| e.to_string())?); }
-    let rs = rq.send().await.map_err(|e| e.to_string())?;
+    let rs = rq.send().await.map_err(|e| {
+        let mut m = e.to_string();
+        let mut src: Option<&(dyn std::error::Error + 'static)> = std::error::Error::source(&e);
+        while let Some(c) = src { m.push_str(": "); m.push_str(&c.to_string()); src = c.source(); }
+        m
+    })?;
     let status = rs.status().as_u16();
     let mut hs = std::collections::BTreeMap::new();
     for (k, v) in rs.headers().iter() { if let Ok(s) = v.to_str() { hs.insert(k.as_str().to_string(), s.to_string()); } }
@@ -393,11 +398,13 @@ mod lan {
         if let Some(l) = st.take() { l.stop.store(true, Ordering::SeqCst); std::thread::sleep(Duration::from_millis(700)); }
         fs::create_dir_all(&root).map_err(|e| e.to_string())?;
         let server = tiny_http::Server::http(("0.0.0.0", port)).map_err(|e| format!("Não consegui abrir a porta {port}: {e}"))?;
+        if std::net::TcpStream::connect_timeout(&std::net::SocketAddr::from(([127, 0, 0, 1], port)), Duration::from_millis(1500)).is_err() { return Err(format!("A porta {port} abriu, mas este computador não aceita conexões nela (firewall, antivírus ou VPN bloqueando?)")); }
         let stop = Arc::new(AtomicBool::new(false)); let stop2 = stop.clone();
         let want = format!("Basic {}", auth);
         std::thread::spawn(move || {
+            let mut errs = 0u32;
             while !stop2.load(Ordering::SeqCst) {
-                let mut rq = match server.recv_timeout(Duration::from_millis(500)) { Ok(Some(r)) => r, Ok(None) => continue, Err(_) => break };
+                let mut rq = match server.recv_timeout(Duration::from_millis(500)) { Ok(Some(r)) => { errs = 0; r }, Ok(None) => continue, Err(_) => { errs += 1; if errs > 200 { break; } std::thread::sleep(Duration::from_millis(50)); continue; } };
                 let hdr = |rq: &tiny_http::Request, n: &str| rq.headers().iter().find(|h| h.field.as_str().as_str().eq_ignore_ascii_case(n)).map(|h| h.value.as_str().to_string());
                 let mk = |code: u16, body: Vec<u8>, tag: Option<String>| { let mut r = tiny_http::Response::from_data(body).with_status_code(code); if let Some(t) = tag { if let Ok(h) = tiny_http::Header::from_bytes(&b"ETag"[..], t.as_bytes()) { r.add_header(h); } } r };
                 if hdr(&rq, "Authorization").as_deref() != Some(want.as_str()) {
