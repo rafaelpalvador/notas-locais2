@@ -273,5 +273,17 @@ Configurações → Sincronização → **Entrar com o Google**. As notas sincro
 
 No login vai aparecer “O Google não verificou este app”: é o seu próprio app. Toque em **Avançado → Acessar Marginália Notes (não seguro)**.
 
+## GitHub (repositório privado)
+Configurações → Sincronização → **GitHub (repositório privado)**. As notas vão para a pasta `marginalia/` do repositório, uma nota por arquivo `.json`; cada alteração vira um commit (histórico). Funciona no celular, no computador e na versão web.
+
+### Configurar (uma vez, ~3 min)
+1. Em **github.com/new** crie um repositório **Private** (ex.: `minhas-notas`).
+2. Abra **github.com/settings/personal-access-tokens/new** (token *fine-grained*).
+3. **Repository access → Only select repositories** → escolha só esse repositório.
+4. **Permissions → Repository permissions → Contents: Read and write**.
+5. Gere o token, copie e cole no app (junto com `seu-usuario/minhas-notas`). Repita no outro aparelho, com o mesmo token.
+
+Dicas: use **Criptografar no GitHub…** para que o repositório mostre só arquivos ilegíveis (a mesma senha em todos os aparelhos). O GitHub limita escritas seguidas (~80 por minuto), então a primeira sincronização de muitas notas pode levar alguns minutos.
+
 ## Proton Drive no computador
 Configurações → **Pasta de dados** → escolha uma pasta dentro do Proton Drive (ex.: `Proton Drive/Marginalia`). As notas ficam lá como arquivos `.md` e o Proton Drive guarda a cópia dele. Isso funciona junto com o Google Drive e o Wi-Fi.

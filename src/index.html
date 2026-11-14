@@ -4394,6 +4394,89 @@ window.syncWithTarget=(id,T,cfg,persist)=>{const run=async()=>{for(let i=0;i<240
  window.__tg={get:()=>G};
 })();
 
+/* NEW33: GitHub — sincroniza as notas com um repositório privado (celular e computador) */
+(function(){
+ const LS=(k,v)=>{try{if(v===undefined)return localStorage.getItem('ln:gh:'+k);if(v===null)localStorage.removeItem('ln:gh:'+k);else localStorage.setItem('ln:gh:'+k,typeof v==='string'?v:JSON.stringify(v))}catch(e){}};
+ const J=(k,d)=>{try{return JSON.parse(LS(k)||'')}catch(e){return d}};
+ const GH={repo:LS('repo')||'',tok:LS('tok')||'',br:LS('br')||'',pw:LS('pw')||'',B:J('base',{}),AS:new Set(J('as',[])),last:+(LS('last')||0),err:'',busy:false,key:null,keyFor:'',sha:{}};
+ window.GH=GH;
+ const PRE='marginalia/';
+ const persist=()=>{LS('repo',GH.repo||null);LS('tok',GH.tok||null);LS('br',GH.br||null);LS('pw',GH.pw||null);LS('base',GH.B);LS('as',[...GH.AS]);LS('last',String(GH.last))};
+ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+ async function http(method,url,headers,body){
+  if(typeof AT!=='undefined'&&AT){const r=await AT.invoke('http_req',{method,url,headers:headers||{},body:body==null?null:b64e(u8(body))});const h={};Object.entries(r.headers||{}).forEach(([k,v])=>h[k.toLowerCase()]=v);return{status:r.status,body:b64d(r.body),headers:h}}
+  let r;try{r=await fetch(url,{method,headers:headers||{},body:body==null?undefined:u8(body),cache:'no-store'})}catch(e){throw new Error('GitHub: sem conexão')}
+  const h={};r.headers.forEach((v,k)=>h[k.toLowerCase()]=v);return{status:r.status,body:new Uint8Array(await r.arrayBuffer()),headers:h}}
+ let lastW=0;
+ async function api(method,path,json){
+  const w=method!=='GET';
+  for(let t=0;t<4;t++){
+   if(w){const d=Date.now()-lastW;if(d<800)await sleep(800-d);lastW=Date.now()}
+   const r=await http(method,'https://api.github.com'+path,{Authorization:'Bearer '+GH.tok,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'Marginalia-Notes',...(json?{'Content-Type':'application/json'}:{})},json?JSON.stringify(json):null);
+   if(r.status===401)throw new Error('GitHub: token inválido ou expirado — gere outro e entre de novo');
+   if((r.status===403||r.status===429)&&t<3){const ra=+r.headers['retry-after']||0,rem=r.headers['x-ratelimit-remaining'];const reset=+r.headers['x-ratelimit-reset']||0;
+    if(rem==='0'&&reset){const sec=reset-Math.floor(Date.now()/1000);if(sec>90)throw new Error('GitHub: limite de requisições atingido — tente de novo em '+Math.ceil(sec/60)+' min');await sleep(Math.max(1,sec)*1000+500);continue}
+    await sleep((ra||30)*1000);continue}
+   return r}
+  throw new Error('GitHub: muitas requisições seguidas — tente de novo em alguns minutos')}
+ const enc=p=>PRE+String(p||'').replace(/^\/+/,'').split('/').map(encodeURIComponent).join('/').replace(/%2F/g,'/');
+ const base=p=>'/repos/'+GH.repo+'/contents/'+enc(p);
+ const ref=()=>GH.br?'?ref='+encodeURIComponent(GH.br):'';
+ async function meta(path){const r=await api('GET',base(path)+ref());if(r.status===404)return null;if(r.status!==200)throw new Error('GitHub: erro '+r.status+' ao ler');const j=JSON.parse(td(r.body));if(Array.isArray(j))return null;return j}
+ const E=new Uint8Array();
+ async function ghReq(method,path,body,hdr){hdr=hdr||{};
+  if(method==='MKCOL')return{status:201,body:E,etag:''};
+  if(method==='GET'){const m=await meta(path);if(!m)return{status:404,body:E,etag:''};GH.sha[path]=m.sha;let bytes;
+   if(m.content&&m.encoding==='base64')bytes=b64d(m.content.replace(/\s/g,''));
+   else if(!m.size)bytes=E;
+   else{const b=await api('GET','/repos/'+GH.repo+'/git/blobs/'+m.sha);if(b.status!==200)return{status:b.status,body:E,etag:''};bytes=b64d(JSON.parse(td(b.body)).content.replace(/\s/g,''))}
+   return{status:200,body:bytes,etag:m.sha}}
+  if(method==='DELETE'){const m=await meta(path);if(!m)return{status:404,body:E,etag:''};
+   const r=await api('DELETE',base(path),{message:'Marginália: apagar '+path,sha:m.sha,...(GH.br?{branch:GH.br}:{})});delete GH.sha[path];return{status:r.status===200?204:r.status,body:E,etag:''}}
+  if(method==='PUT'){const im=hdr['If-Match'];let sha=GH.sha[path];
+   if(im!==undefined||!sha){const m=await meta(path);sha=m?m.sha:undefined;if(im!==undefined&&m&&m.sha!==String(im))return{status:412,body:E,etag:m.sha}}
+   const bj={message:'Marginália: '+path,content:b64e(u8(body||'')),...(GH.br?{branch:GH.br}:{})};if(sha)bj.sha=sha;
+   let r=await api('PUT',base(path),bj);
+   if(r.status===409||r.status===422){const m=await meta(path);if(im!==undefined)return{status:412,body:E,etag:m?m.sha:''};if(m)bj.sha=m.sha;else delete bj.sha;r=await api('PUT',base(path),bj)}
+   if(r.status>=300)return{status:r.status,body:r.body,etag:''};
+   const j=JSON.parse(td(r.body));GH.sha[path]=j.content.sha;return{status:201,body:E,etag:j.content.sha}}
+  return{status:200,body:E,etag:''}}
+ {const _wr=wdReq;wdReq=function(method,path,body,hdr){if(String(WD.cfg.url||'').startsWith('github:'))return ghReq(method,path,body,hdr);return _wr.apply(this,arguments)}}
+ const cfg=()=>({url:'github:',user:'',pass:'',dir:'',e2ee:GH.pw||'',auto:true});
+ async function ghSync(manual){if(!GH.tok||!GH.repo)return;if(GH.busy)return;GH.busy=true;st();
+  try{GH.sha={};await syncWithTarget('gh',GH,cfg(),persist)}finally{GH.busy=false;st();redraw();
+   if(manual){const r=window.__wdLastRes;if(GH.err)toast(GH.err);else toast(r&&(r.up||r.dn||r.dl)?'GitHub: '+r.up+' enviadas, '+r.dn+' recebidas'+(r.jn?', '+r.jn+' juntadas':''):'GitHub: tudo em dia')}}}
+ window.ghSync=ghSync;
+ function st(){const el=$('#ghst');if(el){el.textContent=GH.busy?'Sincronizando com o GitHub…':GH.err?GH.err:GH.last?'Última vez: '+new Date(GH.last).toLocaleString(loc()):'Ainda não sincronizou';el.className='mu'+(GH.err?' lanerr':'')}}
+ setTimeout(()=>{if(GH.tok&&GH.repo)ghSync(false)},5000);setInterval(()=>{if(GH.tok&&GH.repo&&document.visibilityState==='visible')ghSync(false)},180000);
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&GH.tok&&GH.repo)setTimeout(()=>ghSync(false),2000)});
+ let ed=null;document.addEventListener('input',()=>{if(!GH.tok||!GH.repo)return;clearTimeout(ed);ed=setTimeout(()=>ghSync(false),20000)},true);
+ const card=()=>{
+  let h='<h3>GitHub (repositório privado)</h3><p class="mu">As notas vão para a pasta <code>marginalia/</code> de um repositório <b>privado</b> seu, uma nota por arquivo (<code>.json</code>), e cada alteração vira um histórico que você pode consultar no GitHub. Use o mesmo repositório e o mesmo token no celular e no computador.</p>';
+  if(GH.tok&&GH.repo){h+='<div class="lanbox"><div><b>Conectado</b> <code>'+esc(GH.repo)+'</code></div><p class="mu" id="ghst"></p></div><div class="lanbtns"><button class="stb" data-gh="now">Sincronizar agora</button><button class="stb" data-gh="pw">'+(GH.pw?'Trocar senha de criptografia':'Criptografar no GitHub…')+'</button><button class="stb" data-gh="out">Desconectar</button></div>'+(GH.pw?'<p class="mu">As notas estão <b>criptografadas</b> no GitHub: o repositório mostra só arquivos ilegíveis.</p>':'<p class="mu">Sem senha, as notas ficam legíveis no GitHub (só você as vê, pois o repositório é privado).</p>')}
+  else{h+='<div class="lanbox"><label>Repositório (dono/nome)<input id="ghrepo" value="'+esc(GH.repo)+'" placeholder="seu-usuario/minhas-notas" autocapitalize="off" autocomplete="off" spellcheck="false"></label><label>Token de acesso<input id="ghtok" type="password" placeholder="github_pat_…" autocapitalize="off" autocomplete="off" spellcheck="false"></label><div class="lanbtns"><button class="stb pri" data-gh="in">Conectar ao GitHub</button></div></div>'+
+   '<details class="gdcfg"><summary>Como criar o repositório e o token (uma vez)</summary><ol class="mu"><li>Em <b>github.com/new</b> crie um repositório <b>Private</b> (ex.: <code>minhas-notas</code>).</li><li>Abra <b>github.com/settings/personal-access-tokens/new</b> (token <i>fine-grained</i>).</li><li><b>Repository access</b> → <i>Only select repositories</i> → escolha só esse repositório.</li><li><b>Permissions → Repository permissions → Contents: Read and write</b>.</li><li>Gere, copie o token e cole aqui. Faça o mesmo no outro aparelho (pode usar o mesmo token).</li></ol></details>'}
+  return h};
+ const redraw=()=>{const c=$('#ghcard');if(c){c.innerHTML=card();st()}};
+ const _stPage=stPage;stPage=function(p){const h=_stPage(p);if(p!=='sync')return h;setTimeout(st,0);return h.replace('<div id="gdcard">','<div id="ghcard">'+card()+'</div><div id="gdcard">')};
+ async function connect(){const repo=($('#ghrepo').value||'').trim().replace(/^https?:\/\/github\.com\//,'').replace(/\.git$/,'').replace(/\/+$/,''),tok=($('#ghtok').value||'').trim();
+  if(!/^[\w.-]+\/[\w.-]+$/.test(repo)||!tok){toast('Preencha o repositório (dono/nome) e o token');return}
+  const old={repo:GH.repo,tok:GH.tok,br:GH.br};GH.repo=repo;GH.tok=tok;GH.br='';
+  try{const r=await api('GET','/repos/'+repo);
+   if(r.status===404)throw new Error('Repositório não encontrado — confira o nome e se o token tem acesso a ele');
+   if(r.status!==200)throw new Error('GitHub: erro '+r.status);
+   const j=JSON.parse(td(r.body));if(j.permissions&&!j.permissions.push)throw new Error('O token não pode escrever neste repositório (precisa de Contents: Read and write)');
+   if(j.private===false&&!(await askConfirm('Este repositório é PÚBLICO: qualquer pessoa poderia ler suas notas. Continuar mesmo assim?')))throw new Error('Conexão cancelada');
+   GH.br=j.default_branch||'';GH.B={};GH.AS=new Set();GH.last=0;GH.key=null;GH.keyFor='';GH.sha={};persist();redraw();toast('Conectado a '+repo);ghSync(true)}
+  catch(e){GH.repo=old.repo;GH.tok=old.tok;GH.br=old.br;toast(e.message||String(e))}}
+ document.addEventListener('click',async e=>{const b=e.target.closest&&e.target.closest('[data-gh]');if(!b)return;e.preventDefault();const k=b.dataset.gh;
+  if(k==='in')connect();
+  else if(k==='now')ghSync(true);
+  else if(k==='out'){if(!(await askConfirm('Desconectar do GitHub neste aparelho? As notas continuam aqui e no repositório.')))return;GH.tok='';GH.repo='';GH.br='';GH.B={};GH.AS=new Set();GH.last=0;GH.sha={};persist();redraw()}
+  else if(k==='pw'){const v=await askText('Senha para criptografar as notas no GitHub (use a mesma em todos os aparelhos). Deixe vazio para não criptografar.',GH.pw||'');if(v===null)return;GH.pw=v.trim();GH.key=null;GH.keyFor='';GH.B={};GH.AS=new Set();GH.last=0;GH.sha={};persist();redraw();toast(GH.pw?'Use a mesma senha nos outros aparelhos':'Criptografia desligada')}},true);
+ {const c0=CMDS;CMDS=()=>c0().concat([['Sincronizar com o GitHub agora',()=>ghSync(true)]])}
+})();
+
 boot();
 </script>
 </body>
