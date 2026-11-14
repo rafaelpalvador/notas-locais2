@@ -198,7 +198,10 @@ async fn http_req(method: String, url: String, headers: std::collections::BTreeM
     use base64::Engine;
     let b64 = base64::engine::general_purpose::STANDARD;
     let m = reqwest::Method::from_bytes(method.as_bytes()).map_err(|e| e.to_string())?;
-    let client = reqwest::Client::builder().timeout(std::time::Duration::from_secs(60)).build().map_err(|e| e.to_string())?;
+    let mut cb = reqwest::Client::builder().timeout(std::time::Duration::from_secs(60));
+    // endereços locais (http://, Wi-Fi) nunca passam por proxy/VPN/antivírus do sistema
+    if url.starts_with("http://") { cb = cb.no_proxy(); }
+    let client = cb.build().map_err(|e| e.to_string())?;
     let mut rq = client.request(m, &url);
     for (k, v) in headers.iter() { rq = rq.header(k.as_str(), v.as_str()); }
     if let Some(b) = body { rq = rq.body(b64.decode(b).map_err(|e| e.to_string())?); }
