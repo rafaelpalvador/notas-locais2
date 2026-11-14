@@ -391,7 +391,7 @@ body[data-fnt=serif] #cmw .cm-editor{font-family:Georgia,"Times New Roman",serif
 #cmw .cm-iw-hr hr,#cmw .cm-hr{display:block;border:0;border-top:1px solid var(--bd);margin:.9em 0}
 #cmw .cm-iw-img img{max-width:100%;border-radius:8px;vertical-align:middle;cursor:pointer}
 /* blocos especiais renderizados dentro do editor */
-#cmw .cm-blk{position:relative;margin:.4em 0;font-family:var(--ui);line-height:1.6}
+#cmw .cm-blk{position:relative;margin:0;padding:.4em 0;font-family:var(--ui);line-height:1.6}
 #cmw .cm-blk>*:not(.cm-srcb){max-width:none!important}
 #cmw .cm-srcb{position:absolute;right:6px;top:6px;z-index:3;font:600 11px ui-monospace,monospace;padding:3px 7px;border-radius:6px;background:var(--sf);border:1px solid var(--bd);color:var(--mu);opacity:0;transition:opacity .15s;cursor:pointer}
 #cmw .cm-blk:hover .cm-srcb{opacity:1}@media(hover:none){#cmw .cm-srcb{opacity:.75}}
@@ -770,6 +770,7 @@ body.rdrag{user-select:none;-webkit-user-select:none;cursor:crosshair}
 .cm-al-l{text-align:left}.cm-al-c{text-align:center}.cm-al-r{text-align:right}.cm-al-j{text-align:justify}
 #cmw .cm-in-1{padding-left:1.6em!important}#cmw .cm-in-2{padding-left:3.2em!important}#cmw .cm-in-3{padding-left:4.8em!important}#cmw .cm-in-4{padding-left:6.4em!important}#cmw .cm-in-5{padding-left:8em!important}#cmw .cm-in-6{padding-left:9.6em!important}
 body[data-m=view] .cm-almk{display:none}.cm-almk{color:var(--mu);opacity:.6}
+#cmw .cm-blk>:first-child{margin-top:0!important}#cmw .cm-blk>:last-child{margin-bottom:0!important}#cmw .cm-blk .tb,#cmw .cm-blk table{margin-top:0!important;margin-bottom:0!important}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -2741,7 +2742,8 @@ function hydrateSoon(el){RQ.push(el);if(RQT)return;RQT=requestAnimationFrame(()=
 class BlockW extends C.WidgetType{constructor(src,l0,kind){super();this.src=src;this.l0=l0;this.kind=kind}
  eq(o){return o.src===this.src&&o.kind===this.kind&&o.sig===this.sig}
  toDOM(){const d=document.createElement('div');d.className='cm-blk cm-blk-'+this.kind;d.contentEditable='false';d._l0=this.l0;let h='';ED_LP++;try{h=md('\n'.repeat(this.l0)+this.src)}catch(e){h='<pre>'+esc(this.src)+'</pre>'}ED_LP--;
-  d._src=this.src;d._sig=this.sig;d.innerHTML=h+'<button class="cm-srcb" title="Editar o texto deste bloco" aria-label="Editar o texto deste bloco">&lt;/&gt;</button>';hydrateSoon(d);return d}
+  d._src=this.src;d._sig=this.sig;d.innerHTML=h+'<button class="cm-srcb" title="Editar o texto deste bloco" aria-label="Editar o texto deste bloco">&lt;/&gt;</button>';hydrateSoon(d);if(window.ResizeObserver){const ro=new ResizeObserver(()=>{const v=window.cmView&&cmView();if(v)v.requestMeasure()});ro.observe(d);d._ro=ro}return d}
+ destroy(dom){if(dom._ro){dom._ro.disconnect();dom._ro=null}}
  updateDOM(dom){if(dom._sig!==this.sig)return false;if(dom._src!==this.src){const own=dom._own&&Date.now()-dom._own<2000,h=x=>(x||'').split('\n')[0].split(/\s/)[0];if(!own||h(dom._src)!==h(this.src))return false}dom._src=this.src;const dl=this.l0-(dom._l0||0);if(dl){dom.querySelectorAll('[data-ds]').forEach(x=>x.dataset.ds=+x.dataset.ds+dl);dom.querySelectorAll('[data-l]').forEach(x=>x.dataset.l=+x.dataset.l+dl);dom._l0=this.l0}return true}
  ignoreEvent(){return true}get estimatedHeight(){return this.kind==='tb'?120:300}}
 let ED_LP=0;
