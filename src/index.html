@@ -767,6 +767,9 @@ body.dbmode #dbr{display:block;flex:1;min-height:0;overflow:auto;padding:18px 26
 .rsel{box-shadow:inset 0 0 0 2px var(--ac);background-image:linear-gradient(rgba(80,120,255,.16),rgba(80,120,255,.16))!important}
 body.rdrag{user-select:none;-webkit-user-select:none;cursor:crosshair}
 .tbl td[colspan],.tbl th[colspan],.tbl td[rowspan]{vertical-align:middle}
+.cm-al-l{text-align:left}.cm-al-c{text-align:center}.cm-al-r{text-align:right}.cm-al-j{text-align:justify}
+#cmw .cm-in-1{padding-left:1.6em!important}#cmw .cm-in-2{padding-left:3.2em!important}#cmw .cm-in-3{padding-left:4.8em!important}#cmw .cm-in-4{padding-left:6.4em!important}#cmw .cm-in-5{padding-left:8em!important}#cmw .cm-in-6{padding-left:9.6em!important}
+body[data-m=view] .cm-almk{display:none}.cm-almk{color:var(--mu);opacity:.6}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -806,10 +809,11 @@ body.rdrag{user-select:none;-webkit-user-select:none;cursor:crosshair}
  </div>
  <div id="ft">
  <button data-c="menu:tmb" title="Tipo de bloco"><span id="tbl">Texto</span> ▾</button><i class="sp"></i>
- <button data-c="b" title="Negrito"><b>B</b></button><button data-c="i" title="Itálico"><i>I</i></button><button data-c="s" title="Riscado"><s>S</s></button><button data-c="mk" title="Marca-texto">Marca</button><button data-c="menu:tmc" title="Cor do marca-texto" style="min-width:20px;padding:6px 3px">▾</button><button data-c="menu:tmt" title="Cor da letra" aria-label="Cor da letra" style="min-width:30px;padding:6px 5px"><b style="border-bottom:3px solid #d1342b;line-height:1">A</b> ▾</button><button data-c="cd" title="Código">&lt;/&gt;</button><i class="sp"></i>
+ <button data-c="b" title="Negrito"><b>B</b></button><button data-c="i" title="Itálico"><i>I</i></button><button data-c="s" title="Riscado"><s>S</s></button><button data-c="mk" title="Marca-texto">Marca</button><button data-c="menu:tmc" title="Cor do marca-texto" style="min-width:20px;padding:6px 3px">▾</button><button data-c="menu:tmt" title="Cor da letra" aria-label="Cor da letra" style="min-width:30px;padding:6px 5px"><b style="border-bottom:3px solid #d1342b;line-height:1">A</b> ▾</button><button data-c="cd" title="Código">&lt;/&gt;</button><button data-c="menu:tma" title="Alinhar e recuar" aria-label="Alinhar e recuar">☰ ▾</button><i class="sp"></i>
  <span class="szc"><button data-c="sz:-" title="Diminuir" aria-label="Diminuir">−</button><input id="szi" type="number" min="6" max="200" step="1" value="16" aria-label="Tamanho do texto" title="Tamanho do texto"><button data-c="sz:+" title="Aumentar" aria-label="Aumentar">+</button><button data-c="menu:tms" title="Tamanhos" aria-label="Tamanhos" style="min-width:20px;padding:6px 3px">▾</button></span><button data-c="lk" title="Link para nota">@</button><button data-c="x" title="Texto simples">Tx</button>
  <div class="tm" id="tmc" hidden><button data-c="hl:yellow"><span class="swc" style="background:var(--hl)"></span>Amarelo</button><button data-c="hl:green"><span class="swc" style="background:#b8f0c0"></span>Verde</button><button data-c="hl:blue"><span class="swc" style="background:#b9dcff"></span>Azul</button><button data-c="hl:pink"><span class="swc" style="background:#ffc4dd"></span>Rosa</button><button data-c="hl:orange"><span class="swc" style="background:#ffd3a8"></span>Laranja</button><button data-c="hl:none"><span class="swc" style="background:transparent"></span>Remover cor</button></div>
  <div class="tm" id="tmt" hidden><button data-c="tc:red"><span class="swc" style="background:var(--tc-red-v)"></span>Vermelho</button><button data-c="tc:orange"><span class="swc" style="background:var(--tc-orange-v)"></span>Laranja</button><button data-c="tc:green"><span class="swc" style="background:var(--tc-green-v)"></span>Verde</button><button data-c="tc:blue"><span class="swc" style="background:var(--tc-blue-v)"></span>Azul</button><button data-c="tc:purple"><span class="swc" style="background:var(--tc-purple-v)"></span>Roxo</button><button data-c="tc:pink"><span class="swc" style="background:var(--tc-pink-v)"></span>Rosa</button><button data-c="tc:gray"><span class="swc" style="background:var(--tc-gray-v)"></span>Cinza</button><button data-c="tc:none"><span class="swc" style="background:transparent"></span>Cor padrão</button></div>
+ <div class="tm" id="tma" hidden><button data-c="al:l">⇤ Alinhar à esquerda</button><button data-c="al:c">⇔ Centralizar</button><button data-c="al:r">⇥ Alinhar à direita</button><button data-c="al:j">☰ Justificar</button><button data-c="in:+">→ Aumentar recuo (Tab)</button><button data-c="in:-">← Diminuir recuo (Shift+Tab)</button></div>
  <div class="tm" id="tmb" hidden><button data-c="blk:title"><span class="ic">Aa</span>Título</button><button data-c="blk:heading"><span class="ic">Aa</span>Cabeçalho</button><button data-c="blk:sub"><span class="ic">Aa</span>Subcabeçalho</button><button data-c="blk:text"><span class="ic">Aa</span>Texto</button><button data-c="blk:high"><span class="ic">Aa</span>Destaque</button><button data-c="blk:callout"><span class="ic">Aa</span>Chamada</button><button data-c="blk:check"><span class="ic">☑</span>Checkbox</button><button data-c="blk:bullet"><span class="ic">•</span>Lista com marcadores</button><button data-c="blk:num"><span class="ic">1.</span>Lista numerada</button><button data-c="blk:toggle"><span class="ic">▸</span>Toggle</button><button data-c="blk:toggleh"><span class="ic">▸</span>Toggle cabeçalho</button><button data-c="blk:toggles"><span class="ic">▸</span>Toggle subcabeçalho</button></div>
  <div class="tm" id="tms" hidden><button data-c="sz:10">10</button><button data-c="sz:12">12</button><button data-c="sz:14">14</button><button data-c="sz:16">16</button><button data-c="sz:18">18</button><button data-c="sz:20">20</button><button data-c="sz:24">24</button><button data-c="sz:28">28</button><button data-c="sz:32">32</button><button data-c="sz:40">40</button><button data-c="sz:48">48</button><button data-c="sz:64">64</button><button data-c="sz:normal">Padrão</button></div>
 <button id="ftm" title="Minimizar barra" aria-label="Minimizar barra">▴</button></div>
@@ -2728,6 +2732,8 @@ const mdHL=C.HighlightStyle.define([
 /* ---------- utilidades ---------- */
 const SPECIAL=/^(draw|pdf|kanban|canvas|mermaid|audio|locked|db|dbschema)\b/;
 const selTouches=(st,a,b)=>st.selection.ranges.some(r=>r.from<=b&&r.to>=a);
+/* marcadores de formatação só aparecem com o cursor DENTRO do trecho (não nas bordas): ao digitar **r** o negrito já fecha sem mostrar os asteriscos */
+const selIn=(st,a,b)=>st.selection.ranges.some(r=>r.from<b&&r.to>a);
 const lineActive=(st,ln)=>st.selection.ranges.some(r=>r.from<=ln.to&&r.to>=ln.from);
 const RQ=[];let RQT=0;
 function hydrateSoon(el){RQ.push(el);if(RQT)return;RQT=requestAnimationFrame(()=>{RQT=0;const l=RQ.splice(0);if(!l.some(x=>x.isConnected))return;try{hydrate()}catch(e){}try{hydMath()}catch(e){}
@@ -2783,7 +2789,7 @@ function inlineDecos(view){const st=view.state,doc=st.doc,b=new C.RangeSetBuilde
     for(let k=l1.number;k<=lz.number;k++){const l=doc.line(k);add(l.from,l.from,C.Decoration.line({class:'cm-cbl'+(k===l1.number?' cm-cbf':'')+(k===lz.number?' cm-cbz':'')}))}
     if(lp&&!selTouches(st,n.from,n.to)){hide(l1.from,l1.to);if(info)add(l1.to,l1.to,C.Decoration.widget({widget:new TagW(info.split(/\s/)[0],info),side:1}));if(lz.number>l1.number&&/^\s*(`{3,}|~{3,})\s*$/.test(lz.text))hide(lz.from,lz.to)}return false}
    if(!lp)return;
-   const act=selTouches(st,n.from,n.to);
+   const act=selIn(st,n.from,n.to);
    if(t==='Emphasis'||t==='StrongEmphasis'||t==='Strikethrough'||t==='InlineCode'){if(!act){let c=n.node.firstChild;while(c){if(c.name==='EmphasisMark'||c.name==='StrikethroughMark'||c.name==='CodeMark')hide(c.from,c.to);c=c.nextSibling}}if(t==='InlineCode')add(n.from,n.to,C.Decoration.mark({class:'cm-ic'}))}
    else if(t==='Link'&&!act){const s2=doc.sliceString(n.from,n.to);if(/^!?\[[^\]]*\]\(assets\//.test(s2)||s2.startsWith('!'))return false;const m=s2.match(/^\[([^\]]*)\]\(([^)\s]+)[^)]*\)$/);if(m){hide(n.from,n.from+1);hide(n.from+1+m[1].length,n.to);add(n.from+1,n.from+1+m[1].length,C.Decoration.mark({class:'cm-alink',attributes:{'data-href':m[2]}}))}return false}
    else if(t==='Image'||t==='URL'||t==='Autolink')return false}});
@@ -2792,13 +2798,13 @@ function inlineDecos(view){const st=view.state,doc=st.doc,b=new C.RangeSetBuilde
    [/!\[([^\]|]*)(?:\|(\d{1,4}))?\]\(assets\/([^)\s]+)(?:\s+"orig:[^"]+")?\)/g,(m,a,z)=>{if(selTouches(st,a,z))return;add(a,z,C.Decoration.replace({widget:new InlW(inl(m[0]),'img'+m[0],'cm-iw-img')}))}],
    [/(?<!!)\[\[([^\]|]+)(?:\|([^\]]+))?\]\]|(?<!!)@\[([^\]|]+)(?:\|([^\]]+))?\]/g,(m,a,z)=>{add(a,z,C.Decoration.mark({class:'cm-wl'}));if(selTouches(st,a,z))return;const tg=(m[1]||m[3]).trim(),lb=m[2]||m[4]||tg,ex=S.notes.some(x=>x.title.toLowerCase()===tg.split('#')[0].trim().toLowerCase())||/^(pasta|folder)\//i.test(tg);
      add(a,z,C.Decoration.replace({widget:new InlW('<a class="wl'+(ex?'':' miss')+'" data-n="'+esc(tg.split('#')[0].replace(/^(pasta|folder)\//i,''))+'"'+(/^(pasta|folder)\//i.test(tg)?' data-f="'+esc(tg.replace(/^(pasta|folder)\//i,''))+'"':'')+(tg.includes('#^')?' data-blk="'+esc(tg.split('#^')[1])+'"':tg.includes('#')?' data-hd="'+esc(tg.split('#')[1])+'"':'')+'>'+esc(lb)+'</a>','wl'+m[0]+ex)}))}],
-   [/==([^=\n]+)==/g,(m,a,z)=>{add(a,z,C.Decoration.mark({class:'cm-hlm'}));if(!selTouches(st,a,z)){hide(a,a+2);hide(z-2,z)}}],
-   [/\[([^\]\n]+)\]\{(size=\d{1,3}|\.(?:small|large|huge|hl-green|hl-blue|hl-pink|hl-orange|tc-red|tc-orange|tc-green|tc-blue|tc-purple|tc-pink|tc-gray))\}/g,(m,a,z)=>{const k=m[2];add(a+1,a+1+m[1].length,C.Decoration.mark(k.startsWith('size=')?{attributes:{style:'font-size:'+Math.min(200,+k.slice(5))+'px'}}:{class:k.slice(1).startsWith('hl-')?'hl '+k.slice(1):k.slice(1).startsWith('tc-')?'tc '+k.slice(1):'sz-'+k.slice(1)}));if(!selTouches(st,a,z)){hide(a,a+1);hide(a+1+m[1].length,z)}}],
+   [/==([^=\n]+)==/g,(m,a,z)=>{add(a,z,C.Decoration.mark({class:'cm-hlm'}));if(!selIn(st,a,z)){hide(a,a+2);hide(z-2,z)}}],
+   [/\[([^\]\n]+)\]\{(size=\d{1,3}|\.(?:small|large|huge|hl-green|hl-blue|hl-pink|hl-orange|tc-red|tc-orange|tc-green|tc-blue|tc-purple|tc-pink|tc-gray))\}/g,(m,a,z)=>{const k=m[2];add(a+1,a+1+m[1].length,C.Decoration.mark(k.startsWith('size=')?{attributes:{style:'font-size:'+Math.min(200,+k.slice(5))+'px'}}:{class:k.slice(1).startsWith('hl-')?'hl '+k.slice(1):k.slice(1).startsWith('tc-')?'tc '+k.slice(1):'sz-'+k.slice(1)}));if(!selIn(st,a,z)){hide(a,a+1);hide(a+1+m[1].length,z)}}],
    [/(^|\s)(#[\p{L}\w-]+)/gu,(m,a,z)=>{const s=a+m[1].length;if(/^#{1,6}$/.test(m[2]))return;add(s,z,C.Decoration.mark({class:'cm-tag',attributes:{'data-t':m[2].slice(1)}}))}],
    [/(?<![\\$\w])\$([^\s$](?:[^$\n]*?[^\s$])?)\$(?![\d$])/g,(m,a,z)=>{if(selTouches(st,a,z))return;add(a,z,C.Decoration.replace({widget:new InlW('<span class="mx" data-tex="'+esc(m[1])+'"></span>','mx'+m[1])}))}],
    [/\[\^([^\]\s]+)\](?!:)/g,(m,a,z)=>{if(selTouches(st,a,z))return;add(a,z,C.Decoration.replace({widget:new InlW('<sup class="fnr"><a data-fn="'+esc(m[1])+'">'+esc(m[1])+'</a></sup>','fn'+m[1])}))}],
-   [/(^|[^~])~([^~\s]+)~(?!~)/g,(m,a,z)=>{const s0=a+m[1].length;add(s0+1,z-1,C.Decoration.mark({class:'cm-sub'}));if(!selTouches(st,s0,z)){hide(s0,s0+1);hide(z-1,z)}}],
-   [/\^([^\^\s\[\]]+)\^/g,(m,a,z)=>{add(a+1,z-1,C.Decoration.mark({class:'cm-sup'}));if(!selTouches(st,a,z)){hide(a,a+1);hide(z-1,z)}}],
+   [/(^|[^~])~([^~\s]+)~(?!~)/g,(m,a,z)=>{const s0=a+m[1].length;add(s0+1,z-1,C.Decoration.mark({class:'cm-sub'}));if(!selIn(st,s0,z)){hide(s0,s0+1);hide(z-1,z)}}],
+   [/\^([^\^\s\[\]]+)\^/g,(m,a,z)=>{add(a+1,z-1,C.Decoration.mark({class:'cm-sup'}));if(!selIn(st,a,z)){hide(a,a+1);hide(z-1,z)}}],
    [/:([a-z0-9_+-]{1,30}):/g,(m,a,z)=>{const E=window.EMO||{};if(!E[m[1]]||selTouches(st,a,z))return;add(a,z,C.Decoration.replace({widget:new InlW(E[m[1]],'em'+m[1],'cm-emo')}))}],
    [/\s\^([a-z0-9][\w-]{2,15})\s*$/gim,(m,a,z)=>{if(!selTouches(st,a,z))add(a,z,C.Decoration.mark({class:'cm-bid'}))}]];
   if(lp)for(const[re,fn]of R){re.lastIndex=0;while((m=re.exec(seg))){const a=from+m.index,z=a+m[0].length;if(cmInCode(tree,a))continue;fn(m,a,z)}}
@@ -2835,9 +2841,30 @@ window.cmCmd=function(c){if(!V)return false;const v=V;
  if(c.startsWith('tc:')){const k=c.slice(3);return k==='none'?map.x():wrapSel(v,'[',']{.tc-'+k+'}')}
  if(c.startsWith('sz:')){let z=c.slice(3);const inp=$('#szi');if(z==='+'||z==='-'){z=Math.max(6,Math.min(200,(+inp.value||16)+(z==='+'?2:-2)));inp.value=z}if(z==='normal')return map.x();if(/^\d+$/.test(String(z))){inp.value=z;return window.szWrap?szWrap(v,z):wrapSel(v,'[',']{size='+z+'}')}return false}
  const f=map[c];return f?f():false};
+/* ---------- alinhamento e recuo por linha (guardado como comentário HTML no fim da linha: <!--al:c--> <!--in:2-->) ---------- */
+const ALRE=/((?:\s*<!--(?:al|in):\w-->)+)\s*$/;
+const alParse=tx=>{if(tx.indexOf('<!--')<0)return null;const m=tx.match(ALRE);if(!m)return null;const al=(m[1].match(/<!--al:([lcrj])-->/)||[])[1]||'',ind=Math.min(6,+((m[1].match(/<!--in:(\d)-->/)||[])[1]||0));return{from:m.index,al,ind,mk:m[0].trim()}};
+const alOk=(st,l)=>!(/^\s*(```|~~~)/.test(l.text)||/^\s*\|/.test(l.text)||cmInCode(C.syntaxTree(st),l.from));
+const alField=C.StateField.define({create:st=>alDecos(st),update:(v,tr)=>tr.docChanged||C.syntaxTree(tr.state)!==C.syntaxTree(tr.startState)?alDecos(tr.state):v,provide:f=>C.EditorView.decorations.from(f)});
+function alDecos(st){const r=[],doc=st.doc;for(let i=1;i<=doc.lines;i++){const l=doc.line(i);if(l.text.indexOf('<!--')<0)continue;const p=alParse(l.text);if(!p||!alOk(st,l))continue;
+ const cls=(p.al?'cm-al-'+p.al:'')+(p.ind?' cm-in-'+p.ind:'');if(cls)r.push(C.Decoration.line({class:cls}).range(l.from));r.push(C.Decoration.mark({class:'cm-almk'}).range(l.from+p.from,l.to))}
+ return C.Decoration.set(r,true)}
+function alLines(v){const st=v.state,seen=new Set(),out=[];for(const r of st.selection.ranges){const a=st.doc.lineAt(r.from).number,b=st.doc.lineAt(r.to).number;for(let i=a;i<=b;i++)if(!seen.has(i)){seen.add(i);out.push(st.doc.line(i))}}return out}
+function alSet(v,fn){const st=v.state,ch=[];for(const l of alLines(v)){if(!alOk(st,l))continue;const p=alParse(l.text),base=p?l.text.slice(0,p.from):l.text.replace(/\s+$/,'');if(!base.trim())continue;const nx=fn(p||{al:'',ind:0});
+  const mk=(nx.al?'<!--al:'+nx.al+'-->':'')+(nx.ind?'<!--in:'+nx.ind+'-->':''),from=l.from+base.length,old=l.text.slice(base.length);if(old===(mk?' '+mk:''))continue;ch.push({from,to:l.to,insert:mk?' '+mk:''})}
+ if(ch.length)v.dispatch({changes:ch,userEvent:'input'});v.focus();return true}
+const alList=l=>/^\s*([-*+]|\d+[.)])\s/.test(l.text);
+function alTab(v,d){const st=v.state,ls=alLines(v);if(ls.some(l=>alList(l)||!alOk(st,l)))return false;alSet(v,p=>({al:p.al,ind:Math.max(0,Math.min(6,p.ind+d))}));return true}
+const alSnap=C.EditorView.updateListener.of(u=>{if(!(u.selectionSet||u.docChanged)||!isLPm())return;const st=u.state;let fix=null;
+ for(const r of st.selection.ranges){if(!r.empty)continue;const l=st.doc.lineAt(r.head),p=alParse(l.text);if(p&&r.head>l.from+p.from&&alOk(st,l)){fix=l.from+p.from;break}}
+ if(fix!=null){const v=u.view;queueMicrotask(()=>{try{const s2=v.state;if(s2.selection.ranges.length===1&&s2.selection.main.empty){v.dispatch({selection:{anchor:fix}})}}catch(e){}})}});
+const alExt=[alField,alSnap];
+window.__alSet=alSet;
 const keys=C.keymap.of([
  {key:'Mod-b',run:v=>wrapSel(v,'**')},{key:'Mod-i',run:v=>wrapSel(v,'*')},{key:'Mod-Shift-x',run:v=>wrapSel(v,'~~')},{key:'Mod-e',run:v=>wrapSel(v,'`')},{key:'Mod-Shift-h',run:v=>wrapSel(v,'==')},
- {key:'Mod-l',run:v=>setLinePrefix(v,0,'- [ ] ')},{key:'Mod-1',run:v=>setLinePrefix(v,0,'# ')},{key:'Mod-2',run:v=>setLinePrefix(v,0,'## ')},{key:'Mod-3',run:v=>setLinePrefix(v,0,'### ')},{key:'Mod-0',run:v=>setLinePrefix(v,0,'')}]);
+ {key:'Mod-l',run:v=>setLinePrefix(v,0,'- [ ] ')},{key:'Mod-1',run:v=>setLinePrefix(v,0,'# ')},{key:'Mod-2',run:v=>setLinePrefix(v,0,'## ')},{key:'Mod-3',run:v=>setLinePrefix(v,0,'### ')},{key:'Mod-0',run:v=>setLinePrefix(v,0,'')},
+ {key:'Tab',run:v=>alTab(v,1)},{key:'Shift-Tab',run:v=>alTab(v,-1)},{key:'Mod-Shift-l',run:v=>alSet(v,p=>({al:'',ind:p.ind}))},{key:'Mod-Shift-e',run:v=>alSet(v,p=>({al:'c',ind:p.ind}))},{key:'Mod-Shift-r',run:v=>alSet(v,p=>({al:'r',ind:p.ind}))},
+ {key:'Enter',run:v=>{const st=v.state,r=st.selection.main;if(!r.empty)return false;const l=st.doc.lineAt(r.head),p=alParse(l.text);if(!p||!alOk(st,l)||r.head>l.from+p.from+0&&r.head>l.to)return false;const ind=l.text.match(/^\s*/)[0],at=Math.min(r.head,l.from+p.from);const ins=' '+p.mk+'\n'+ind;v.dispatch({changes:{from:at,insert:ins},selection:{anchor:at+ins.length},userEvent:'input'});return true}}]);
 const pkKeys=C.EditorView.domEventHandlers({keydown(e,v){if(typeof PK!=='undefined'&&PK.on&&['ArrowUp','ArrowDown','Enter','Tab','Escape'].includes(e.key)){const ev=new KeyboardEvent('keydown',{key:e.key,code:e.code,shiftKey:e.shiftKey,ctrlKey:e.ctrlKey,metaKey:e.metaKey,bubbles:true,cancelable:true});ED.dispatchEvent(ev);if(ev.defaultPrevented){e.preventDefault();return true}}return false},
  paste(e){const f=[...(e.clipboardData&&e.clipboardData.files||[])];const h=e.clipboardData&&e.clipboardData.getData('text/html');if(f.length||(h&&/<(h[1-6]|ul|ol|table|li|strong|b|a)\b/i.test(h))){const ev=new ClipboardEvent('paste',{clipboardData:e.clipboardData,bubbles:true,cancelable:true});ED.dispatchEvent(ev);if(ev.defaultPrevented){e.preventDefault();return true}}return false},
  drop(e){const f=[...(e.dataTransfer&&e.dataTransfer.files||[])];if(f.length){e.preventDefault();f.forEach(x=>{try{attach(x)}catch(er){}});return true}return false},
@@ -2870,7 +2897,7 @@ caretXY=window.caretXY;
 function mkState(doc){return C.EditorState.create({doc,extensions:[C.history(),C.drawSelection(),C.dropCursor(),C.indentOnInput(),C.bracketMatching(),C.closeBrackets(),C.highlightSpecialChars(),
  C.markdown({base:C.markdownLanguage,codeLanguages:C.codeLanguages,addKeymap:true}),C.syntaxHighlighting(mdHL),C.syntaxHighlighting(C.classHighlighter),
  C.Prec.highest(pkKeys),C.Prec.high(keys),C.keymap.of([...C.closeBracketsKeymap,...C.defaultKeymap,...C.historyKeymap,C.indentWithTab]),
- C.EditorView.lineWrapping,C.placeholder('Comece a escrever… use # para títulos, - [ ] para tarefas, [[ para ligar notas'),
+ alExt,C.EditorView.lineWrapping,C.placeholder('Comece a escrever… use # para títulos, - [ ] para tarefas, [[ para ligar notas'),
  C.EditorView.contentAttributes.of({spellcheck:'true',autocorrect:'on',autocapitalize:'sentences','aria-label':'Editor da nota'}),
  inlinePlugin,lpComp.of(lpExt()),listener]})}
 V=new C.EditorView({state:mkState(VD.get.call(ED)),parent:wrap});V.contentDOM.classList.add('cmw-c');NOTE=curId;
@@ -4597,6 +4624,24 @@ window.syncWithTarget=(id,T,cfg,persist)=>{const run=async()=>{for(let i=0;i<240
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&R){hide()}},true);
  Object.assign(EN,{"Mesclar":"Merge","Dividir":"Split","Esq.":"Left","Centro":"Center","Dir.":"Right","Alinhar à esquerda":"Align left","Centralizar":"Center","Alinhar à direita":"Align right","Não dá para mesclar o cabeçalho com as linhas abaixo":"The header can't be merged with the rows below"});
  window.__tr={get:()=>R,rect};
+})();
+
+/* NEW36: alinhamento/recuo na leitura e comandos da barra */
+(function(){
+ const RE=/((?:\s*<!--(?:al|in):\w-->)+)\s*$/,AL={l:'left',c:'center',r:'right',j:'justify'};
+ const _md=md;md=function(src){src=String(src??'');if(src.indexOf('<!--')<0||!/<!--(?:al|in):\w-->/.test(src))return _md.call(this,src);
+  const L=src.split('\n');let f=false;for(let i=0;i<L.length;i++){if(/^\s*(```|~~~)/.test(L[i])){f=!f;continue}if(f||/^\s*\|/.test(L[i]))continue;const m=L[i].match(RE);if(m){const al=(m[1].match(/<!--al:([lcrj])-->/)||[])[1]||'',ind=Math.min(6,+((m[1].match(/<!--in:(\d)-->/)||[])[1]||0));L[i]=L[i].slice(0,m.index)+'\u0001'+al+ind+'\u0002'}}
+  let h=_md.call(this,L.join('\n'));
+  h=h.replace(/<(p|h[1-6]|li)((?:\s[^>]*)?)>((?:(?!<\/\1>)[\s\S])*?)\u0001([lcrj]?)(\d)\u0002\s*<\/\1>/g,(m,t,a,body,al,ind)=>{const css=(al?'text-align:'+AL[al]+';':'')+(+ind?'padding-left:'+(+ind*1.6)+'em;':'');if(!css)return'<'+t+a+'>'+body+'</'+t+'>';a=/style="/.test(a)?a.replace('style="','style="'+css):a+' style="'+css+'"';return'<'+t+a+'>'+body+'</'+t+'>'});
+  return h.replace(/\u0001[lcrj]?\d\u0002/g,'')};
+ const _cc=window.cmCmd;window.cmCmd=function(c){
+  if(/^(al|in):/.test(c)){const k=c.slice(0,2),a=c.slice(3);
+   if(x17CEL&&k==='al'&&a!=='j'){const td=x17CEL.td,t=td.closest('table'),ci=x17CEL.ci;if(window.__tg){window.__tg.show(t);window.__tg.apply(m=>{m.al[ci]=m.al[ci]===a?'':a},false)}return true}
+   if(x17CEL)return true;const v=window.cmView&&cmView();if(!v)return false;
+   if(k==='al')return window.__alSet(v,p=>({al:a==='l'?'':a,ind:p.ind}));
+   return window.__alSet(v,p=>({al:p.al,ind:Math.max(0,Math.min(6,p.ind+(a==='+'?1:-1)))}))}
+  return _cc.apply(this,arguments)};
+ Object.assign(EN,{"Alinhar à esquerda":"Align left","Centralizar":"Center","Alinhar à direita":"Align right","Justificar":"Justify","Aumentar recuo (Tab)":"Increase indent (Tab)","Diminuir recuo (Shift+Tab)":"Decrease indent (Shift+Tab)","Alinhar e recuar":"Align and indent"});
 })();
 
 boot();
