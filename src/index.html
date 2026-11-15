@@ -4190,7 +4190,7 @@ window.syncWithTarget=(id,T,cfg,persist)=>{const run=async()=>{for(let i=0;i<240
  window.__conn={enc:connEnc,dec:connDec};
  const newCode=()=>{const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',r=crypto.getRandomValues(new Uint8Array(8));let c='';r.forEach((x,i)=>{c+=A[x%A.length];if(i===3)c+='-'});return c};
  const url=()=>LAN.mode==='host'?'http://127.0.0.1:'+PORT+'/':(()=>{let a=(LAN.addr||'').trim().replace(/^https?:\/\//,'').replace(/\/+$/,'');if(a&&!/:\d+$/.test(a))a+=':'+PORT;return a?'http://'+a+'/':''})();
- const cfg=()=>({url:url(),user:USER,pass:LAN.code,dir:'Marginalia',e2ee:LAN.code,auto:true});
+ const cfg=()=>({url:url(),user:USER,pass:LAN.code,dir:'Marginalia-'+String(LAN.code).replace(/[^A-Z0-9]/gi,''),e2ee:LAN.code,auto:true});
  let q=Promise.resolve();
  async function lanSync(manual){if(!LAN.mode||!LAN.code||!(AT||window.__lanTest))return;if(LAN.busy)return;LAN.busy=true;lanStatus();
   q=syncWithTarget('lan',LAN,cfg(),save).finally(()=>{LAN.busy=false;lanStatus();if(manual){const r=window.__wdLastRes;if(LAN.err)toast(friendly(LAN.err));else toast(r&&(r.up||r.dn||r.dl)?'Wi-Fi: '+r.up+' enviadas, '+r.dn+' recebidas'+(r.jn?', '+r.jn+' juntadas':'')+(r.cfx?', '+r.cfx+' para conferir (⟪ conflito ⟫)':''):'Wi-Fi: tudo em dia')}});return q}
