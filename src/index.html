@@ -760,7 +760,7 @@ body.dbmode #dbr{display:block;flex:1;min-height:0;overflow:auto;padding:18px 26
 :root[data-theme="dark"]{--tc-red-v:#ff7b72;--tc-orange-v:#ffa657;--tc-green-v:#56d364;--tc-blue-v:#79b8ff;--tc-purple-v:#d2a8ff;--tc-pink-v:#ff9bc6;--tc-gray-v:#a0a0ad}
 @media(prefers-color-scheme:dark){:root:not([data-theme]){--tc-red-v:#ff7b72;--tc-orange-v:#ffa657;--tc-green-v:#56d364;--tc-blue-v:#79b8ff;--tc-purple-v:#d2a8ff;--tc-pink-v:#ff9bc6;--tc-gray-v:#a0a0ad}}
 .tc-red{color:var(--tc-red-v)}.tc-orange{color:var(--tc-orange-v)}.tc-green{color:var(--tc-green-v)}.tc-blue{color:var(--tc-blue-v)}.tc-purple{color:var(--tc-purple-v)}.tc-pink{color:var(--tc-pink-v)}.tc-gray{color:var(--tc-gray-v)}
-#cmw .cm-line:hover,#pv :is(p,li,h1,h2,h3,blockquote):hover{background:color-mix(in srgb,var(--ac) 9%,transparent);transition:background .12s}
+#cmw .cm-activeLine,#cmw .cm-line:hover{background:transparent!important}
 #trm{position:fixed;z-index:99;display:flex;flex-wrap:wrap;gap:4px;max-width:288px;padding:6px;background:var(--sf);border:1px solid var(--bd);box-shadow:var(--sh,0 6px 24px rgba(0,0,0,.18))}#trm[hidden]{display:none}
 #trm button{font-size:12.5px;padding:6px 9px}#trm button:disabled{opacity:.4}#trm .sw6{width:26px;height:26px;padding:0;border:1px solid rgba(128,128,128,.45)}#trm .sep{flex-basis:100%;height:0}
 #tsh{position:fixed;z-index:97;width:13px;height:13px;background:var(--ac);border:2px solid var(--sf);box-sizing:border-box;touch-action:none;cursor:crosshair}#tsh[hidden]{display:none}@media(pointer:coarse){#tsh{width:22px;height:22px}}
@@ -773,7 +773,7 @@ body[data-m=view] .cm-almk{display:none}.cm-almk{color:var(--mu);opacity:.6}
 #cmw .cm-blk>:first-child{margin-top:0!important}#cmw .cm-blk>:last-child{margin-bottom:0!important}#cmw .cm-blk .tb,#cmw .cm-blk table{margin-top:0!important;margin-bottom:0!important}
 .lback{font-size:15px;padding:8px 12px;margin-right:auto;flex-basis:100%;text-align:left;background:transparent;border:1px solid var(--bd);color:var(--tx)}@media(min-width:760px){.lback{flex-basis:auto}}
 body[data-v=l] #ft{display:none!important}
-#akb,#kbnew{display:none!important}
+#brb{display:none!important}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -1906,7 +1906,7 @@ function dbBoard(ns){const ks=pkeys(ns),k=kGroup(ns),vals=[...new Set(ns.map(n=>
  const opts=[...new Set(ks.concat([k]))];const cols=vals.concat(['']);
  return'<div class="kbh"><label>Agrupar por <select id="kbk">'+opts.map(o=>'<option'+(o===k?' selected':'')+'>'+esc(o)+'</option>').join('')+'</select></label><input id="kbn" placeholder="+ Nova coluna e Enter" aria-label="Nova coluna"></div><div class="kb" data-kbk="'+esc(k)+'">'+
  cols.map(c=>{const cs=ns.filter(n=>String((n.props||{})[k]||'')===c);return'<div class="kcol" data-kv="'+esc(c)+'"><div class="kch"><b>'+(c?esc(c):'Sem '+esc(k))+'</b><small>'+cs.length+'</small></div>'+cs.map(n=>'<div class="kc" draggable="true" data-kid="'+n.id+'"><b data-id="'+n.id+'">'+esc(n.title)+'</b>'+(n.folder?'<small>'+esc(n.folder)+'</small>':'')+(tagsOf(n).length?'<div>'+tagsOf(n).slice(0,3).map(t=>'<span class="tg" data-t="'+t+'">#'+t+'</span>').join(' ')+'</div>':'')+'</div>').join('')+'<button class="kadd" data-kadd="'+esc(c)+'">+ Nova nota</button></div>'}).join('')+'</div>'}
-function dbDecorate(){return;if(document.body.dataset.v!=='l'||view.t==='g')return;const lv=$('#lv'),gr=lv.querySelector('.gr'),lx=lv.querySelector('.lx');if(!gr||!lx)return;const m=DBV[vkey()]||'list';
+function dbDecorate(){if(document.body.dataset.v!=='l'||view.t==='g')return;const lv=$('#lv'),gr=lv.querySelector('.gr'),lx=lv.querySelector('.lx');if(!gr||!lx)return;const m=DBV[vkey()]||'list';
  lx.insertAdjacentHTML('afterbegin','<span class="seg2 dbm"><button data-dbm="list"'+(m==='list'?' class="on"':'')+'>Cartões</button><button data-dbm="table"'+(m==='table'?' class="on"':'')+'>Tabela</button><button data-dbm="board"'+(m==='board'?' class="on"':'')+'>Quadro</button></span>');
  if(m==='list')return;const[,ns]=listFor();gr.outerHTML=m==='table'?dbTable(ns):dbBoard(ns)}
 function dbRe(){go(view)}
