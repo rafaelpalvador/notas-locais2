@@ -771,6 +771,9 @@ body.rdrag{user-select:none;-webkit-user-select:none;cursor:crosshair}
 #cmw .cm-in-1{padding-left:1.6em!important}#cmw .cm-in-2{padding-left:3.2em!important}#cmw .cm-in-3{padding-left:4.8em!important}#cmw .cm-in-4{padding-left:6.4em!important}#cmw .cm-in-5{padding-left:8em!important}#cmw .cm-in-6{padding-left:9.6em!important}
 body[data-m=view] .cm-almk{display:none}.cm-almk{color:var(--mu);opacity:.6}
 #cmw .cm-blk>:first-child{margin-top:0!important}#cmw .cm-blk>:last-child{margin-bottom:0!important}#cmw .cm-blk .tb,#cmw .cm-blk table{margin-top:0!important;margin-bottom:0!important}
+.lback{font-size:15px;padding:8px 12px;margin-right:auto;flex-basis:100%;text-align:left;background:transparent;border:1px solid var(--bd);color:var(--tx)}@media(min-width:760px){.lback{flex-basis:auto}}
+body[data-v=l] #ft{display:none!important}
+#akb,#kbnew{display:none!important}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -1903,11 +1906,13 @@ function dbBoard(ns){const ks=pkeys(ns),k=kGroup(ns),vals=[...new Set(ns.map(n=>
  const opts=[...new Set(ks.concat([k]))];const cols=vals.concat(['']);
  return'<div class="kbh"><label>Agrupar por <select id="kbk">'+opts.map(o=>'<option'+(o===k?' selected':'')+'>'+esc(o)+'</option>').join('')+'</select></label><input id="kbn" placeholder="+ Nova coluna e Enter" aria-label="Nova coluna"></div><div class="kb" data-kbk="'+esc(k)+'">'+
  cols.map(c=>{const cs=ns.filter(n=>String((n.props||{})[k]||'')===c);return'<div class="kcol" data-kv="'+esc(c)+'"><div class="kch"><b>'+(c?esc(c):'Sem '+esc(k))+'</b><small>'+cs.length+'</small></div>'+cs.map(n=>'<div class="kc" draggable="true" data-kid="'+n.id+'"><b data-id="'+n.id+'">'+esc(n.title)+'</b>'+(n.folder?'<small>'+esc(n.folder)+'</small>':'')+(tagsOf(n).length?'<div>'+tagsOf(n).slice(0,3).map(t=>'<span class="tg" data-t="'+t+'">#'+t+'</span>').join(' ')+'</div>':'')+'</div>').join('')+'<button class="kadd" data-kadd="'+esc(c)+'">+ Nova nota</button></div>'}).join('')+'</div>'}
-function dbDecorate(){if(document.body.dataset.v!=='l'||view.t==='g')return;const lv=$('#lv'),gr=lv.querySelector('.gr'),lx=lv.querySelector('.lx');if(!gr||!lx)return;const m=DBV[vkey()]||'list';
+function dbDecorate(){return;if(document.body.dataset.v!=='l'||view.t==='g')return;const lv=$('#lv'),gr=lv.querySelector('.gr'),lx=lv.querySelector('.lx');if(!gr||!lx)return;const m=DBV[vkey()]||'list';
  lx.insertAdjacentHTML('afterbegin','<span class="seg2 dbm"><button data-dbm="list"'+(m==='list'?' class="on"':'')+'>Cartões</button><button data-dbm="table"'+(m==='table'?' class="on"':'')+'>Tabela</button><button data-dbm="board"'+(m==='board'?' class="on"':'')+'>Quadro</button></span>');
  if(m==='list')return;const[,ns]=listFor();gr.outerHTML=m==='table'?dbTable(ns):dbBoard(ns)}
 function dbRe(){go(view)}
-const _go=go;go=function(v){if(v&&v.t==='g'){view=v;$('#sb').classList.remove('open');document.body.dataset.v='l';renderGraph();renderSB();return}_go(v);dbDecorate()};
+const _go=go;go=function(v){if(v&&v.t==='g'){view=v;$('#sb').classList.remove('open');document.body.dataset.v='l';renderGraph();renderSB();return}_go(v);dbDecorate();lbBack()};
+function lbBack(){if(document.body.dataset.v!=='l'||!view||view.t==='all'||view.t==='g')return;const h=document.querySelector('#lv .lh');if(!h||h.querySelector('#lb'))return;const b=document.createElement('button');b.id='lb';b.className='lback';b.setAttribute('aria-label','Voltar');b.textContent='← Voltar';h.insertBefore(b,h.firstChild)}
+document.addEventListener('click',e=>{if(!(e.target.closest&&e.target.closest('#lb')))return;e.preventDefault();if(view.t==='f'&&String(view.f||'').includes('/'))go({t:'f',f:view.f.slice(0,view.f.lastIndexOf('/'))});else go({t:'all'})});
 document.addEventListener('click',e=>{const t=e.target;if(!t.closest)return;let a;
  if(t.dataset.dbm){e.stopImmediatePropagation();DBV[vkey()]=t.dataset.dbm;try{localStorage.setItem('ln:dbv',JSON.stringify(DBV))}catch(x){}dbRe()}
  else if(a=t.closest('th[data-dbs]')){const k=a.dataset.dbs;DBS=DBS.k===k?{k,d:-DBS.d}:{k,d:1};dbRe()}
