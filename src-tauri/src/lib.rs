@@ -372,7 +372,10 @@ fn oauth_poll() -> Option<String> { oauth::RESULT.lock().ok().and_then(|mut r| r
 // ---------- Sincronização pelo Wi-Fi: servidor WebDAV mínimo no computador ----------
 mod lan {
     use std::{fs, io::Read, path::{Path, PathBuf}, sync::{Arc, Mutex, atomic::{AtomicBool, Ordering}}, time::Duration};
-    pub struct Lan { pub stop: Arc<AtomicBool>, pub port: u16 }
+    pub struct Lan { pub stop: Arc<AtomicBool>, pub port: u16, pub auth: String, pub alive: Arc<AtomicBool> }
+    struct Alive(Arc<AtomicBool>);
+    impl Drop for Alive { fn drop(&mut self) { self.0.store(false, Ordering::SeqCst); } }
+    pub fn running() -> Option<u16> { STATE.lock().ok().and_then(|s| s.as_ref().filter(|l| l.alive.load(Ordering::SeqCst) && !l.stop.load(Ordering::SeqCst)).map(|l| l.port)) }
     pub static STATE: Mutex<Option<Lan>> = Mutex::new(None);
 
     fn etag(b: &[u8]) -> String { let mut h: u64 = 0xcbf29ce484222325; for x in b { h ^= *x as u64; h = h.wrapping_mul(0x100000001b3); } format!("\"{:016x}-{}\"", h, b.len()) }
@@ -395,16 +398,25 @@ mod lan {
     }
     pub fn start(root: PathBuf, port: u16, auth: String) -> Result<(), String> {
         let mut st = STATE.lock().map_err(|e| e.to_string())?;
+        if let Some(l) = st.as_ref() { if l.port == port && l.auth == auth && l.alive.load(Ordering::SeqCst) && !l.stop.load(Ordering::SeqCst) { return Ok(()); } }
         if let Some(l) = st.take() { l.stop.store(true, Ordering::SeqCst); std::thread::sleep(Duration::from_millis(700)); }
         fs::create_dir_all(&root).map_err(|e| e.to_string())?;
-        let server = tiny_http::Server::http(("0.0.0.0", port)).map_err(|e| format!("Não consegui abrir a porta {port}: {e}"))?;
+        let mut bound = None; let mut last_err = String::new();
+        for _ in 0..12 { match tiny_http::Server::http(("0.0.0.0", port)) { Ok(s) => { bound = Some(s); break; } Err(e) => { last_err = e.to_string(); std::thread::sleep(Duration::from_millis(400)); } } }
+        let server = bound.ok_or_else(|| format!("Não consegui abrir a porta {port}: {last_err}"))?;
         if std::net::TcpStream::connect_timeout(&std::net::SocketAddr::from(([127, 0, 0, 1], port)), Duration::from_millis(1500)).is_err() { return Err(format!("A porta {port} abriu, mas este computador não aceita conexões nela (firewall, antivírus ou VPN bloqueando?)")); }
         let stop = Arc::new(AtomicBool::new(false)); let stop2 = stop.clone();
+        let alive = Arc::new(AtomicBool::new(true)); let alive2 = alive.clone(); let auth_keep = auth.clone();
         let want = format!("Basic {}", auth);
         std::thread::spawn(move || {
+            let _g = Alive(alive2);
+            let mut server = server;
+            let mut last_probe = std::time::Instant::now();
+            /* o tiny_http encerra o aceite de conexões se o Windows devolver um erro de rede; aqui o servidor é recriado */
+            let rebind = |stop: &Arc<AtomicBool>| -> Option<tiny_http::Server> { for _ in 0..40 { if stop.load(Ordering::SeqCst) { return None; } if let Ok(s) = tiny_http::Server::http(("0.0.0.0", port)) { return Some(s); } std::thread::sleep(Duration::from_millis(500)); } None };
             let mut errs = 0u32;
             while !stop2.load(Ordering::SeqCst) {
-                let mut rq = match server.recv_timeout(Duration::from_millis(500)) { Ok(Some(r)) => { errs = 0; r }, Ok(None) => continue, Err(_) => { errs += 1; if errs > 200 { break; } std::thread::sleep(Duration::from_millis(50)); continue; } };
+                let mut rq = match server.recv_timeout(Duration::from_millis(500)) { Ok(Some(r)) => { errs = 0; r }, Ok(None) => { if last_probe.elapsed() > Duration::from_secs(4) { last_probe = std::time::Instant::now(); if std::net::TcpStream::connect_timeout(&std::net::SocketAddr::from(([127, 0, 0, 1], port)), Duration::from_millis(1500)).is_err() { drop(server); match rebind(&stop2) { Some(s) => { server = s; } None => break } } } continue }, Err(_) => { errs += 1; std::thread::sleep(Duration::from_millis(100)); if errs >= 2 { errs = 0; drop(server); match rebind(&stop2) { Some(s) => { server = s; } None => break } } continue; } };
                 let hdr = |rq: &tiny_http::Request, n: &str| rq.headers().iter().find(|h| h.field.as_str().as_str().eq_ignore_ascii_case(n)).map(|h| h.value.as_str().to_string());
                 let mk = |code: u16, body: Vec<u8>, tag: Option<String>| { let mut r = tiny_http::Response::from_data(body).with_status_code(code); if let Some(t) = tag { if let Ok(h) = tiny_http::Header::from_bytes(&b"ETag"[..], t.as_bytes()) { r.add_header(h); } } r };
                 if hdr(&rq, "Authorization").as_deref() != Some(want.as_str()) {
@@ -437,7 +449,7 @@ mod lan {
                 let _ = rq.respond(resp);
             }
         });
-        *st = Some(Lan { stop, port });
+        *st = Some(Lan { stop, port, auth: auth_keep, alive });
         Ok(())
     }
     pub fn stop() { if let Ok(mut st) = STATE.lock() { if let Some(l) = st.take() { l.stop.store(true, Ordering::SeqCst); } } }
@@ -458,7 +470,7 @@ fn lan_start(app: tauri::AppHandle, port: u16, user: String, pass: String) -> Re
 fn lan_stop() -> Result<(), String> { lan::stop(); Ok(()) }
 #[tauri::command]
 fn lan_info() -> LanInfo {
-    let port = lan::STATE.lock().ok().and_then(|s| s.as_ref().map(|l| l.port));
+    let port = lan::running();
     LanInfo { running: port.is_some(), port: port.unwrap_or(0), ips: lan::local_ips() }
 }
 
