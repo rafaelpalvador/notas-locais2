@@ -4189,7 +4189,8 @@ window.syncWithTarget=(id,T,cfg,persist)=>{const run=async()=>{for(let i=0;i<240
   return{addr:ip.join('.')+':'+port,code:code.slice(0,4).join('')+'-'+code.slice(4).join('')}};
  window.__conn={enc:connEnc,dec:connDec};
  const newCode=()=>{const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',r=crypto.getRandomValues(new Uint8Array(8));let c='';r.forEach((x,i)=>{c+=A[x%A.length];if(i===3)c+='-'});return c};
- const url=()=>LAN.mode==='host'?'http://127.0.0.1:'+PORT+'/':(()=>{let a=(LAN.addr||'').trim().replace(/^https?:\/\//,'').replace(/\/+$/,'');if(a&&!/:\d+$/.test(a))a+=':'+PORT;return a?'http://'+a+'/':''})();
+ const cleanAddr=x=>{x=String(x||'').trim().replace(/^https?:\/\//i,'').replace(/[\/\s]+.*$/,'').replace(/[，,。;]/g,'.');const m=x.match(/(\d{1,3}(?:\.\d{1,3}){3})(?::(\d{1,5}))?/);return m?m[1]+(m[2]?':'+m[2]:''):x.replace(/[^A-Za-z0-9.\-:]/g,'')};
+ const url=()=>LAN.mode==='host'?'http://127.0.0.1:'+PORT+'/':(()=>{let a=cleanAddr(LAN.addr);if(a&&!/:\d+$/.test(a))a+=':'+PORT;return a?'http://'+a+'/':''})();
  const cfg=()=>({url:url(),user:USER,pass:LAN.code,dir:'Marginalia-'+String(LAN.code).replace(/[^A-Z0-9]/gi,''),e2ee:LAN.code,auto:true});
  let q=Promise.resolve();
  async function lanSync(manual){if(!LAN.mode||!LAN.code||!(AT||window.__lanTest))return;if(LAN.busy)return;LAN.busy=true;lanStatus();
@@ -4227,7 +4228,7 @@ window.syncWithTarget=(id,T,cfg,persist)=>{const run=async()=>{for(let i=0;i<240
   if(k==='host'){const own=$('#lanown'),oc=own?normCode(own.value):'';if(own&&own.value.trim()&&!oc){toast('Código inválido — são 8 letras/números, como ABCD-EFGH');return}if(oc&&oc!==LAN.code){LAN.code=oc;LAN.B={};LAN.AS=new Set();LAN.last=0;LAN.key=null;LAN.keyFor=''}if(await hostStart()){redraw();lanSync(true)}}
   else if(k==='join'){const j=$('#lanjoin');if(j){j.hidden=false;$('#lanaddr').focus()}}
   else if(k==='connect'){let a=$('#lanaddr').value.trim(),c=$('#lancode').value.trim().toUpperCase().replace(/\s+/g,'');const cv=($('#lanconn').value||'').trim();if(cv){const d=connDec(cv);if(!d){toast('Código de conexão inválido — confira se copiou inteiro');return}a=d.addr;c=d.code}if(!c&&!cv){toast('Digite o código de sincronização');return}if(!a){toast('Procurando o computador na rede…');a=await discover(normCode(c));if(!a){toast('Não achei o computador. Confira se ele está ligado, com o app aberto e na mesma rede — ou digite o endereço.');return}}
-   LAN.mode='client';LAN.addr=a;LAN.code=c.length===8&&!c.includes('-')?c.slice(0,4)+'-'+c.slice(4):c;LAN.B={};LAN.AS=new Set();LAN.last=0;LAN.key=null;LAN.keyFor='';save();redraw();await lanSync(true)}
+   a=cleanAddr(a);LAN.mode='client';LAN.addr=a;LAN.code=c.length===8&&!c.includes('-')?c.slice(0,4)+'-'+c.slice(4):c;LAN.B={};LAN.AS=new Set();LAN.last=0;LAN.key=null;LAN.keyFor='';save();redraw();await lanSync(true)}
   else if(k==='now'){if(LAN.mode==='host')await hostStart();await lanSync(true);redraw()}
   else if(k==='copycode'){const ips=(LAN.info&&LAN.info.ips)||[];const t=connEnc((ips[0]||'')+':'+PORT,LAN.code);if(!t){toast('Sem rede para gerar o código');return}try{await navigator.clipboard.writeText(t);toast('Código copiado: '+t)}catch(x){toast(t)}}
   else if(k==='copyonly'){try{await navigator.clipboard.writeText(LAN.code);toast('Código copiado: '+LAN.code)}catch(x){toast(LAN.code)}}
