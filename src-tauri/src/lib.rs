@@ -396,7 +396,40 @@ mod lan {
         if let Ok(s) = std::net::UdpSocket::bind("0.0.0.0:0") { if s.connect("100.100.100.100:80").is_ok() { if let Ok(a) = s.local_addr() { let ip = a.ip().to_string(); if ip.starts_with("100.") && !v.contains(&ip) { v.push(ip); } } } }
         v
     }
-    pub fn start(root: PathBuf, port: u16, auth: String) -> Result<(), String> {
+    /* descoberta pelo código: o computador responde a um "grito" UDP na rede com a porta; o celular só precisa do código */
+    pub const DISC_PORT: u16 = 47731;
+    fn tag(code: &str) -> String { let mut h: u32 = 0x811c9dc5; for b in code.bytes() { h ^= b as u32; h = h.wrapping_mul(16777619); } format!("{:08x}", h) }
+    fn spawn_responder(stop: Arc<AtomicBool>, port: u16, code: String) {
+        std::thread::spawn(move || {
+            let mut sock = None;
+            for _ in 0..10 { if let Ok(s) = std::net::UdpSocket::bind(("0.0.0.0", DISC_PORT)) { sock = Some(s); break; } if stop.load(Ordering::SeqCst) { return; } std::thread::sleep(Duration::from_millis(500)); }
+            let sock = match sock { Some(s) => s, None => return };
+            let _ = sock.set_read_timeout(Some(Duration::from_millis(500)));
+            let want = format!("MRG1?{}", tag(&code)); let mut buf = [0u8; 128];
+            while !stop.load(Ordering::SeqCst) {
+                if let Ok((n, from)) = sock.recv_from(&mut buf) { if &buf[..n] == want.as_bytes() { let _ = sock.send_to(format!("MRG1!{}", port).as_bytes(), from); } }
+            }
+        });
+    }
+    pub fn discover(code: &str) -> Vec<String> {
+        let mut found: Vec<String> = Vec::new();
+        let sock = match std::net::UdpSocket::bind("0.0.0.0:0") { Ok(s) => s, Err(_) => return found };
+        let _ = sock.set_broadcast(true);
+        let msg = format!("MRG1?{}", tag(code));
+        let mut targets: Vec<String> = vec![format!("255.255.255.255:{}", DISC_PORT)];
+        for ip in local_ips() { let p: Vec<&str> = ip.split('.').collect(); if p.len() == 4 && !ip.starts_with("100.") { targets.push(format!("{}.{}.{}.255:{}", p[0], p[1], p[2], DISC_PORT)); } }
+        let _ = sock.set_read_timeout(Some(Duration::from_millis(250)));
+        let t0 = std::time::Instant::now();
+        let mut sent = 0;
+        while t0.elapsed() < Duration::from_millis(2500) {
+            if sent < 3 { for t in &targets { let _ = sock.send_to(msg.as_bytes(), t.as_str()); } sent += 1; }
+            let mut buf = [0u8; 64];
+            if let Ok((n, from)) = sock.recv_from(&mut buf) { let t = String::from_utf8_lossy(&buf[..n]).to_string(); if let Some(p) = t.strip_prefix("MRG1!") { let a = format!("{}:{}", from.ip(), p.trim()); if !found.contains(&a) { found.push(a); } } }
+            if !found.is_empty() && t0.elapsed() > Duration::from_millis(900) { break; }
+        }
+        found
+    }
+    pub fn start(root: PathBuf, port: u16, auth: String, code: String) -> Result<(), String> {
         let mut st = STATE.lock().map_err(|e| e.to_string())?;
         if let Some(l) = st.as_ref() { if l.port == port && l.auth == auth && l.alive.load(Ordering::SeqCst) && !l.stop.load(Ordering::SeqCst) { return Ok(()); } }
         if let Some(l) = st.take() { l.stop.store(true, Ordering::SeqCst); std::thread::sleep(Duration::from_millis(700)); }
@@ -405,7 +438,8 @@ mod lan {
         for _ in 0..12 { match tiny_http::Server::http(("0.0.0.0", port)) { Ok(s) => { bound = Some(s); break; } Err(e) => { last_err = e.to_string(); std::thread::sleep(Duration::from_millis(400)); } } }
         let server = bound.ok_or_else(|| format!("Não consegui abrir a porta {port}: {last_err}"))?;
         if std::net::TcpStream::connect_timeout(&std::net::SocketAddr::from(([127, 0, 0, 1], port)), Duration::from_millis(1500)).is_err() { return Err(format!("A porta {port} abriu, mas este computador não aceita conexões nela (firewall, antivírus ou VPN bloqueando?)")); }
-        let stop = Arc::new(AtomicBool::new(false)); let stop2 = stop.clone();
+        let stop = Arc::new(AtomicBool::new(false)); let stop2 = stop.clone(); let stop3 = stop.clone();
+        spawn_responder(stop3, port, code);
         let alive = Arc::new(AtomicBool::new(true)); let alive2 = alive.clone(); let auth_keep = auth.clone();
         let want = format!("Basic {}", auth);
         std::thread::spawn(move || {
@@ -463,11 +497,13 @@ fn lan_start(app: tauri::AppHandle, port: u16, user: String, pass: String) -> Re
     use base64::Engine;
     let root = app.path().app_data_dir().map_err(|e| e.to_string())?.join("sync-wifi");
     let auth = base64::engine::general_purpose::STANDARD.encode(format!("{user}:{pass}"));
-    lan::start(root, port, auth)?;
+    lan::start(root, port, auth, pass.clone())?;
     Ok(LanInfo { running: true, port, ips: lan::local_ips() })
 }
 #[tauri::command]
 fn lan_stop() -> Result<(), String> { lan::stop(); Ok(()) }
+#[tauri::command]
+async fn lan_discover(code: String) -> Result<Vec<String>, String> { tauri::async_runtime::spawn_blocking(move || lan::discover(&code)).await.map_err(|e| e.to_string()) }
 #[tauri::command]
 fn lan_info() -> LanInfo {
     let port = lan::running();
@@ -501,7 +537,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![load_vault, save_note, delete_note, create_folder, save_asset, read_asset, set_vault, rename_folder, delete_folder, http_req, ext_open, ext_poll, ext_reveal, update_install, lan_start, lan_stop, lan_info, oauth_listen, oauth_poll, mcp_info, mcp_install])
+        .invoke_handler(tauri::generate_handler![load_vault, save_note, delete_note, create_folder, save_asset, read_asset, set_vault, rename_folder, delete_folder, http_req, lan_discover, ext_open, ext_poll, ext_reveal, update_install, lan_start, lan_stop, lan_info, oauth_listen, oauth_poll, mcp_info, mcp_install])
         .run(tauri::generate_context!())
         .expect("erro ao iniciar o app");
 }
