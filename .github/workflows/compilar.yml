@@ -149,10 +149,52 @@ jobs:
       - name: Permissões (microfone, câmera e lembretes)
         run: |
           M=src-tauri/gen/android/app/src/main/AndroidManifest.xml
-          for P in RECORD_AUDIO CAMERA MODIFY_AUDIO_SETTINGS POST_NOTIFICATIONS SCHEDULE_EXACT_ALARM USE_EXACT_ALARM RECEIVE_BOOT_COMPLETED VIBRATE; do
+          for P in RECORD_AUDIO CAMERA MODIFY_AUDIO_SETTINGS POST_NOTIFICATIONS SCHEDULE_EXACT_ALARM USE_EXACT_ALARM RECEIVE_BOOT_COMPLETED VIBRATE INTERNET ACCESS_NETWORK_STATE ACCESS_WIFI_STATE CHANGE_WIFI_MULTICAST_STATE NEARBY_WIFI_DEVICES ACCESS_LOCAL_NETWORK; do
             grep -q "android.permission.$P" "$M" || perl -0pi -e "s#(<manifest[^>]*>)#\$1\n    <uses-permission android:name=\"android.permission.$P\" />#" "$M"
           done
           grep -n "uses-permission" "$M"
+      - name: Pedir permissão de rede local ao abrir (Android 16+)
+        run: |
+          M=src-tauri/gen/android/app/src/main/AndroidManifest.xml
+          D=src-tauri/gen/android/app/src/main/java/app/notaslocais
+          mkdir -p "$D"
+          cat > "$D/LnApp.kt" <<'KT'
+          package app.notaslocais
+
+          import android.app.Activity
+          import android.app.Application
+          import android.content.pm.PackageManager
+          import android.os.Build
+          import android.os.Bundle
+
+          class LnApp : Application() {
+            override fun onCreate() {
+              super.onCreate()
+              registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
+                var asked = false
+                override fun onActivityResumed(a: Activity) {
+                  if (asked) return
+                  asked = true
+                  val want = mutableListOf<String>()
+                  if (Build.VERSION.SDK_INT >= 33) want.add("android.permission.NEARBY_WIFI_DEVICES")
+                  if (Build.VERSION.SDK_INT >= 36) want.add("android.permission.ACCESS_LOCAL_NETWORK")
+                  val miss = want.filter { a.checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED }
+                  if (miss.isNotEmpty()) a.requestPermissions(miss.toTypedArray(), 4711)
+                }
+                override fun onActivityCreated(a: Activity, b: Bundle?) {}
+                override fun onActivityStarted(a: Activity) {}
+                override fun onActivityPaused(a: Activity) {}
+                override fun onActivityStopped(a: Activity) {}
+                override fun onActivitySaveInstanceState(a: Activity, b: Bundle) {}
+                override fun onActivityDestroyed(a: Activity) {}
+              })
+            }
+          }
+          KT
+          sed -i 's/^          //' "$D/LnApp.kt"
+          grep -q 'android:name=".LnApp"' "$M" || perl -0pi -e 's#<application\b#<application android:name="app.notaslocais.LnApp"#' "$M"
+          grep -n "<application" "$M"
+          head -5 "$D/LnApp.kt"
       - name: Compilar APK otimizado (tenta de novo se a rede falhar)
         run: |
           P=src-tauri/gen/android/gradle/wrapper/gradle-wrapper.properties
