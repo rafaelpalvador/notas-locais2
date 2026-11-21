@@ -451,14 +451,15 @@ mod lan {
             let mut errs = 0u32;
             while !stop2.load(Ordering::SeqCst) {
                 let mut rq = match server.recv_timeout(Duration::from_millis(500)) { Ok(Some(r)) => { errs = 0; r }, Ok(None) => { if last_probe.elapsed() > Duration::from_secs(4) { last_probe = std::time::Instant::now(); if std::net::TcpStream::connect_timeout(&std::net::SocketAddr::from(([127, 0, 0, 1], port)), Duration::from_millis(1500)).is_err() { drop(server); match rebind(&stop2) { Some(s) => { server = s; } None => break } } } continue }, Err(_) => { errs += 1; std::thread::sleep(Duration::from_millis(100)); if errs >= 2 { errs = 0; drop(server); match rebind(&stop2) { Some(s) => { server = s; } None => break } } continue; } };
+                { let want = want.clone(); let root = root.clone(); std::thread::spawn(move || {
                 let hdr = |rq: &tiny_http::Request, n: &str| rq.headers().iter().find(|h| h.field.as_str().as_str().eq_ignore_ascii_case(n)).map(|h| h.value.as_str().to_string());
                 let mk = |code: u16, body: Vec<u8>, tag: Option<String>| { let mut r = tiny_http::Response::from_data(body).with_status_code(code); if let Some(t) = tag { if let Ok(h) = tiny_http::Header::from_bytes(&b"ETag"[..], t.as_bytes()) { r.add_header(h); } } r };
                 if hdr(&rq, "Authorization").as_deref() != Some(want.as_str()) {
                     let mut r = mk(401, b"auth".to_vec(), None);
                     if let Ok(h) = tiny_http::Header::from_bytes(&b"WWW-Authenticate"[..], &b"Basic realm=\"Marginalia\""[..]) { r.add_header(h); }
-                    let _ = rq.respond(r); continue;
+                    let _ = rq.respond(r); return;
                 }
-                let p = match safe(&root, rq.url()) { Some(p) => p, None => { let _ = rq.respond(mk(400, vec![], None)); continue; } };
+                let p = match safe(&root, rq.url()) { Some(p) => p, None => { let _ = rq.respond(mk(400, vec![], None)); return; } };
                 let method = rq.method().as_str().to_uppercase();
                 let resp = match method.as_str() {
                     "GET" => match fs::read(&p) { Ok(b) if p.is_file() => { let t = etag(&b); mk(200, b, Some(t)) } _ => mk(404, vec![], None) },
@@ -481,6 +482,7 @@ mod lan {
                     _ => mk(200, vec![], None),
                 };
                 let _ = rq.respond(resp);
+                }); }
             }
         });
         *st = Some(Lan { stop, port, auth: auth_keep, alive });
