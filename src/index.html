@@ -4673,6 +4673,20 @@ window.syncWithTarget=(id,T,cfg,persist)=>{const run=async()=>{for(let i=0;i<240
  Object.assign(EN,{"Alinhar à esquerda":"Align left","Centralizar":"Center","Alinhar à direita":"Align right","Justificar":"Justify","Aumentar recuo (Tab)":"Increase indent (Tab)","Diminuir recuo (Shift+Tab)":"Decrease indent (Shift+Tab)","Alinhar e recuar":"Align and indent"});
 })();
 
+/* NEW37: botão de hyperlink (URL) na barra de formatação */
+(function(){const ft=document.getElementById('ft');if(!ft)return;
+ const ref=ft.querySelector('[data-c="lk"]');if(ref)ref.title='Link para nota [[…]]';
+ if(!ft.querySelector('[data-c="ln"]')){const b=document.createElement('button');b.dataset.c='ln';b.className='ji';b.title='Inserir link (URL)';b.setAttribute('aria-label','Inserir link (URL)');
+  b.innerHTML='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg>';
+  if(ref)ref.insertAdjacentElement('afterend',b);else ft.appendChild(b)}
+ const _c=window.cmCmd;
+ window.cmCmd=function(c){if(c!=='ln')return _c.apply(this,arguments);
+  const v=window.cmView&&cmView();if(!v)return false;const r=v.state.selection.main,t=v.state.sliceDoc(r.from,r.to);
+  askText('Endereço do link (URL)','https://').then(u=>{u=String(u||'').trim();if(!u||u==='https://')return;
+   if(!/^[a-z][a-z0-9+.\-]*:/i.test(u)&&u[0]!=='#')u='https://'+u;
+   const lab=t||u;v.dispatch({changes:{from:r.from,to:r.to,insert:'['+lab+']('+u+')'},selection:{anchor:r.from+lab.length+u.length+4},userEvent:'input'});v.focus()});
+  return true}})();
+
 boot();
 </script>
 </body>
