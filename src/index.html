@@ -736,7 +736,7 @@ body.dbmode #dbr{display:block;flex:1;min-height:0;overflow:auto;padding:18px 26
 #tqb{z-index:96}
 .cm-blk:has(.te-b) .cm-srcb{right:96px!important;top:-4px!important}#tqb button[disabled]{opacity:.4}
 /* v0.1.39: cantos retos, painéis encostados nas bordas */
-*,*::before,*::after{border-radius:0!important}
+html:not([data-st=vidro]) *,html:not([data-st=vidro]) *::before,html:not([data-st=vidro]) *::after{border-radius:0!important}
 .swc,.tsw,.fsw,.fdot,.kbdot,.kbcs,.imh[data-h=se],.cvsw button,.cvl,.psc,.cd2.has::after,li.tk input,.wdmod .mx2,.sw i,.sw i::before,#xm .fsw,.popxb{border-radius:50%!important}
 .sw i{border-radius:999px!important}
 @media(min-width:761px){#app{padding:0;gap:0}#sb,#mn{border-top:0;border-bottom:0;box-shadow:none}#sb{border-left:0}#mn{border-right:0}}
@@ -823,6 +823,37 @@ body.popo .pop:not([hidden]):not(#ex){animation:lnSheet .32s var(--ez) backwards
 #bar .tt .sub{flex-wrap:nowrap!important}
 /* respeita quem prefere menos movimento */
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* ===== Estilo Vidro (iPhone) ===== */
+html[data-st=vidro]{--gl:rgba(255,255,255,.58);--glb:rgba(255,255,255,.75)}
+html[data-st=vidro][data-theme=dark],html[data-st=vidro][data-theme=lume]{--gl:rgba(40,42,52,.55);--glb:rgba(255,255,255,.12)}
+@media(prefers-color-scheme:dark){html[data-st=vidro]:not([data-theme]){--gl:rgba(40,42,52,.55);--glb:rgba(255,255,255,.12)}}
+html[data-st=vidro] #sb,html[data-st=vidro] #mn{border-radius:26px;border:1px solid var(--glb);box-shadow:0 8px 28px rgba(40,60,120,.12)}
+html[data-st=vidro] .pop,html[data-st=vidro] #ap,html[data-st=vidro] #fp,html[data-st=vidro] .tm{border-radius:20px;border:1px solid var(--glb)}
+html[data-st=vidro] button{border-radius:12px}
+html[data-st=vidro] .srch{border-radius:999px;background:color-mix(in srgb,var(--sf) 70%,transparent);border:1px solid var(--glb);padding-left:14px;height:44px}
+html[data-st=vidro] .srch input{background:none}
+html[data-st=vidro] .brand{font-size:34px;font-weight:800;letter-spacing:-.8px}
+html[data-st=vidro] #sb .it{border-radius:14px}
+html[data-st=vidro] #rn .it,html[data-st=vidro] #fvl .it{background:var(--gl);border:1px solid var(--glb);margin:6px 0;padding:10px 12px;border-radius:18px}
+html[data-st=vidro] #ti{font-weight:800;letter-spacing:-.6px}
+html[data-st=vidro] #ft{margin:6px 12px;border:1px solid var(--glb);border-radius:999px;background:var(--gl);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);box-shadow:0 8px 24px rgba(40,60,120,.14);padding:4px 10px}
+html[data-st=vidro] #ft .tm{border-radius:18px}
+html[data-st=vidro] .stbox,html[data-st=vidro] .stmod .stbox{border-radius:26px}
+html[data-st=vidro] .mdl>*,html[data-st=vidro] #cfm>*,html[data-st=vidro] #askm>*{border-radius:22px}
+html[data-st=vidro] .qn{border-radius:999px}
+#tbr,#fab{display:none}
+@media(max-width:760px){
+ html[data-st=vidro] #mn{border-radius:0;border:0;box-shadow:none;background:transparent}
+ html[data-st=vidro] #sb{border-radius:0 28px 28px 0;width:92%;max-width:380px;padding-bottom:96px}
+ html[data-st=vidro] #sb.open ~ #tbr,html[data-st=vidro] body.sbo #tbr{display:flex}
+ html[data-st=vidro] #tbr{position:fixed;left:14px;right:90px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:90;height:64px;border-radius:999px;background:var(--gl);border:1px solid var(--glb);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);box-shadow:0 10px 30px rgba(40,60,120,.18);align-items:center;justify-content:space-around;padding:6px;max-width:300px}
+ html[data-st=vidro] #tbr button{flex:1;height:100%;background:none;display:grid;place-items:center;font-size:11px;font-weight:600;color:var(--mu);border-radius:999px;padding:2px 4px;gap:0}
+ html[data-st=vidro] #tbr button.on{background:color-mix(in srgb,var(--ac) 16%,transparent);color:var(--ac)}
+ html[data-st=vidro] body.sbo #fab{display:grid}
+ html[data-st=vidro] #fab{position:fixed;right:max(14px,calc(100% - 380px + 14px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:91;width:64px;height:64px;border-radius:50%;background:var(--ac);color:#fff;font-size:32px;font-weight:300;place-items:center;box-shadow:0 12px 28px color-mix(in srgb,var(--ac) 45%,transparent);padding:0}
+ html[data-st=vidro] #ft{margin:6px 10px;overflow-x:auto;flex-wrap:nowrap}
+}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -839,6 +870,7 @@ body.popo .pop:not([hidden]):not(#ex){animation:lnSheet .32s var(--ez) backwards
  <button id="qn" class="qn">Nota rápida de hoje</button>
  <div class="it" id="trk" style="margin-top:8px"><span>Lixeira</span><small id="trc"></small></div>
 </aside>
+<nav id="tbr" aria-label="Navegação"><button data-t="n" class="on">Notas</button><button data-t="f">Pastas</button><button data-t="a">Ajustes</button></nav><button id="fab" aria-label="Nova nota">+</button>
 <main id="mn">
  <div id="cv" hidden><div class="cvi" id="cvi"></div><div class="cvb"><button data-pop="cvp">Mudar capa</button><button id="cvr">Remover</button></div></div>
  <div id="bar">
@@ -4754,6 +4786,21 @@ window.syncWithTarget=(id,T,cfg,persist)=>{const run=async()=>{for(let i=0;i<240
  const _o=stOpen;stOpen=function(p){if(p==='dados'||p==='arq')p='backup';return _o.call(this,p)};
  const _m=stMount;stMount=function(){_m.apply(this,arguments);if(STPG==='backup'){const box=$('#stfp'),fb=$('#fpb'),fm=$('#fpm');if(box&&fb&&!box.contains(fb)){try{fpRender()}catch(e){}box.appendChild(fb);if(fm)box.appendChild(fm)}}};
 })();
+
+/* Estilo Vidro: escolha, aplicação e barra inferior */
+if(!UI.st)UI.st='vidro';
+(function(){const _a=applyUI;applyUI=function(){_a();const r=document.documentElement;
+ if(UI.st==='vidro'){r.dataset.st='vidro';r.dataset.glass='1';r.style.setProperty('--gp',(UI.gp||62)+'%')}else r.removeAttribute('data-st');
+ try{localStorage.setItem('ln:ui',JSON.stringify(UI))}catch(e){}};
+ const _sp=stPage;stPage=function(p){const h=_sp(p);if(p!=='apar')return h;
+  return h.replace('</h2>','</h2>'+stRow('Estilo','Vidro: translúcido e arredondado, estilo iPhone. Clássico: cantos retos.',stSel('ui.st',UI.st,[['vidro','Vidro'],['classico','Clássico']])))};
+ const sb=document.getElementById('sb');
+ document.getElementById('tbr').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.t==='a'){sb.classList.remove('open');stOpen()}
+  else if(b.dataset.t==='f'){const x=document.querySelector('#sb [data-pop=fp]');if(x)x.click()}
+  else{sb.scrollTop=0}});
+ document.getElementById('fab').addEventListener('click',()=>{sb.classList.remove('open');newNote()});
+ applyUI()})();
 
 boot();
 </script>
