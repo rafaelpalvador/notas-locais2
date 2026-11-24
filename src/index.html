@@ -777,6 +777,52 @@ body[data-v=l] #ft{display:none!important}
 /* confirmações e diálogos sempre à frente das configurações */
 .mdl,#cfm,#askm{z-index:300!important}
 #ts{z-index:400!important}
+
+/* ===== Polimento visual e fluidez (inspirado no Apple): movimento suave, toque responsivo, acabamento ===== */
+:root{--ez:cubic-bezier(.32,.72,0,1);--ez2:cubic-bezier(.2,.8,.2,1)}
+body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;letter-spacing:-.006em;-webkit-tap-highlight-color:transparent}
+button,select,summary,label.sw,.it,[data-c]{touch-action:manipulation}
+button{transition:background-color .16s var(--ez2),color .16s var(--ez2),border-color .16s var(--ez2),box-shadow .22s var(--ez2),opacity .16s,transform .14s var(--ez2)}
+button:active:not(:disabled){transform:scale(.97)}
+.it{transition:background-color .16s var(--ez2)}
+/* rolagem discreta */
+*{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--mu) 42%,transparent) transparent}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--mu) 38%,transparent);border:3px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:color-mix(in srgb,var(--mu) 60%,transparent);background-clip:padding-box;border:3px solid transparent}
+.stbox section,.stbox nav,#sb,.mdb,.pop{overscroll-behavior:contain}
+/* foco claro e sutil */
+:focus{outline:none}
+button:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid color-mix(in srgb,var(--ac) 65%,transparent);outline-offset:1px}
+#q:focus,#nf:focus,#stq:focus,.askin:focus,.u:focus,#stm select:focus,#stm input[type=text]:focus{box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 20%,transparent);border-color:color-mix(in srgb,var(--ac) 70%,transparent)!important}
+/* janelas e menus entram suaves */
+@keyframes lnIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes lnFade{from{opacity:0}to{opacity:1}}
+@keyframes lnPop{from{opacity:0;transform:translateY(-4px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes lnSheet{from{transform:translateY(28px);opacity:0}to{transform:none;opacity:1}}
+.stmod:not([hidden]),.wdmod:not([hidden]),.mdl:not([hidden]):not(#cfm):not(#askm){animation:lnFade .2s ease backwards}
+.stmod:not([hidden]) .stbox,.wdmod:not([hidden]) .mbox,.mdl:not([hidden]):not(#cfm):not(#askm) .mdb{animation:lnIn .3s var(--ez) backwards}
+.pop:not([hidden]){animation:lnPop .18s var(--ez2) backwards;transform-origin:top right}
+body.popo .pop:not([hidden]):not(#ex){animation:lnSheet .32s var(--ez) backwards}
+/* menus com sombra em camadas */
+.pop,#pk,.nmm,#tgm,#trm{box-shadow:0 0 0 .5px color-mix(in srgb,var(--ink) 12%,transparent),0 10px 32px rgba(0,0,0,.14),0 2px 6px rgba(0,0,0,.06)!important}
+/* barra lateral mais calma */
+#sb .sec-t{letter-spacing:.07em;opacity:.85}
+#sb .emp{font-size:12px;opacity:.65;line-height:1.45}
+#nf{border:1px solid transparent!important;background:color-mix(in srgb,var(--mu) 10%,transparent)!important;transition:background-color .2s var(--ez2),box-shadow .22s var(--ez2),border-color .2s}
+#nf:focus{background:var(--sf)!important}
+/* configurações: linhas com resposta ao toque, interruptor com mola */
+.stbox .str{transition:background-color .15s var(--ez2)}
+@media(hover:hover){.stbox .str:hover{background:color-mix(in srgb,var(--mu) 6%,transparent)}}
+.stbox nav button[data-stp]{transition:background-color .18s var(--ez2),color .18s}
+@media(min-width:761px){#stm .stbox nav .stnx{display:none!important}}
+/* celular: título e metadados mais enxutos */
+@media(max-width:760px){#ti{font-size:22px}.tt .sub{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.tt .sub::-webkit-scrollbar{display:none}.tt .sub>*{flex:none}}
+/* o CodeMirror usa <img> invisíveis como amortecedor; sem isso elas inflam a altura das linhas */
+.cm-widgetBuffer{height:1em!important;width:0!important;min-height:0!important;max-height:1em!important;margin:0!important;padding:0!important;border:0!important;vertical-align:text-top!important}
+#bar .tt .sub{flex-wrap:nowrap!important}
+/* respeita quem prefere menos movimento */
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -4686,6 +4732,28 @@ window.syncWithTarget=(id,T,cfg,persist)=>{const run=async()=>{for(let i=0;i<240
    if(!/^[a-z][a-z0-9+.\-]*:/i.test(u)&&u[0]!=='#')u='https://'+u;
    const lab=t||u;v.dispatch({changes:{from:r.from,to:r.to,insert:'['+lab+']('+u+')'},selection:{anchor:r.from+lab.length+u.length+4},userEvent:'input'});v.focus()});
   return true}})();
+
+/* NEW38: configurações enxutas (sem itens repetidos) */
+(function(){
+ const rm=k=>{const i=STP.findIndex(x=>x[0]===k);if(i>=0)STP.splice(i,1)};rm('arq');rm('dados');
+ const bk=STP.find(x=>x[0]==='backup');if(bk)bk[1]='Dados e backup';
+ const dom=h=>{const t=document.createElement('div');t.innerHTML=h;return t};
+ const _p=stPage;
+ stPage=function(p){
+  if(p==='arq'||p==='dados')p='backup';
+  if(p==='backup'){
+   const keep=[...dom(_p('arq')).querySelectorAll('.str')].slice(0,2).map(e=>e.outerHTML).join('');
+   return'<h2>Dados e backup</h2><h3>Pasta de dados</h3><p class="mu">Onde o Marginália guarda as notas (arquivos .md) e os anexos. Escolha uma pasta dentro do OneDrive, Proton Drive, Dropbox ou Syncthing para levar para outros aparelhos.</p><div id="stfp" class="stbox2"></div>'+
+    '<h3>Notas novas e exclusão</h3>'+keep+'<h3>Backup e importação</h3>'+_p('backup').replace(/<h2>[\s\S]*?<\/h2>/,'')}
+  let h=_p(p);
+  if(p==='sobre'){const t=dom(h);[...t.querySelectorAll('h3')].forEach(x=>{if(/Atalhos úteis/.test(x.textContent)){const n=x.nextElementSibling;if(n)n.remove();x.remove()}});
+   [...t.querySelectorAll('.str')].forEach(x=>{if(/Onde ficam os dados/.test(x.textContent))x.remove()});h=t.innerHTML}
+  else if(p==='sync'){const t=dom(h);[...t.querySelectorAll('.str')].forEach(x=>{if(x.querySelector('[data-sta="fp"]'))x.remove()});h=t.innerHTML}
+  else if(p==='atual'){const t=dom(h);[...t.querySelectorAll('.str')].forEach(x=>{if(x.querySelector('#updtok'))x.remove()});h=t.innerHTML.replace(/ em Configurações do Obtainium coloque o mesmo token do GitHub\./,'')}
+  return h};
+ const _o=stOpen;stOpen=function(p){if(p==='dados'||p==='arq')p='backup';return _o.call(this,p)};
+ const _m=stMount;stMount=function(){_m.apply(this,arguments);if(STPG==='backup'){const box=$('#stfp'),fb=$('#fpb'),fm=$('#fpm');if(box&&fb&&!box.contains(fb)){try{fpRender()}catch(e){}box.appendChild(fb);if(fm)box.appendChild(fm)}}};
+})();
 
 boot();
 </script>
