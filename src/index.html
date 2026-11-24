@@ -862,6 +862,9 @@ html[data-st=vidro] .jsw{border-radius:999px;border:1px solid var(--glb);backgro
 html[data-st=vidro] .jsw button{border-radius:999px}
 html[data-st=vidro] .jsw button+button{border-left:0}
 @media(max-width:760px){html[data-st=vidro] #mn{background:var(--bg)}html[data-st=vidro] #tabs{background:transparent}}
+
+#lvm{display:none}
+@media(max-width:760px){body[data-v=l] #lvm{display:grid;position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:12px;z-index:30;width:44px;height:44px;place-items:center;padding:0;border-radius:50%;background:color-mix(in srgb,var(--sf) 90%,transparent);border:1px solid var(--bd);box-shadow:0 4px 14px rgba(0,0,0,.2)}body[data-v=l] #lvm svg{width:22px;height:22px;fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round}body[data-v=l] #lv{padding-top:68px}}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -878,7 +881,7 @@ html[data-st=vidro] .jsw button+button{border-left:0}
  <button id="qn" class="qn">Nota rápida de hoje</button>
  <div class="it" id="trk" style="margin-top:8px"><span>Lixeira</span><small id="trc"></small></div>
 </aside>
-<nav id="tbr" aria-label="Navegação"><button data-t="n" class="on">Notas</button><button data-t="f">Pastas</button><button data-t="a">Ajustes</button></nav><button id="fab" aria-label="Nova nota">+</button>
+<button id="lvm" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><nav id="tbr" aria-label="Navegação"><button data-t="n" class="on">Notas</button><button data-t="f">Pastas</button><button data-t="a">Ajustes</button></nav><button id="fab" aria-label="Nova nota">+</button>
 <main id="mn">
  <div id="cv" hidden><div class="cvi" id="cvi"></div><div class="cvb"><button data-pop="cvp">Mudar capa</button><button id="cvr">Remover</button></div></div>
  <div id="bar">
@@ -4803,6 +4806,7 @@ if(!UI.st)UI.st='vidro';
  const _sp=stPage;stPage=function(p){const h=_sp(p);if(p!=='apar')return h;
   return h.replace('</h2>','</h2>'+stRow('Estilo','Vidro: translúcido e arredondado, estilo iPhone. Clássico: cantos retos.',stSel('ui.st',UI.st,[['vidro','Vidro'],['classico','Clássico']])))};
  const sb=document.getElementById('sb');
+ document.getElementById('lvm').addEventListener('click',()=>sb.classList.add('open'));
  const tb=document.getElementById('tbr');const mark=t=>tb.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
  const go=t=>{mark(t);if(t==='a'){stOpen();setTimeout(()=>mark('n'),400)}else if(t==='f'){const e=document.getElementById('fl')||sb;e.scrollIntoView({block:'start',behavior:'smooth'})}else{sb.scrollTo({top:0,behavior:'smooth'})}};
  tb.addEventListener('click',e=>{const b=e.target.closest('button');if(b){e.preventDefault();go(b.dataset.t)}});
