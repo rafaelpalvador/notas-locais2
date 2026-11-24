@@ -865,6 +865,8 @@ html[data-st=vidro] .jsw button+button{border-left:0}
 
 #lvm{display:none}
 @media(max-width:760px){body[data-v=l] #lvm{display:grid;position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:12px;z-index:30;width:44px;height:44px;place-items:center;padding:0;border-radius:50%;background:color-mix(in srgb,var(--sf) 90%,transparent);border:1px solid var(--bd);box-shadow:0 4px 14px rgba(0,0,0,.2)}body[data-v=l] #lvm svg{width:22px;height:22px;fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round}body[data-v=l] #lv{padding-top:68px}}
+
+@media(max-width:760px){#cmw .cm-content{padding:14px 10px 50vh!important;max-width:none!important}#pv{padding:8px 10px!important}#pv>*{max-width:none!important}.tgb{margin-left:2px!important;padding-left:8px!important}#lv{padding-left:14px;padding-right:14px}}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -3430,7 +3432,7 @@ function nmButtons(){document.querySelectorAll('#sb .it[data-id]').forEach(el=>{
 const _rs15=renderSB;renderSB=function(){_rs15.apply(this,arguments);try{nmButtons();sbLayout()}catch(e){console.error(e)}};
 
 /* ---------- barra lateral com blocos móveis ---------- */
-const ST0={secOrder:[],secHide:[],ftOrder:[],ftHide:[],confirmDel:true,newFolder:'',spell:false,syncScroll:true,lineW:760,accent:'',zoom:100,uiFont:'',edFont:'',compact:false,counts:true,hdrAuto:true,openSettingsKey:true};
+const ST0={secOrder:[],secHide:[],ftOrder:[],ftHide:[],confirmDel:true,newFolder:'',spell:false,syncScroll:true,lineW:960,accent:'',zoom:100,uiFont:'',edFont:'',compact:false,counts:true,hdrAuto:true,openSettingsKey:true};
 let ST={...ST0};try{ST={...ST0,...JSON.parse(localStorage.getItem('ln:st')||'{}')}}catch(e){}
 const stSave=()=>{try{localStorage.setItem('ln:st',JSON.stringify(ST))}catch(e){}};
 const SECN={'s-fl':'Arquivos (árvore)','s-rn':'Recentes','s-fv':'Favoritos','s-tg':'Tags','s-sm':'Pastas inteligentes','s-cal':'Calendário','qn':'Botão "Nota rápida de hoje"','capb':'Botão "Captura rápida"','trk':'Lixeira','wdst':'Status da sincronização','nf':'Campo "Nova pasta"'};
@@ -4807,6 +4809,7 @@ if(!UI.st)UI.st='vidro';
   return h.replace('</h2>','</h2>'+stRow('Estilo','Vidro: translúcido e arredondado, estilo iPhone. Clássico: cantos retos.',stSel('ui.st',UI.st,[['vidro','Vidro'],['classico','Clássico']])))};
  const sb=document.getElementById('sb');
  document.getElementById('lvm').addEventListener('click',()=>sb.classList.add('open'));
+ try{if(ST&&ST.lineW===760&&!localStorage.getItem('ln:lw2')){ST.lineW=960;localStorage.setItem('ln:lw2','1');stSet&&stSet('lineW',960)}}catch(e){}
  const tb=document.getElementById('tbr');const mark=t=>tb.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
  const go=t=>{mark(t);if(t==='a'){stOpen();setTimeout(()=>mark('n'),400)}else if(t==='f'){const e=document.getElementById('fl')||sb;e.scrollIntoView({block:'start',behavior:'smooth'})}else{sb.scrollTo({top:0,behavior:'smooth'})}};
  tb.addEventListener('click',e=>{const b=e.target.closest('button');if(b){e.preventDefault();go(b.dataset.t)}});
