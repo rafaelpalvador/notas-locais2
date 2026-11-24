@@ -852,6 +852,16 @@ html[data-st=vidro] .qn{border-radius:999px}
  html[data-st=vidro] #fab{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:91;width:64px;height:64px;border-radius:50%;background:var(--ac);color:#fff;font-size:32px;font-weight:300;place-items:center;box-shadow:0 12px 28px color-mix(in srgb,var(--ac) 45%,transparent);padding:0}
  html[data-st=vidro] #ft{margin:6px 10px;overflow-x:auto;flex-wrap:nowrap}
 }
+
+/* Vidro v2: fundo do editor, sem barra de rolagem, ícones com contraste */
+html[data-st=vidro] #mn{background:var(--bg)}
+html[data-st=vidro] #sb{scrollbar-width:none}html[data-st=vidro] #sb::-webkit-scrollbar{display:none}
+.jsw button.on,.jbtn.on{background:var(--ac)!important;color:var(--on-ac,#fff)!important}.jsw button.on svg{stroke:currentColor}
+.jsw button:focus,.jsw button:focus-visible{outline:none;box-shadow:none}
+html[data-st=vidro] .jsw{border-radius:999px;border:1px solid var(--glb);background:var(--gl)}
+html[data-st=vidro] .jsw button{border-radius:999px}
+html[data-st=vidro] .jsw button+button{border-left:0}
+@media(max-width:760px){html[data-st=vidro] #mn{background:var(--bg)}html[data-st=vidro] #tabs{background:transparent}}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -4797,7 +4807,9 @@ if(!UI.st)UI.st='vidro';
  const go=t=>{mark(t);if(t==='a'){stOpen();setTimeout(()=>mark('n'),400)}else if(t==='f'){const e=document.getElementById('fl')||sb;e.scrollIntoView({block:'start',behavior:'smooth'})}else{sb.scrollTo({top:0,behavior:'smooth'})}};
  tb.addEventListener('click',e=>{const b=e.target.closest('button');if(b){e.preventDefault();go(b.dataset.t)}});
  document.getElementById('fab').addEventListener('click',()=>{sb.classList.remove('open');newNote()});
- const fc=()=>{const f=document.getElementById('fab'),c=getComputedStyle(f).backgroundColor.match(/\d+/g)||[0,0,0];f.style.color=(.299*c[0]+.587*c[1]+.114*c[2])>150?'#1a1a1a':'#fff'};
+ (function(){let sx=null,sy=0;document.addEventListener('touchstart',e=>{const t=e.touches[0];sx=(innerWidth<=760&&t.clientX<=36&&!sb.classList.contains('open'))?t.clientX:null;sy=t.clientY},{passive:true});
+  document.addEventListener('touchend',e=>{if(sx===null)return;const t=e.changedTouches[0];if(t.clientX-sx>60&&Math.abs(t.clientY-sy)<80)sb.classList.add('open');sx=null},{passive:true})})();
+ const fc=()=>{const t=document.createElement('i');t.style.cssText='position:fixed;opacity:0;background:var(--ac)';document.body.appendChild(t);const c=getComputedStyle(t).backgroundColor.match(/\d+/g)||[0,0,0];t.remove();const k=(.299*c[0]+.587*c[1]+.114*c[2])>150?'#1a1a1a':'#fff';document.documentElement.style.setProperty('--on-ac',k);document.getElementById('fab').style.color=k};
  const _b=applyUI;applyUI=function(){_b();fc()};applyUI()})();
 
 boot();
