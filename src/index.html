@@ -878,6 +878,14 @@ body:not(.stfull) #cmw .cm-content,body:not(.stfull) #pv>*{max-width:var(--lw)!i
 #pv details>*:not(summary){margin-left:0}
 html[data-st=vidro] #sb{background:color-mix(in srgb,var(--sf) 96%,transparent)}
 @media(max-width:760px){#sb .sbg{display:none!important}}
+
+/* barra de formatação: mostra o que está ativo e responde ao toque */
+#ft button{transition:background .15s,color .15s,transform .1s}
+#ft button:active{transform:scale(.88)}
+#ft button.fon{background:var(--ac)!important;color:var(--on-ac,#fff)!important;border-radius:10px}
+#ft button.fon svg{stroke:currentColor}
+#ft button.fpulse{animation:fpulse .35s ease}
+@keyframes fpulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ac) 60%,transparent)}100%{box-shadow:0 0 0 10px transparent}}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -4834,6 +4842,24 @@ if(!UI.st)UI.st='vidro';
  const tbc=()=>{const c=getComputedStyle(sb),t=document.getElementById('tbr');['--sf','--ink','--ac','--acs','--glb'].forEach(k=>t.style.setProperty(k,c.getPropertyValue(k)))};
  const fc=()=>{const t=document.createElement('i');t.style.cssText='position:fixed;opacity:0;background:var(--ac)';document.body.appendChild(t);const c=getComputedStyle(t).backgroundColor.match(/\d+/g)||[0,0,0];t.remove();const k=(.299*c[0]+.587*c[1]+.114*c[2])>150?'#1a1a1a':'#fff';document.documentElement.style.setProperty('--on-ac',k);document.getElementById('fab').style.color=k};
  const _b=applyUI;applyUI=function(){_b();fc();tbc()};applyUI()})();
+
+/* estado ativo da barra de formatação */
+(function(){const ft=$('#ft');if(!ft)return;let tb0=null;
+ const MAP={StrongEmphasis:'b',Emphasis:'i',Strikethrough:'s',InlineCode:'cd',BulletList:'ul',OrderedList:'ol',Task:'ck',Blockquote:'q',Link:'ln'};
+ function upd(){const v=window.cmView&&cmView();const on=new Set();let hd=0;
+  if(v&&document.body.dataset.m!=='read'){try{const st=v.state,pos=st.selection.main.head;
+   for(const side of[-1,1]){let n=window.CM.syntaxTree(st).resolveInner(pos,side);while(n){const k=MAP[n.name];if(k)on.add(k);const h=/^ATXHeading(\d)/.exec(n.name);if(h)hd=+h[1];n=n.parent}}
+   const ln=st.doc.lineAt(pos),t=ln.text,o=pos-ln.from;
+   if(/^\s*[-*+]\s\[[ xX]\]/.test(t)){on.add('ck');on.delete('ul')}
+   const before=t.slice(0,o),c=(before.match(/==/g)||[]).length;if(c%2===1&&t.slice(o).includes('=='))on.add('mk');
+   const m=/^(#{1,6})\s/.exec(t);if(m)hd=m[1].length}catch(e){}}
+  ft.querySelectorAll('button[data-c]').forEach(b=>b.classList.toggle('fon',on.has(b.dataset.c)||(b.dataset.c==='h2'&&hd>0)));
+  const tb=ft.querySelector('[data-c="menu:tmb"]');if(tb){if(tb0===null)tb0=tb.innerHTML;const lbl=hd?'Título '+hd:null;
+   if(lbl){if(!tb.dataset.hd||tb.dataset.hd!=hd){tb.dataset.hd=hd;tb.innerHTML=tb0.replace(/Texto|Text/,lbl)}tb.classList.add('fon')}else if(tb.dataset.hd){delete tb.dataset.hd;tb.innerHTML=tb0;tb.classList.remove('fon')}}}
+ let t;const soon=()=>{clearTimeout(t);t=setTimeout(upd,60)};
+ document.addEventListener('selectionchange',soon);document.addEventListener('keyup',soon);document.addEventListener('pointerup',soon);
+ ft.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;b.classList.remove('fpulse');void b.offsetWidth;b.classList.add('fpulse');setTimeout(upd,120);setTimeout(upd,400)});
+ window.ftState=upd;upd()})();
 
 boot();
 </script>
