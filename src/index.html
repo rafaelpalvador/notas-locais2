@@ -886,6 +886,31 @@ html[data-st=vidro] #sb{background:color-mix(in srgb,var(--sf) 96%,transparent)}
 #ft button.fon svg{stroke:currentColor}
 #ft button.fpulse{animation:fpulse .35s ease}
 @keyframes fpulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ac) 60%,transparent)}100%{box-shadow:0 0 0 10px transparent}}
+
+/* capa: alturas, reposicionar, crédito */
+#cv{transition:height .25s ease}
+#cv[data-h=s]{height:130px}#cv[data-h=m]{height:210px}#cv[data-h=l]{height:320px}
+@media(max-width:760px){#cv[data-h=s]{height:100px}#cv[data-h=m]{height:160px}#cv[data-h=l]{height:240px}}
+#cv .cvi{transition:background-position .1s}
+#cv::after{content:"";position:absolute;inset:auto 0 0 0;height:40%;background:linear-gradient(to bottom,transparent,color-mix(in srgb,var(--bg) 35%,transparent));pointer-events:none}
+#cv .cvb button{background:color-mix(in srgb,var(--sf) 85%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--bd);font-size:12.5px;padding:6px 11px;border-radius:999px}
+@media(max-width:760px){#cv .cvb{top:10px;bottom:auto;right:10px}#cv .cvb button{padding:5px 10px;font-size:12px}}
+#cvcr{position:absolute;left:12px;bottom:10px;z-index:2;font-size:11px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6);text-decoration:none;opacity:.85}
+#cvhint[hidden]{display:none!important}#unsm .unq input{min-width:0}#unsm .unq button{flex:none}
+#cv.mv{cursor:ns-resize;touch-action:none}#cv.mv .cvb,#cv.mv #cvcr{display:none}
+#cvhint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;background:color-mix(in srgb,var(--sf) 90%,transparent);backdrop-filter:blur(12px);padding:8px 8px 8px 14px;border-radius:999px;font-size:13px;display:flex;gap:8px;align-items:center;box-shadow:0 6px 20px rgba(0,0,0,.2);pointer-events:auto;white-space:nowrap}
+#cvhint button{border-radius:999px;background:var(--ac);color:var(--on-ac,#fff);padding:5px 12px}
+.cvrow{display:flex;gap:6px}.cvrow button{flex:1}
+/* Unsplash */
+#unsm .mdb{width:min(760px,96vw);max-height:88vh;display:flex;flex-direction:column;gap:10px}
+#unsm .unq{display:flex;gap:8px}#unsm .unq input{flex:1;font-size:16px;padding:10px 14px;border-radius:999px}
+#unsm .ung{overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;min-height:120px}
+#unsm .ung{grid-auto-rows:118px}#unsm .uni{position:relative;padding:0;border:0;border-radius:12px;overflow:hidden;height:118px;min-height:0;background:var(--cd) center/cover no-repeat;cursor:pointer}
+#unsm .uni span{position:absolute;left:0;right:0;bottom:0;padding:14px 8px 5px;font-size:11px;color:#fff;text-align:left;background:linear-gradient(transparent,rgba(0,0,0,.6));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#unsm .uni:hover{outline:3px solid var(--ac)}
+#unsm .unm{font-size:12.5px;color:var(--mu)}#unsm .unm a{color:var(--ac)}
+@media(max-width:760px){#unsm .ung{grid-template-columns:repeat(2,1fr)}}
+img.rimg{max-width:100%;height:auto;border-radius:12px;display:block;margin:6px 0}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -904,13 +929,13 @@ html[data-st=vidro] #sb{background:color-mix(in srgb,var(--sf) 96%,transparent)}
 </aside>
 <button id="lvm" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><nav id="tbr" aria-label="Navegação"><button data-t="n" class="on">Notas</button><button data-t="f">Pastas</button><button data-t="a">Ajustes</button></nav><button id="fab" aria-label="Nova nota">+</button>
 <main id="mn">
- <div id="cv" hidden><div class="cvi" id="cvi"></div><div class="cvb"><button data-pop="cvp">Mudar capa</button><button id="cvr">Remover</button></div></div>
+ <div id="cv" hidden><div class="cvi" id="cvi"></div><a id="cvcr" target="_blank" rel="noopener" hidden></a><div class="cvb"><button data-pop="cvp">Mudar capa</button><button id="cvmv">Reposicionar</button><button id="cvr">Remover</button></div><div id="cvhint" hidden>Arraste a imagem para cima ou para baixo · <button id="cvok">Pronto</button></div></div>
  <div id="bar">
   <button class="ib" id="mb" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   <div class="tt"><input id="ti" aria-label="Título da nota" placeholder="Título"><div class="sub"><select id="fs" aria-label="Pasta da nota"></select><button id="fv" class="fvb" title="Favorito" aria-label="Favorito">☆</button><button id="cvb" class="cvbtn" data-pop="cvp">+ Capa</button><span id="st"></span></div></div>
   <div class="grp">
    <span class="seg2"><button data-m="split" title="Escrever em Markdown com a visualização ao lado">Markdown</button><button data-m="view" title="Escrever sem ver o Markdown">Escrita</button><button data-m="read" title="Somente leitura: clique em links e pastas">Leitura</button></span>
-   <div class="mw"><button class="ib" data-pop="im" title="Inserir" aria-label="Inserir"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><div class="pop" id="im" hidden><button id="ad">Desenho</button><button id="at2">Tabela</button><button id="at">Anexar imagem, áudio ou PDF</button></div></div>
+   <div class="mw"><button class="ib" data-pop="im" title="Inserir" aria-label="Inserir"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><div class="pop" id="im" hidden><button id="ad">Desenho</button><button id="at2">Tabela</button><button id="at">Anexar imagem, áudio ou PDF</button><button id="aun">Imagem do Unsplash</button></div></div>
    <button class="ib wide" id="rc">Gravar</button>
    <div class="mw"><button class="ib" data-pop="mm" title="Configurações da nota" aria-label="Configurações da nota"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><div class="pop" id="mm" hidden>
  <div class="row"><b>Página</b><div class="seg" data-pg="fmt"><button data-v="free">Livre</button><button data-v="letter">Carta</button><button data-v="a4">A4</button><button data-v="notebook">Caderno</button></div></div>
@@ -940,7 +965,7 @@ html[data-st=vidro] #sb{background:color-mix(in srgb,var(--sf) 96%,transparent)}
 </main>
 </div>
 <style id="pgs"></style>
-<div id="cvp" class="pop" hidden><div class="row"><b>Capa</b><div class="cvg" id="cvg"></div></div><div class="row"><button id="cvu">Enviar imagem…</button><input type="file" id="cvf" accept="image/*" hidden></div><div class="row"><b>Posição</b><input type="range" id="cvpos" min="0" max="100" aria-label="Posição"></div><button id="cvr2" class="dng">Remover capa</button></div>
+<div id="cvp" class="pop" hidden><div class="row"><b>Capa</b><div class="cvg" id="cvg"></div></div><div class="row cvrow"><button id="cvun" class="pri">Unsplash…</button><button id="cvu">Enviar imagem…</button><input type="file" id="cvf" accept="image/*" hidden></div><div class="row"><b>Altura</b><div class="seg2 cvhs"><button data-cvh="s">Baixa</button><button data-cvh="m">Média</button><button data-cvh="l">Alta</button></div></div><div class="row"><b>Posição</b><input type="range" id="cvpos" min="0" max="100" aria-label="Posição"></div><button id="cvr2" class="dng">Remover capa</button></div>
 <div id="pk" hidden></div>
 <div id="dp" class="pop" hidden><div class="row"><b>Backup</b></div><button id="xz">Exportar tudo (.zip)</button><button id="xi">Importar arquivos…</button><button id="xd">Importar pasta…</button><div class="row"><b>Lixeira</b></div><button id="xt">Abrir lixeira</button></div>
 <div id="tp" class="pop" hidden><div class="row"><b>Modelos</b></div><div id="tpl"></div></div>
@@ -1004,7 +1029,7 @@ function link(a,b){const d=unesc(a).trim();
  if(/^(pasta|folder)\//i.test(d)||S.folders.includes(d)){const f=d.replace(/^(pasta|folder)\//i,'');return'<a class="wl fo" data-f="'+esc(f)+'">'+(b||esc(f))+'</a>'}
  const ex=S.notes.some(n=>n.title.toLowerCase()===d.toLowerCase());
  return'<a class="wl'+(ex?'':' miss')+'" data-n="'+esc(d)+'">'+(b||a)+'</a>'}
-function inl(s){const cs=[],ms=[];s=s.replace(/`([^`]+)`/g,(_,c)=>'\u0001'+(cs.push(c)-1)+'\u0001');s=s.replace(/\$([^\s$](?:[^$\n]*?[^\s$])?)\$(?!\d)/g,(_,t)=>'\u0002'+(ms.push(t)-1)+'\u0002');s=esc(s);s=s.replace(/!\[([^\]|]*)(?:\|(\d{1,4}))?\]\(assets\/([^)\s]+)(?:\s+&quot;orig:([^&\s]+)&quot;)?\)/g,(_,al,w,a,o)=>'<img data-a="'+a+'" alt="'+al+'"'+(w?' data-w="'+w+'" style="width:'+w+'px"':'')+(o?' data-o="'+o+'"':'')+'>');
+function inl(s){const cs=[],ms=[];s=s.replace(/`([^`]+)`/g,(_,c)=>'\u0001'+(cs.push(c)-1)+'\u0001');s=s.replace(/\$([^\s$](?:[^$\n]*?[^\s$])?)\$(?!\d)/g,(_,t)=>'\u0002'+(ms.push(t)-1)+'\u0002');s=esc(s);s=s.replace(/!\[([^\]|]*)(?:\|(\d{1,4}))?\]\(assets\/([^)\s]+)(?:\s+&quot;orig:([^&\s]+)&quot;)?\)/g,(_,al,w,a,o)=>'<img data-a="'+a+'" alt="'+al+'"'+(w?' data-w="'+w+'" style="width:'+w+'px"':'')+(o?' data-o="'+o+'"':'')+'>');s=s.replace(/!\[([^\]|]*)(?:\|(\d{1,4}))?\]\((https:\/\/[^)\s]+)\)/g,(_,al,w,u)=>'<img class="rimg" loading="lazy" referrerpolicy="no-referrer" src="'+u+'" alt="'+al+'"'+(w?' style="width:'+w+'px"':'')+'>');
  s=s.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g,(_,a,b)=>link(a,b));s=s.replace(/@\[([^\]|]+)(?:\|([^\]]+))?\]/g,(_,a,b)=>link(a,b));
  s=s.replace(/(^|\s)@([\p{L}\w\-\/]+)/gu,(m,p,f)=>S.folders.includes(f)?p+'<a class="wl fo" data-f="'+f+'">@'+f+'</a>':m);
  s=s.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(^|[^*\w])\*(?=\S)([^*]*?\S)\*(?![\w*])/g,'$1<i>$2</i>').replace(/==(.+?)==/g,'<mark>$1</mark>').replace(/~~(.+?)~~/g,'<s>$1</s>');
@@ -1714,7 +1739,7 @@ uiFlags();roApply();
 
 /*NEW4-START*/
 const pdfDims=n=>{const p=n.props||{},b=({letter:[612,792],a4:[595,842],notebook:[420,595]})[p.page]||[595,842];return p.orient==='l'?[b[1],b[0]]:b};
-const RES=['favorite','page','orient','pagebg','margin','font','fullw','cover','coverpos'];
+const RES=['favorite','page','orient','pagebg','margin','font','fullw','cover','coverpos','coverh','coverby','coverlink'];
 const PGS={letter:[816,1056],a4:[794,1123],notebook:[559,794]},PGK={fmt:'page',ori:'orient',bg:'pagebg',mar:'margin',font:'font'},PGD={fmt:'free',ori:'p',mar:'m',font:'sans'};
 function pgGet(n,k){const p=(n&&n.props)||{};if(k==='bg')return p.pagebg||(p.page==='notebook'?'ruled':'plain');return p[PGK[k]]||PGD[k]}
 function pgApply(){const n=cur(),b=document.body,f=pgGet(n,'fmt'),o=pgGet(n,'ori')==='l',sz=PGS[f],pv=$('#pv');
@@ -1726,11 +1751,12 @@ function pgApply(){const n=cur(),b=document.body,f=pgGet(n,'fmt'),o=pgGet(n,'ori
 const CVG={aurora:'linear-gradient(120deg,#ffd86b,#ff8fb1 55%,#7ab7ff)',mar:'linear-gradient(120deg,#6ee7d8,#5b8cff 55%,#a78bfa)',neon:'linear-gradient(120deg,#ff5fa2,#7c5cff 55%,#00d4ff)',proton:'linear-gradient(120deg,#1b1340,#6d4aff 60%,#a78bfa)',grafite:'linear-gradient(120deg,#4a4f58,#8b919b)',sunset:'linear-gradient(120deg,#ff9a56,#ff5e7e 60%,#8f4bff)',forest:'linear-gradient(120deg,#0f5132,#2fa36b 60%,#c6f0a0)',night:'linear-gradient(120deg,#0b1026,#243b8f 65%,#6f6ae0)',rose:'linear-gradient(120deg,#ffd1dc,#ff9bb8)',sand:'linear-gradient(120deg,#f6e7c8,#e1b972)'};
 const FCP=['#e5484d','#f76b15','#f5c518','#30a46c','#12a594','#3e63dd','#8e4ec6','#d6409f','#8b8d98'];
 $('#cvg').innerHTML=Object.keys(CVG).map(k=>'<button class="cvs" data-cv="g:'+k+'" style="background:'+CVG[k]+'" aria-label="'+k+'"></button>').join('')+FCP.map(c=>'<button class="cvs" data-cv="c:'+c+'" style="background:'+c+'" aria-label="'+c+'"></button>').join('');
-async function cvApply(){const n=cur(),el=$('#cv'),v=n&&n.props&&n.props.cover;if(!v){el.hidden=true;$('#cvb').hidden=false;return}
+async function cvApply(){const n=cur(),el=$('#cv'),v=n&&n.props&&n.props.cover;if(el){el.dataset.h=(n&&n.props&&n.props.coverh)||'m';const cr=$('#cvcr');if(cr){const by=v&&n.props.coverby;cr.hidden=!by;if(by){cr.textContent='Foto: '+by+' · Unsplash';cr.href=n.props.coverlink||'https://unsplash.com'}}document.querySelectorAll('[data-cvh]').forEach(b=>b.classList.toggle('on',b.dataset.cvh===el.dataset.h))}if(!v){el.hidden=true;$('#cvb').hidden=false;return}
  el.hidden=false;$('#cvb').hidden=true;const i=$('#cvi'),pos=(n.props.coverpos||'50')+'%';$('#cvpos').value=n.props.coverpos||50;
  if(v.startsWith('g:'))i.style.background=CVG[v.slice(2)]||CVG.aurora;else if(v.startsWith('c:'))i.style.background=/^#[0-9a-f]{3,8}$/i.test(v.slice(2))?v.slice(2):'#888';
+ else if(v.startsWith('u:')){i.style.background='var(--cd) url("'+v.slice(2).replace(/["\\]/g,'')+'") center '+pos+'/cover no-repeat'}
  else if(v.startsWith('img:')){i.style.background='var(--cd)';try{const u=await urlA(v.slice(4));if(u&&cur()===n)i.style.background='url("'+u+'") center '+pos+'/cover no-repeat'}catch(e){}}}
-function setCover(v){const n=cur();if(!n)return;n.props=n.props||{};if(v){n.props.cover=v}else{delete n.props.cover;delete n.props.coverpos}n.updated=now();save();cvApply();renderPr()}
+function setCover(v){const n=cur();if(!n)return;n.props=n.props||{};if(v){if(n.props.cover!==v){delete n.props.coverby;delete n.props.coverlink}n.props.cover=v}else{delete n.props.cover;delete n.props.coverpos;delete n.props.coverby;delete n.props.coverlink}n.updated=now();save();cvApply();renderPr()}
 $('#cvf').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f||!/^image\//.test(f.type))return;const name='cover-'+Date.now().toString(36)+'.'+((f.name.match(/\.(\w+)$/)||[])[1]||'png').toLowerCase();try{await putA(name,f);setCover('img:'+name)}catch(x){toast('Não foi possível salvar a imagem')}});
 $('#cvpos').addEventListener('input',e=>{const n=cur();if(!n)return;n.props.coverpos=e.target.value;save();cvApply()});
 /* tamanho do texto em números */
@@ -2916,6 +2942,7 @@ function inlineDecos(view){const st=view.state,doc=st.doc,b=new C.RangeSetBuilde
   /* padrões próprios do app */
   const seg=doc.sliceString(from,to);let m;const R=[
    [/!\[([^\]|]*)(?:\|(\d{1,4}))?\]\(assets\/([^)\s]+)(?:\s+"orig:[^"]+")?\)/g,(m,a,z)=>{if(selTouches(st,a,z))return;add(a,z,C.Decoration.replace({widget:new InlW(inl(m[0]),'img'+m[0],'cm-iw-img')}))}],
+   [/!\[([^\]|]*)(?:\|(\d{1,4}))?\]\(https:\/\/[^)\s]+\)/g,(m,a,z)=>{if(selTouches(st,a,z))return;add(a,z,C.Decoration.replace({widget:new InlW(inl(m[0]),'img'+m[0],'cm-iw-img')}))}],
    [/(?<!!)\[\[([^\]|]+)(?:\|([^\]]+))?\]\]|(?<!!)@\[([^\]|]+)(?:\|([^\]]+))?\]/g,(m,a,z)=>{add(a,z,C.Decoration.mark({class:'cm-wl'}));if(selTouches(st,a,z))return;const tg=(m[1]||m[3]).trim(),lb=m[2]||m[4]||tg,ex=S.notes.some(x=>x.title.toLowerCase()===tg.split('#')[0].trim().toLowerCase())||/^(pasta|folder)\//i.test(tg);
      add(a,z,C.Decoration.replace({widget:new InlW('<a class="wl'+(ex?'':' miss')+'" data-n="'+esc(tg.split('#')[0].replace(/^(pasta|folder)\//i,''))+'"'+(/^(pasta|folder)\//i.test(tg)?' data-f="'+esc(tg.replace(/^(pasta|folder)\//i,''))+'"':'')+(tg.includes('#^')?' data-blk="'+esc(tg.split('#^')[1])+'"':tg.includes('#')?' data-hd="'+esc(tg.split('#')[1])+'"':'')+'>'+esc(lb)+'</a>','wl'+m[0]+ex)}))}],
    [/==([^=\n]+)==/g,(m,a,z)=>{add(a,z,C.Decoration.mark({class:'cm-hlm'}));if(!selIn(st,a,z)){hide(a,a+2);hide(z-2,z)}}],
@@ -4860,6 +4887,59 @@ if(!UI.st)UI.st='vidro';
  document.addEventListener('selectionchange',soon);document.addEventListener('keyup',soon);document.addEventListener('pointerup',soon);
  ft.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;b.classList.remove('fpulse');void b.offsetWidth;b.classList.add('fpulse');setTimeout(upd,120);setTimeout(upd,400)});
  window.ftState=upd;upd()})();
+
+/* Integração Unsplash (capa e corpo do texto) + reposicionar capa */
+(function(){const KEYK='ln:unsk',APP='marginalia',UTM='?utm_source='+APP+'&utm_medium=referral';
+ const key=()=>{try{return localStorage.getItem(KEYK)||''}catch(e){return''}};
+ const setKey=v=>{try{v?localStorage.setItem(KEYK,v.trim()):localStorage.removeItem(KEYK)}catch(e){}};
+ async function askKey(){const v=await askText('Chave de acesso do Unsplash (Access Key)',key());if(v===null)return false;setKey(v);return !!v.trim()}
+ window.unsKey=askKey;
+ function picker(mode){
+  const m=modal('unsm','<div class="teh"><b>'+(mode==='cover'?'Capa do Unsplash':'Imagem do Unsplash')+'</b><button data-ux aria-label="Fechar">×</button></div><div class="unq"><input type="search" placeholder="Buscar fotos (ex.: montanha, café, cidade)" aria-label="Buscar fotos"><button class="pri" data-us>Buscar</button></div><div class="ung"></div><div class="unm"></div>');
+  const q=m.querySelector('input'),g=m.querySelector('.ung'),meta=m.querySelector('.unm');let page=1,term='',busy=0,list=[];
+  const close=()=>{m.hidden=true};
+  const info=()=>{meta.innerHTML='Fotos do <a href="https://unsplash.com/'+UTM+'" target="_blank" rel="noopener">Unsplash</a>. <a href="#" data-uk>Trocar chave</a>'};
+  function needKey(){g.innerHTML='';meta.innerHTML='<p>Para buscar fotos é preciso uma chave gratuita do Unsplash:</p><ol><li>Entre em <a href="https://unsplash.com/oauth/applications" target="_blank" rel="noopener">unsplash.com/oauth/applications</a> e crie uma conta.</li><li>Toque em <b>New Application</b>, aceite os termos e dê um nome (ex.: Marginália).</li><li>Copie a <b>Access Key</b> e cole aqui.</li></ol><button class="pri" data-uk>Colar chave</button>'}
+  async function load(more){const k=key();if(!k){needKey();return}if(busy)return;busy=1;
+   if(!more){page=1;list=[];g.innerHTML='<p class="unm">Carregando…</p>'}
+   const u=term?'https://api.unsplash.com/search/photos?per_page=24&page='+page+'&query='+encodeURIComponent(term)+(mode==='cover'?'&orientation=landscape':''):'https://api.unsplash.com/photos?per_page=24&order_by=popular&page='+page;
+   try{const r=await fetch(u,{headers:{Authorization:'Client-ID '+k,'Accept-Version':'v1'}});
+    if(r.status===401){busy=0;setKey('');g.innerHTML='';meta.innerHTML='<p>A chave não foi aceita pelo Unsplash.</p><button class="pri" data-uk>Colar outra chave</button>';return}
+    if(r.status===403){busy=0;g.innerHTML='<p class="unm">Limite de buscas por hora atingido. Tente de novo mais tarde.</p>';return}
+    const d=await r.json(),arr=Array.isArray(d)?d:(d.results||[]);if(!more)g.innerHTML='';
+    if(!arr.length&&!more)g.innerHTML='<p class="unm">Nada encontrado.</p>';
+    arr.forEach(p=>{list.push(p);const b=document.createElement('button');b.className='uni';b.dataset.i=list.length-1;b.style.backgroundImage='url("'+p.urls.small+'")';b.title=(p.alt_description||'')+' — '+p.user.name;b.innerHTML='<span>'+esc(p.user.name)+'</span>';g.appendChild(b)});
+    page++;info()}catch(e){g.innerHTML='<p class="unm">Sem conexão com o Unsplash.</p>'}busy=0}
+  async function pick(p){close();try{fetch(p.links.download_location,{headers:{Authorization:'Client-ID '+key()}})}catch(e){}
+   const by=p.user.name,link=p.user.links.html+UTM,src=p.urls.raw+'&w='+(mode==='cover'?2000:1400)+'&q=80&fit=max';
+   if(mode==='cover'){setCover('u:'+src);const n=cur();if(n){n.props.coverby=by;n.props.coverlink=link;n.props.coverpos=n.props.coverpos||50;save();cvApply()}toast('Capa: foto de '+by)}
+   else{const ed=$('#ed'),at=ed.selectionStart,alt=(p.alt_description||'Foto').replace(/[\[\]()\n]/g,'');
+    ed.setRangeText('\n!['+alt+']('+src+')\n*Foto de ['+by.replace(/[\[\]]/g,'')+']('+link+') no [Unsplash](https://unsplash.com/'+UTM+')*\n',at,at,'end');ed.dispatchEvent(new Event('input'));toast('Imagem inserida')}}
+  m.onclick=async e=>{const t=e.target;if(t===m||t.closest('[data-ux]'))return close();
+   if(t.closest('[data-uk]')){e.preventDefault();if(await askKey()){m.hidden=false;load()}else m.hidden=false;return}
+   if(t.closest('[data-us]')){term=q.value.trim();load();return}
+   const b=t.closest('.uni');if(b)pick(list[+b.dataset.i])};
+  q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();term=q.value.trim();load()}else if(e.key==='Escape')close()};
+  g.onscroll=()=>{if(g.scrollTop+g.clientHeight>g.scrollHeight-80&&list.length)load(true)};
+  if(!key())needKey();else{load();setTimeout(()=>q.focus(),60)}
+ }
+ window.unsplashPick=picker;
+ document.addEventListener('click',e=>{const t=e.target;
+  if(t.closest('#cvun')){const p=t.closest('.pop');if(p)p.hidden=true;picker('cover')}
+  else if(t.closest('#aun')){const p=t.closest('.pop');if(p)p.hidden=true;picker('body')}
+  else if(t.closest('[data-cvh]')){const n=cur();if(!n||!n.props||!n.props.cover)return;n.props.coverh=t.closest('[data-cvh]').dataset.cvh;n.updated=now();save();cvApply()}});
+ /* reposicionar arrastando */
+ const cv=$('#cv');let drag=null;
+ const stop=()=>{cv.classList.remove('mv');$('#cvhint').hidden=true;save()};
+ $('#cvmv').onclick=e=>{e.stopPropagation();cv.classList.add('mv');$('#cvhint').hidden=false};
+ $('#cvok').onclick=e=>{e.stopPropagation();stop()};
+ cv.addEventListener('pointerdown',e=>{if(!cv.classList.contains('mv')||e.target.closest('#cvhint'))return;const n=cur();drag={y:e.clientY,p:+(n.props.coverpos||50)};cv.setPointerCapture(e.pointerId)});
+ cv.addEventListener('pointermove',e=>{if(!drag)return;const n=cur();if(!n)return;const h=cv.clientHeight||200;n.props.coverpos=String(Math.max(0,Math.min(100,Math.round(drag.p-(e.clientY-drag.y)/h*60))));const i=$('#cvi');i.style.backgroundPosition='center '+n.props.coverpos+'%';$('#cvpos').value=n.props.coverpos});
+ cv.addEventListener('pointerup',()=>{if(drag){drag=null;const n=cur();if(n){n.updated=now();save()}}});
+ /* Ajustes → Avançado: chave */
+ const _sp=stPage;stPage=function(p){const h=_sp(p);if(p!=='avan')return h;return h.replace('</h2>','</h2>'+stRow('Unsplash','Chave de acesso para buscar fotos (capa e imagens). '+(key()?'Configurada.':'Não configurada.'),'<button data-unsk>'+(key()?'Trocar chave':'Adicionar chave')+'</button>'))};
+ document.addEventListener('click',async e=>{if(e.target.closest('[data-unsk]')){await askKey();if($('#stm')&&!$('#stm').hidden)stOpen('avan')}});
+})();
 
 boot();
 </script>
