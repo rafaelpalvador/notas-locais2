@@ -176,6 +176,7 @@ jobs:
                   if (asked) return
                   asked = true
                   val want = mutableListOf<String>()
+                  want.add("android.permission.RECORD_AUDIO")
                   if (Build.VERSION.SDK_INT >= 33) want.add("android.permission.NEARBY_WIFI_DEVICES")
                   if (Build.VERSION.SDK_INT >= 36) want.add("android.permission.ACCESS_LOCAL_NETWORK")
                   val miss = want.filter { a.checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED }

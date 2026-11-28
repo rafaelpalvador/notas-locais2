@@ -997,6 +997,25 @@ img.rimg{max-width:100%;height:auto;border-radius:12px;display:block;margin:6px 
  #frp{left:10px!important;right:10px!important;width:auto!important;top:calc(66px + env(safe-area-inset-top,0px))!important}
  #mm.mmo{position:fixed!important;left:10px!important;right:10px!important;top:calc(64px + env(safe-area-inset-top,0px))!important;max-height:75vh;overflow:auto;z-index:45}
 }
+
+/* Celular v2: cabeçalho compacto e alinhado + gravação visível */
+@media(max-width:760px){
+ body.mlay #bar{display:block!important;padding:calc(62px + env(safe-area-inset-top,0px)) 16px 4px!important;min-height:0!important;height:auto!important;border:0!important;background:transparent!important}
+ body.mlay #bar .tt{display:flex!important;flex-wrap:wrap;align-items:center;gap:2px 8px;margin:0!important;padding:0!important;width:100%;grid-template-columns:none!important}
+ body.mlay #icb.none{display:none!important}
+ body.mlay #icb{width:auto!important;height:auto!important;font-size:26px;line-height:1;margin:0!important;padding:0!important;position:static!important}
+ body.mlay #ti{flex:1;min-width:0;font-size:26px!important;font-weight:800;letter-spacing:-.5px;line-height:1.2;padding:0!important;margin:0!important;height:auto!important}
+ body.mlay #bar .sub{width:100%;max-width:calc(100vw - 32px);box-sizing:border-box;display:flex!important;flex-wrap:wrap!important;align-items:center;gap:6px 12px;margin:6px 0 0!important;padding:0!important;font-size:13.5px;color:var(--mu);overflow:visible}
+ body.mlay #bar .sub>*{margin:0!important;flex:none}body.mlay #bar .sub>button,body.mlay #bar .sub>span>button{padding:4px 2px!important;min-width:0!important}
+ body.mlay #fs{max-width:62vw;height:30px;padding:0 26px 0 10px;font-size:13.5px;border-radius:999px}
+ body.mlay #wcs,body.mlay #st{display:none!important}
+ body.mlay #pr{border:0!important;padding:0 16px!important;margin:0!important}
+ body.mlay #pr summary{font-size:13px;padding:4px 0!important}
+ #mbb [data-mb=rec].recing{background:#e5484d!important;color:#fff!important;animation:recp 1.2s ease-in-out infinite}
+ @keyframes recp{50%{box-shadow:0 0 0 8px rgba(229,72,77,.18)}}
+ #mrec{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--kb,0px) + 82px + env(safe-area-inset-bottom,0px));z-index:43;background:#e5484d;color:#fff;border-radius:999px;padding:7px 14px;font-size:14px;font-weight:600;display:flex;gap:8px;align-items:center;box-shadow:0 6px 18px rgba(229,72,77,.35);white-space:nowrap}
+ #mrec[hidden]{display:none}#mrec i{width:8px;height:8px;border-radius:50%;background:#fff;animation:recb 1s infinite}@keyframes recb{50%{opacity:.2}}
+}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -1015,7 +1034,7 @@ img.rimg{max-width:100%;height:auto;border-radius:12px;display:block;margin:6px 
 </aside>
 <button id="lvm" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><nav id="tbr" aria-label="Navegação"><button data-t="n" class="on">Notas</button><button data-t="f">Pastas</button><button data-t="a">Ajustes</button></nav><button id="fab" aria-label="Nova nota">+</button>
 <div id="mtb" aria-label="Barra superior"><button class="mr" data-mt="menu" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><span class="msp"></span><span class="mpill"><button data-mt="undo" aria-label="Desfazer"><svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg></button><button data-mt="redo" aria-label="Refazer"><svg viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 000 12h3"/></svg></button></span><button class="mr" data-mt="find" aria-label="Buscar na nota"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button><button class="mr" data-mt="more" data-pop="mm" aria-label="Mais opções"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg></button><button class="mr mok" data-mt="ok" aria-label="Concluir"><svg class="i-ok" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg><svg class="i-rd" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><svg class="i-ed" viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg></button></div>
-<div id="mbb" aria-label="Ferramentas"><button class="madd" data-mb="add" aria-label="Adicionar bloco"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><span class="mpill"><button data-mb="fmt" aria-label="Formatação"><b>Aa</b></button><button data-mb="check" aria-label="Lista de tarefas"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></button><button data-mb="img" aria-label="Imagem"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg></button><button data-mb="draw" aria-label="Desenho"><svg viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg></button><button data-mb="rec" aria-label="Gravar áudio"><svg viewBox="0 0 24 24"><path d="M5 10v4M9 7v10M13 4v16M17 8v8M21 11v2"/></svg></button></span></div>
+<div id="mrec" hidden><i></i><span>Gravando 0:00</span> · toque para parar</div><div id="mbb" aria-label="Ferramentas"><button class="madd" data-mb="add" aria-label="Adicionar bloco"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><span class="mpill"><button data-mb="fmt" aria-label="Formatação"><b>Aa</b></button><button data-mb="check" aria-label="Lista de tarefas"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></button><button data-mb="img" aria-label="Imagem"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg></button><button data-mb="draw" aria-label="Desenho"><svg viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg></button><button data-mb="rec" aria-label="Gravar áudio"><svg viewBox="0 0 24 24"><path d="M5 10v4M9 7v10M13 4v16M17 8v8M21 11v2"/></svg></button></span></div>
 <main id="mn">
  <div id="cv" hidden><div class="cvi" id="cvi"></div><a id="cvcr" target="_blank" rel="noopener" hidden></a><div class="cvb"><button data-pop="cvp">Mudar capa</button><button id="cvmv">Reposicionar</button><button id="cvr">Remover</button></div><div id="cvhint" hidden>Arraste a imagem para cima ou para baixo · <button id="cvok">Pronto</button></div></div>
  <div id="bar">
@@ -5128,7 +5147,7 @@ if(!UI.st)UI.st='vidro';
   else if(a==='check'){const v0=V();if(v0){const l0=v0.state.doc.lineAt(v0.state.selection.main.head);if(/^(#{1,6}\s|>|\||```)/.test(l0.text))v0.dispatch({changes:{from:l0.to,insert:'\n'},selection:{anchor:l0.to+1}})}cmCmd('blk:check');const v=V();if(v){const ln=v.state.doc.lineAt(v.state.selection.main.head);v.dispatch({selection:{anchor:ln.to}});v.focus()}}
   else if(a==='img')$('#at').click();
   else if(a==='draw')$('#ad').click();
-  else if(a==='rec'){$('#rc').click();b.classList.toggle('on')}});
+  else if(a==='rec'){rec();let t0=Date.now();clearInterval(window.__mrI);setTimeout(()=>{window.__mrI=setInterval(()=>{const on=!!REC;b.classList.toggle('recing',on);$('#mrec').hidden=!on;if(on){const s=Math.floor((Date.now()-(REC.t0||t0))/1000);$('#mrec span').textContent='Gravando '+Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}else{clearInterval(window.__mrI);const tx=$('#rc').textContent;if(tx&&tx!=='Gravar')toast(tx)}},300)},150)}});
  document.addEventListener('click',e=>{if(!e.target.closest('#mm')&&!e.target.closest('[data-mt=more]')){const m=$('#mm');if(m)m.classList.remove('mmo')}},true);
  setTimeout(hist,800)})();
 
