@@ -146,6 +146,10 @@ jobs:
         run: npx tauri android init --ci
       - name: Ícones do app
         run: npx tauri icon src-tauri/icons/icon.png
+      - name: Ícone adaptativo do Android (fundo preto)
+        run: |
+          python3 -m pip install --quiet pillow || pip3 install --quiet pillow
+          python3 scripts/android_icons.py
       - name: Permissões (microfone, câmera e lembretes)
         run: |
           M=src-tauri/gen/android/app/src/main/AndroidManifest.xml
