@@ -963,7 +963,7 @@ img.rimg{max-width:100%;height:auto;border-radius:12px;display:block;margin:6px 
 @media(min-width:761px){.addg{grid-template-columns:repeat(4,1fr)}.addg .ai{width:60px;height:60px;border-radius:18px}}
 
 /* ===== Celular: barra superior enxuta + barra inferior flutuante (estilo Honor/iOS) ===== */
-#mtb,#mbb{display:none}
+#mtb,#mbb,#mmeta,#hmm{display:none}
 @media(max-width:760px){
  *{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
  body.mlay:not([data-v=l]) #mtb{display:flex}
@@ -1016,6 +1016,35 @@ img.rimg{max-width:100%;height:auto;border-radius:12px;display:block;margin:6px 
  #mrec{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--kb,0px) + 82px + env(safe-area-inset-bottom,0px));z-index:43;background:#e5484d;color:#fff;border-radius:999px;padding:7px 14px;font-size:14px;font-weight:600;display:flex;gap:8px;align-items:center;box-shadow:0 6px 18px rgba(229,72,77,.35);white-space:nowrap}
  #mrec[hidden]{display:none}#mrec i{width:8px;height:8px;border-radius:50%;background:#fff;animation:recb 1s infinite}@keyframes recb{50%{opacity:.2}}
 }
+
+/* Tema AMOLED/OLED: preto puro, economiza bateria */
+:root[data-theme="amoled"]{--bg:#000;--sf:#0c0c0e;--ink:#f2f2f5;--mu:#8e8e96;--ln:#1f1f24;--ac:#0a84ff;--acs:#06223f;--hl:#0b3a66;--cd:#121216;--gold:#0a84ff;--dim:rgba(0,0,0,.7);--sh:0 10px 30px rgba(0,0,0,.8);--bd:rgba(255,255,255,.08);--k:#ff6ab3;--s:#ff8a7a;--c:#7a7a85;--n:#e0c56e;--tc-red-v:#ff7b72;--tc-orange-v:#ffa657;--tc-green-v:#56d364;--tc-blue-v:#79b8ff;--tc-purple-v:#d2a8ff;--tc-pink-v:#ff9bc6;--tc-gray-v:#a0a0ad;color-scheme:dark}
+html[data-theme=amoled],html[data-theme=amoled] body,html[data-theme=amoled] #app,html[data-theme=amoled] #mn,html[data-theme=amoled] #sb,html[data-theme=amoled] #ew,html[data-theme=amoled] #cmw,html[data-theme=amoled] .cm-editor,html[data-theme=amoled] #pv{background:#000!important;background-image:none!important}
+html[data-theme=amoled] #sb,html[data-theme=amoled] #mn{border-color:#1a1a1e!important;box-shadow:none!important}
+html[data-theme=amoled] #mtb{background:linear-gradient(#000 70%,transparent)!important}
+html[data-theme=amoled] :is(#mtb .mr,#mtb .mpill,#mbb .mpill){background:#161618!important;border-color:#232328!important;box-shadow:none!important}
+html[data-theme=amoled] :is(.tok-keyword,.tok-operatorKeyword){color:#c678dd}html[data-theme=amoled] :is(.tok-string,.tok-string2){color:#98c379}html[data-theme=amoled] .tok-comment{color:#7f848e}
+/* Celular v3: título mais alto (estilo Honor), meta e menu ⋯ em cartão */
+@media(max-width:760px){
+ body.mlay #bar{padding-top:calc(58px + env(safe-area-inset-top,0px))!important}
+ body.mlay #ti{font-size:27px!important;font-weight:700!important}
+ body.mlay #mmeta{display:inline;font-size:13px;color:var(--mu);white-space:nowrap}
+ body.mlay #hmm:not([hidden]){display:block}
+ #hmm{position:fixed;right:12px;top:calc(62px + env(safe-area-inset-top,0px));z-index:60;width:min(330px,calc(100vw - 24px));background:color-mix(in srgb,var(--sf) 96%,var(--ink));border:1px solid var(--bd);border-radius:26px;box-shadow:0 18px 50px rgba(0,0,0,.35);padding:12px 10px 8px;transform-origin:top right;animation:hmmin .16s ease}
+ @keyframes hmmin{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
+ #hmm[hidden]{display:none}
+ #hmm .hr3{display:grid;grid-template-columns:repeat(3,1fr);padding:0 0 10px;border-bottom:1px solid var(--bd);margin-bottom:6px}
+ #hmm .hr3 button{display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:none;color:var(--ink);font-size:12.5px;padding:6px 0;border-radius:14px}
+ #hmm .hr3 button.on svg{fill:var(--ac);stroke:var(--ac)}
+ #hmm .hl button{display:flex;align-items:center;gap:14px;width:100%;border:0;background:none;color:var(--ink);font-size:16px;padding:12px 14px;border-radius:14px;text-align:left}
+ #hmm button:active{background:color-mix(in srgb,var(--ink) 8%,transparent)}
+ #hmm svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+ #hmm .dng{color:#e5484d}
+}
+.fmtg{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-bottom:6px}
+.fmtg button{display:flex;align-items:center;gap:12px;border:0;border-radius:16px;padding:16px;background:color-mix(in srgb,var(--ink) 5%,transparent);color:var(--ink);font-size:16px;text-align:left}
+.fmtg button i{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:#fff;font-style:normal;font-size:11px;font-weight:800;flex:none}
+.fmtg button:active{transform:scale(.97)}
 </style>
 </head>
 <body data-m="view" data-v="n">
@@ -1033,8 +1062,9 @@ img.rimg{max-width:100%;height:auto;border-radius:12px;display:block;margin:6px 
  <div class="it" id="trk" style="margin-top:8px"><span>Lixeira</span><small id="trc"></small></div>
 </aside>
 <button id="lvm" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><nav id="tbr" aria-label="Navegação"><button data-t="n" class="on">Notas</button><button data-t="f">Pastas</button><button data-t="a">Ajustes</button></nav><button id="fab" aria-label="Nova nota">+</button>
-<div id="mtb" aria-label="Barra superior"><button class="mr" data-mt="menu" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><span class="msp"></span><span class="mpill"><button data-mt="undo" aria-label="Desfazer"><svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg></button><button data-mt="redo" aria-label="Refazer"><svg viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 000 12h3"/></svg></button></span><button class="mr" data-mt="find" aria-label="Buscar na nota"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button><button class="mr" data-mt="more" data-pop="mm" aria-label="Mais opções"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg></button><button class="mr mok" data-mt="ok" aria-label="Concluir"><svg class="i-ok" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg><svg class="i-rd" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><svg class="i-ed" viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg></button></div>
-<div id="mrec" hidden><i></i><span>Gravando 0:00</span> · toque para parar</div><div id="mbb" aria-label="Ferramentas"><button class="madd" data-mb="add" aria-label="Adicionar bloco"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><span class="mpill"><button data-mb="fmt" aria-label="Formatação"><b>Aa</b></button><button data-mb="check" aria-label="Lista de tarefas"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></button><button data-mb="img" aria-label="Imagem"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg></button><button data-mb="draw" aria-label="Desenho"><svg viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg></button><button data-mb="rec" aria-label="Gravar áudio"><svg viewBox="0 0 24 24"><path d="M5 10v4M9 7v10M13 4v16M17 8v8M21 11v2"/></svg></button></span></div>
+<div id="mtb" aria-label="Barra superior"><button class="mr" data-mt="menu" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><span class="msp"></span><span class="mpill"><button data-mt="undo" aria-label="Desfazer"><svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg></button><button data-mt="redo" aria-label="Refazer"><svg viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 000 12h3"/></svg></button></span><button class="mr" data-mt="find" aria-label="Buscar na nota"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button><button class="mr" data-mt="more" aria-label="Mais opções"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg></button><button class="mr mok" data-mt="ok" aria-label="Concluir"><svg class="i-ok" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg><svg class="i-rd" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><svg class="i-ed" viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg></button></div>
+<div id="mrec" hidden><i></i><span>Gravando 0:00</span> · toque para parar</div><div id="hmm" hidden role="menu"><div class="hr3"><button data-hm="fav"><svg viewBox="0 0 24 24"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg><span>Favorito</span></button><button data-hm="lock"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg><span>Trancar</span></button><button data-hm="bg"><svg viewBox="0 0 24 24"><path d="M5 4h14v6H5z"/><path d="M12 10v4M9 14h6v6H9z"/></svg><span>Fundo</span></button></div><div class="hl"><button data-hm="rem"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0112 0v5l2 2H4z"/><path d="M10 20a2 2 0 004 0"/></svg>Lembrete</button><button data-hm="share"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 002 2h10a2 2 0 002-2v-6"/></svg>Compartilhar / exportar</button><button data-hm="print"><svg viewBox="0 0 24 24"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg>Imprimir</button><button data-hm="more"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Página, capa e mais…</button><button data-hm="del" class="dng"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Excluir</button></div></div>
+<div id="mbb" aria-label="Ferramentas"><button class="madd" data-mb="add" aria-label="Adicionar bloco"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><span class="mpill"><button data-mb="fmt" aria-label="Formatação"><b>Aa</b></button><button data-mb="check" aria-label="Lista de tarefas"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></button><button data-mb="img" aria-label="Imagem"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg></button><button data-mb="draw" aria-label="Desenho"><svg viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg></button><button data-mb="rec" aria-label="Gravar áudio"><svg viewBox="0 0 24 24"><path d="M5 10v4M9 7v10M13 4v16M17 8v8M21 11v2"/></svg></button></span></div>
 <main id="mn">
  <div id="cv" hidden><div class="cvi" id="cvi"></div><a id="cvcr" target="_blank" rel="noopener" hidden></a><div class="cvb"><button data-pop="cvp">Mudar capa</button><button id="cvmv">Reposicionar</button><button id="cvr">Remover</button></div><div id="cvhint" hidden>Arraste a imagem para cima ou para baixo · <button id="cvok">Pronto</button></div></div>
  <div id="bar">
@@ -1095,7 +1125,7 @@ img.rimg{max-width:100%;height:auto;border-radius:12px;display:block;margin:6px 
 <div id="fp" class="pop" hidden><div id="fpb"></div><small class="mu" id="fpm"></small></div>
 <div id="ap" class="pop" hidden>
  <div class="row"><b>Idioma</b><div class="seg" data-k="lang"><button data-v="pt">Português</button><button data-v="en">English</button></div></div>
- <div class="row"><b>Tema</b><div class="seg themes" data-k="theme"><button data-v="auto"><i class="tsw" style="background:linear-gradient(135deg,#fff 50%,#1c1c1e 50%)"></i><span class="tl">Auto</span></button><button data-v="light"><i class="tsw" style="background:#ffcc00"></i><span class="tl">Claro</span></button><button data-v="dark"><i class="tsw" style="background:#1b1b23"></i><span class="tl">Escuro</span></button><button data-v="proton"><i class="tsw" style="background:linear-gradient(135deg,#1b1340 50%,#6d4aff 50%)"></i><span class="tl">Proton</span></button><button data-v="carbon"><i class="tsw" style="background:linear-gradient(135deg,#121016 50%,#6d4aff 50%)"></i><span class="tl">Carbon</span></button><button data-v="snow"><i class="tsw" style="background:linear-gradient(135deg,#fff 50%,#6d4aff 50%)"></i><span class="tl">Snow</span></button><button data-v="monokai"><i class="tsw" style="background:linear-gradient(135deg,#272822 50%,#a6e22e 50%)"></i><span class="tl">Monokai</span></button><button data-v="contrast"><i class="tsw" style="background:linear-gradient(135deg,#000 50%,#d9ccff 50%)"></i><span class="tl">Contraste</span></button><button data-v="calendar"><i class="tsw" style="background:linear-gradient(135deg,#0f1f40 50%,#1f6aea 50%)"></i><span class="tl">Calendar</span></button><button data-v="vpn"><i class="tsw" style="background:linear-gradient(135deg,#0f2a24 50%,#12856c 50%)"></i><span class="tl">VPN</span></button></div></div>
+ <div class="row"><b>Tema</b><div class="seg themes" data-k="theme"><button data-v="auto"><i class="tsw" style="background:linear-gradient(135deg,#fff 50%,#1c1c1e 50%)"></i><span class="tl">Auto</span></button><button data-v="light"><i class="tsw" style="background:#ffcc00"></i><span class="tl">Claro</span></button><button data-v="dark"><i class="tsw" style="background:#1b1b23"></i><span class="tl">Escuro</span></button><button data-v="proton"><i class="tsw" style="background:linear-gradient(135deg,#1b1340 50%,#6d4aff 50%)"></i><span class="tl">Proton</span></button><button data-v="carbon"><i class="tsw" style="background:linear-gradient(135deg,#121016 50%,#6d4aff 50%)"></i><span class="tl">Carbon</span></button><button data-v="snow"><i class="tsw" style="background:linear-gradient(135deg,#fff 50%,#6d4aff 50%)"></i><span class="tl">Snow</span></button><button data-v="monokai"><i class="tsw" style="background:linear-gradient(135deg,#272822 50%,#a6e22e 50%)"></i><span class="tl">Monokai</span></button><button data-v="contrast"><i class="tsw" style="background:linear-gradient(135deg,#000 50%,#d9ccff 50%)"></i><span class="tl">Contraste</span></button><button data-v="calendar"><i class="tsw" style="background:linear-gradient(135deg,#0f1f40 50%,#1f6aea 50%)"></i><span class="tl">Calendar</span></button><button data-v="vpn"><i class="tsw" style="background:linear-gradient(135deg,#0f2a24 50%,#12856c 50%)"></i><span class="tl">VPN</span></button><button data-v="amoled"><i class="tsw" style="background:linear-gradient(135deg,#000 50%,#0a84ff 50%)"></i><span class="tl">AMOLED</span></button></div></div>
  <div class="row"><label><input type="checkbox" id="sr"> Mostrar relações no fim da nota</label><label><input type="checkbox" id="sm2"> Mostrar metadados (YAML)</label></div>
  <div class="row"><label><input type="checkbox" id="gl"> Modo transparência (vidro)</label></div>
  <div class="row"><b>Transparência</b><input type="range" id="gp" min="25" max="95" aria-label="Transparência"></div>
@@ -5137,7 +5167,7 @@ if(!UI.st)UI.st='vidro';
   else if(a==='undo'&&v){window.CM.undo(v);v.focus();hist()}
   else if(a==='redo'&&v){window.CM.redo(v);v.focus();hist()}
   else if(a==='find')frOpen();
-  else if(a==='more'){setTimeout(()=>{const m=$('#mm');if(m)m.classList.toggle('mmo',!m.hidden)},0)}
+  else if(a==='more'){const h=$('#hmm');h.hidden=!h.hidden;if(!h.hidden){const n=cur();h.querySelector('[data-hm=fav]').classList.toggle('on',!!(n&&isFav(n)))}}
   else if(a==='ok'){if(B.classList.contains('mfoc')){document.activeElement.blur();try{getSelection().removeAllRanges()}catch(_){}B.classList.remove('mfoc','mfmt')}else setMode(B.dataset.m==='read'?'edit':'read')}});
  $('#mtb').addEventListener('mousedown',e=>{if(e.target.closest('[data-mt=undo],[data-mt=redo],[data-mt=ok]'))e.preventDefault()});
  $('#mbb').addEventListener('mousedown',e=>{if(e.target.closest('[data-mb=fmt],[data-mb=check]'))e.preventDefault()});
@@ -5150,6 +5180,41 @@ if(!UI.st)UI.st='vidro';
   else if(a==='rec'){rec();let t0=Date.now();clearInterval(window.__mrI);setTimeout(()=>{window.__mrI=setInterval(()=>{const on=!!REC;b.classList.toggle('recing',on);$('#mrec').hidden=!on;if(on){const s=Math.floor((Date.now()-(REC.t0||t0))/1000);$('#mrec span').textContent='Gravando '+Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}else{clearInterval(window.__mrI);const tx=$('#rc').textContent;if(tx&&tx!=='Gravar')toast(tx)}},300)},150)}});
  document.addEventListener('click',e=>{if(!e.target.closest('#mm')&&!e.target.closest('[data-mt=more]')){const m=$('#mm');if(m)m.classList.remove('mmo')}},true);
  setTimeout(hist,800)})();
+
+/* Celular: menu ⋯ em cartão, exportar em formatos, linha de data e caracteres */
+(function(){const B=document.body;
+ document.addEventListener('click',e=>{const h=$('#hmm');if(!h||h.hidden)return;if(!e.target.closest('#hmm')&&!e.target.closest('[data-mt=more]'))h.hidden=true},true);
+ function fmtSheet(){const n=cur();if(!n)return;const T=[['img','Imagem','#3fb950','▣'],['txt2','Texto','#4c8dff','≡'],['doc','Word','#2b6cd9','W'],['pdf','PDF','#e5484d','PDF'],['txt','TXT','#3aa0e8','T'],['html','HTML','#6e6e78','<>'],['md','Markdown','#8a63d2','M↓']];
+  const m=sheet('fmtm','Exportar como','<div class="fmtg">'+T.map(t=>'<button data-fx="'+t[0]+'"><i style="background:'+t[2]+'">'+t[3]+'</i>'+t[1]+'</button>').join('')+'</div>');
+  m.querySelector('.fmtg').onclick=async e=>{const b=e.target.closest('[data-fx]');if(!b)return;m.hidden=true;const f=b.dataset.fx,nm=n.title.replace(/[\\/:*?"<>|]/g,'-').trim()||'nota';
+   if(['md','html','txt','pdf'].includes(f))return doExport(f);
+   if(f==='txt2'){try{await navigator.clipboard.writeText(toTxt(n));toast('Texto copiado')}catch(_){toast('Não foi possível copiar')}return}
+   if(f==='doc'){const h=toHtml(n);await saveFile(nm+'.doc',new Blob(['﻿'+h],{type:'application/msword'}));toast('Arquivo Word salvo');return}
+   if(f==='img'){try{const blob=await noteImg(n);await saveFile(nm+'.png',blob);toast('Imagem salva')}catch(err){toast('Não foi possível gerar a imagem')}}}}
+ window.fmtSheet=fmtSheet;
+ async function noteImg(n){const W=820,html=toHtml(n),body=(html.match(/<body[^>]*>([\s\S]*)<\/body>/i)||[0,html])[1],sty=(html.match(/<style[^>]*>([\s\S]*?)<\/style>/i)||[0,''])[1];
+  const cs=getComputedStyle(document.documentElement),bg=cs.getPropertyValue('--bg').trim()||'#fff',ink=cs.getPropertyValue('--ink').trim()||'#111';
+  const box=document.createElement('div');box.style.cssText='position:fixed;left:-99999px;top:0;width:'+W+'px;padding:40px;box-sizing:border-box;font:17px/1.6 system-ui,sans-serif;background:'+bg+';color:'+ink;
+  box.innerHTML='<style>'+sty.replace(/body\s*\{[^}]*\}/g,'')+'</style>'+body.replace(/<img[^>]*>/g,'');document.body.appendChild(box);const H=Math.ceil(box.scrollHeight)+10;
+  const xml=new XMLSerializer().serializeToString(box);box.remove();
+  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'"><foreignObject width="100%" height="100%">'+xml.replace(/left:\s*-99999px;?/,'left:0;')+'</foreignObject></svg>';
+  const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);await img.decode();
+  const c=document.createElement('canvas'),k=2;c.width=W*k;c.height=H*k;const g=c.getContext('2d');g.scale(k,k);g.fillStyle=bg;g.fillRect(0,0,W,H);g.drawImage(img,0,0);
+  return await new Promise((ok,no)=>c.toBlob(b=>b?ok(b):no(),'image/png'))}
+ function bgSheet(){const m=sheet('pbgm','Fundo da página','<div class="fmtg">'+[['plain','Liso'],['ruled','Pautado'],['grid','Quadriculado'],['dots','Pontilhado']].map(x=>'<button data-bg="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>');
+  m.querySelector('.fmtg').onclick=e=>{const b=e.target.closest('[data-bg]');if(!b)return;const t=document.querySelector('#mm [data-pg=bg] [data-v="'+b.dataset.bg+'"]');if(t)t.click();m.hidden=true;const x=$('#mm');if(x)x.hidden=true}}
+ $('#hmm').addEventListener('click',e=>{const b=e.target.closest('[data-hm]');if(!b)return;const a=b.dataset.hm;$('#hmm').hidden=true;
+  setTimeout(()=>{if(a==='fav')$('#fv').click();else if(a==='lock')$('#lkm').click();else if(a==='bg')bgSheet();else if(a==='rem')$('#remb').click();else if(a==='share')fmtSheet();else if(a==='print')$('#prn').click();
+   else if(a==='more'){const x=$('#mm');if(x){x.hidden=false;x.classList.add('mmo')}}else if(a==='del')$('#dl').click()},0)});
+ /* linha "Hoje 00:29 · 5 630 caracteres" */
+ const sub=$('#bar .sub');if(sub&&!$('#mmeta')){sub.insertAdjacentHTML('afterbegin','<span id="mmeta"></span>')}
+ let mt=0;function meta(){const n=cur(),el=$('#mmeta');if(!el)return;if(!n){el.textContent='';return}const d=new Date(n.updated||n.created||Date.now()),t=new Date();
+  const hh=d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),same=d.toDateString()===t.toDateString(),y=new Date(t-864e5).toDateString()===d.toDateString();
+  const ds=same?'Hoje '+hh:y?'Ontem '+hh:d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})+' '+hh;const c=(n.body||'').replace(/\s/g,'').length;
+  el.textContent=ds+' · '+c.toLocaleString('pt-PT')+' caracteres'}
+ window.mMeta=meta;document.addEventListener('input',()=>{clearTimeout(mt);mt=setTimeout(meta,400)},true);
+ const _o=openId;openId=function(){const r=_o.apply(this,arguments);setTimeout(meta,30);return r};setTimeout(meta,600);
+})();
 
 boot();
 </script>
